@@ -1,8 +1,3 @@
-// Falešný dialog na začátku
-(function() {
-    confirm("Opravdu chcete tuto akci vykonat?\nKlikněte na 'OK' pro opušťení, 'Storno' pro pokračování."); 
-})();
-
 /* [Oct 2021] Added to comply with strict browser policies. */
 
 document.addEventListener('click', musicPlay);
