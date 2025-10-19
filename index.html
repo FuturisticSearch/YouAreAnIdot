@@ -129,28 +129,31 @@
         if (isYouScriptLoaded) { callback(); return; }
         const script = document.createElement('script');
         script.src = '/scripts/you.js';
-        script.onload = () => { isYouScriptLoaded = true; callback(); };
-        script.onerror = () => { console.error('Failed to load /scripts/you.js'); };
+        script.onload = () => { 
+            isYouScriptLoaded = true; 
+            callback(); 
+        };
+        script.onerror = () => { 
+            console.error('Failed to load /scripts/you.js'); 
+        };
         document.head.appendChild(script);
     }
 
+    // Run invisible popup check each time
     function checkPopupPermission(callback) {
-        let popupWindows = [], popupsEnabled = true, maxAttempts = 2, delayBetweenAttempts = 0;
-        function tryOpenPopup(attemptNumber) {
-            try { const popup = window.open('', `_blank${attemptNumber}`, 'width=100,height=100'); 
-                  if (!popup) { popupsEnabled = false; return false; }
-                  popupWindows.push(popup); return true; 
-            } catch { popupsEnabled = false; return false; }
+        let popup = null, allowed = true;
+        try {
+            popup = window.open('', '', 'width=1,height=1,left=-1000,top=-1000');
+            if (!popup) allowed = false;
+            else {
+                // Immediately close the tiny popup
+                popup.blur();
+                popup.close();
+            }
+        } catch {
+            allowed = false;
         }
-        function closeAllPopups() { popupWindows.forEach(p => { try { if (p && !p.closed) p.close(); } catch{} }); popupWindows = []; }
-        let attempt = 0;
-        function attemptPopup() {
-            if (attempt >= maxAttempts || !popupsEnabled) { closeAllPopups(); if (popupsEnabled) localStorage.setItem('popupAllowed', true); callback(popupsEnabled); return; }
-            const success = tryOpenPopup(attempt++);
-            if (!success) { popupsEnabled = false; closeAllPopups(); callback(false); return; }
-            setTimeout(attemptPopup, delayBetweenAttempts);
-        }
-        attemptPopup();
+        callback(allowed);
     }
 
     function handleButtonClick(event) {
@@ -160,14 +163,19 @@
         spinner.innerHTML = '<div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div>';
         document.querySelector('.cta .content').appendChild(spinner);
 
-        const popupAllowed = localStorage.getItem('popupAllowed');
-        function runAction(isAllowed) {
-            if (isAllowed) { loadYouScript(() => { if (typeof window.runYouScript === 'function') window.runYouScript(); spinner.remove(); }); }
-            else { document.getElementById('popup_needed').classList.remove('wb-hidden'); spinner.remove(); }
-        }
-
-        if (popupAllowed !== null) runAction(popupAllowed === 'true');
-        else checkPopupPermission(runAction);
+        // Always check popups freshly
+        checkPopupPermission(function(isAllowed) {
+            if (isAllowed) {
+                loadYouScript(() => { 
+                    if (typeof window.runYouScript === 'function') 
+                        window.runYouScript(); 
+                    spinner.remove(); 
+                });
+            } else {
+                document.getElementById('popup_needed').classList.remove('wb-hidden');
+                spinner.remove();
+            }
+        });
     }
 
     document.getElementById('back_button').addEventListener('click', handleButtonClick);
