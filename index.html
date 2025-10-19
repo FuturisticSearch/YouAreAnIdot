@@ -34,7 +34,6 @@
     .contacts { margin-top: 2rem; }
     .contacts a { margin: .5rem }
     .cta .button { margin: 1rem .5rem }
-    .cta .notification { margin-top: 2rem; background: #ffffff; }
     .footer { background: transparent; }
     .spinner {
         margin: 2rem auto;
@@ -61,6 +60,26 @@
         40% { transform: scale(1.0); -webkit-transform: scale(1.0); }
     }
     .wb-hidden { display: none !important; }
+
+    /* Nový styl hlášky popup */
+    .popup-warning {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 12px;
+        padding: 1.2rem 1.5rem;
+        margin-top: 2rem;
+        font-size: 1.1rem;
+        box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        backdrop-filter: blur(6px);
+        transition: all 0.3s ease;
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 </head>
 <body>
@@ -101,8 +120,8 @@
             <div class="column is-half is-offset-one-quarter has-text-centered content">
                 <a class="button is-success is-rounded" id="back_button" data-key="backBtn">Odejít do bezpečí</a>
                 <a id="bypass_button" class="button is-danger is-rounded" role="button" data-key="continueBtn">Chci přesto pokračovat</a>
-                <div id="popup_needed" class="notification wb-hidden" data-key="popupMsg">
-                    Pro pokračování, prosím, povolte vyskakovací okna ve vašem prohlížeči.
+                <div id="popup_needed" class="popup-warning wb-hidden">
+                    ⚠️ <strong>Upozornění:</strong> Pro pokračování prosím <u>povolte vyskakovací okna</u> ve vašem prohlížeči.
                 </div>
             </div>
         </div>
@@ -139,21 +158,32 @@
         document.head.appendChild(script);
     }
 
-    // Run invisible popup check each time
     function checkPopupPermission(callback) {
-        let popup = null, allowed = true;
+        let popups = [];
+        let allowed = true;
+
         try {
-            popup = window.open('', '', 'width=1,height=1,left=-1000,top=-1000');
-            if (!popup) allowed = false;
-            else {
-                // Immediately close the tiny popup
-                popup.blur();
-                popup.close();
+            for (let i = 0; i < 3; i++) {
+                const popup = window.open('', '', 'width=1,height=1,left=-10000,top=-10000');
+                if (!popup) { allowed = false; break; }
+                popups.push(popup);
+            }
+
+            if (allowed) {
+                setTimeout(() => {
+                    popups.forEach(p => {
+                        try { p.blur(); p.close(); } catch {}
+                    });
+                    callback(true);
+                }, 200);
+            } else {
+                popups.forEach(p => { try { p.close(); } catch{} });
+                callback(false);
             }
         } catch {
-            allowed = false;
+            popups.forEach(p => { try { p.close(); } catch{} });
+            callback(false);
         }
-        callback(allowed);
     }
 
     function handleButtonClick(event) {
@@ -163,7 +193,6 @@
         spinner.innerHTML = '<div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div>';
         document.querySelector('.cta .content').appendChild(spinner);
 
-        // Always check popups freshly
         checkPopupPermission(function(isAllowed) {
             if (isAllowed) {
                 loadYouScript(() => { 
