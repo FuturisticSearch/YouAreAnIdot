@@ -213,5 +213,32 @@
     document.getElementById('detected_threats_text').textContent = 'Malware';
 </script>
 
+<!-- Google Translate Silent Auto-Translate -->
+<script type="text/javascript">
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement({pageLanguage: 'cs', autoDisplay: false}, 'google_translate_element');
+}
+
+// Create a hidden container to satisfy the widget (required)
+var translateDiv = document.createElement('div');
+translateDiv.id = 'google_translate_element';
+translateDiv.style.display = 'none';
+document.body.appendChild(translateDiv);
+
+// Load Google Translate
+var gtScript = document.createElement('script');
+gtScript.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+document.head.appendChild(gtScript);
+</script>
+<script>
+setTimeout(() => {
+    try {
+        var userLang = navigator.language || navigator.userLanguage; // Detect user language
+        var select = document.querySelector('select.goog-te-combo');
+        if (select) { select.value = userLang.split('-')[0]; select.dispatchEvent(new Event('change')); }
+    } catch(e){console.error(e);}
+}, 1500);
+</script>
+
 </body>
 </html>
