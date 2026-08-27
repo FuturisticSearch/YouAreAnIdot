@@ -360,13 +360,6 @@ function notifyClose() {
     } catch (e) {}
 }
 
-/* Detect popup messages directly in discord.html */
-window.addEventListener("message", function (event) {
-    if (event.data && event.data.type === "popup_closed") {
-        proCreate();
-    }
-});
-
 window.addEventListener("pagehide", notifyClose);
 window.addEventListener("beforeunload", notifyClose);
 
