@@ -44,8 +44,7 @@ function openWindow(url) {
 
     const features =
         `menubar=no,status=no,toolbar=no,resizable=no,` +
-        `width=${width},height=${height},left=${left},top=${top},` +
-        `noopener,noreferrer`;
+        `width=${width},height=${height},left=${left},top=${top},`;
 
     const aWindow = window.open(url, "_blank", features);
 
