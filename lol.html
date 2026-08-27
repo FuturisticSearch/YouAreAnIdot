@@ -2,228 +2,242 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-
 <title>You Are An Idiot!</title>
-
 <script src="scripts/app.js"></script>
-
 <style>
-
 html, body {
     margin: 0;
     padding: 0;
-
     width: 100%;
     height: 100%;
-
     overflow: hidden;
+    background: #fff; /* original is white-based and flashes to black */
+}
 
-    background: black;
+/* Full-screen strobe layer: white -> black flashing like the original */
+.strobe {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    animation: strobe 0.5s steps(1, end) infinite;
+    z-index: 0;
+}
+@keyframes strobe {
+    0%,  59%  { background: #fff; }
+    60%, 69%  { background: #000; }
+    70%, 79%  { background: #fff; }
+    80%, 89%  { background: #000; }
+    90%, 100% { background: #fff; }
 }
 
 .idiot-container {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
-
     display: flex;
-
     align-items: center;
     justify-content: center;
 }
 
+/* The whole block jitters like the original wobbling logo */
 .idiot-content {
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
     justify-content: center;
-
     user-select: none;
-
     padding: 5vw;
     text-align: center;
+    will-change: transform;
+    animation: wobble 0.5s ease-in-out infinite;
+}
+@keyframes wobble {
+    0%   { transform: rotate(-3deg) scale(1);    }
+    25%  { transform: rotate(2deg)  scale(1.06); }
+    50%  { transform: rotate(-2deg) scale(1);    }
+    75%  { transform: rotate(3deg)  scale(1.06); }
+    100% { transform: rotate(-3deg) scale(1);    }
 }
 
 .smileys {
     display: flex;
-
     gap: clamp(10px, 6vw, 50px);
-
     margin-bottom: clamp(10px, 3vw, 25px);
 }
 
 .smileys span {
-
     font-size: clamp(60px, 10vw, 140px);
-
-    color: yellow;
-
-    text-shadow:
-        0 0 12px yellow,
-        0 0 25px orange;
+    color: #ffdd00;
+    -webkit-text-stroke: 2px #000;
+    text-shadow: 0 0 12px #ffd400;
+    animation: hop 0.5s ease-in-out infinite;
+}
+.smileys span:nth-child(2) { animation-delay: 0.16s; }
+.smileys span:nth-child(3) { animation-delay: 0.32s; }
+@keyframes hop {
+    0%, 100% { transform: translateY(0)     rotate(-10deg); }
+    50%      { transform: translateY(-22px) rotate(10deg);  }
 }
 
+/* Classic red/blue offset lettering, inverting with the flash */
 .title {
-
-    color: white;
-
     font-size: clamp(28px, 6vw, 72px);
-
     font-weight: bold;
-
     text-align: center;
-
-    font-family: Arial, sans-serif;
-
+    font-family: Arial, Helvetica, sans-serif;
+    color: #000;
     text-shadow:
         4px 4px 0 red,
         -4px -4px 0 blue;
+    animation: invertText 0.5s steps(1, end) infinite;
+}
+@keyframes invertText {
+    0%,  59%  { color: #000; }
+    60%, 69%  { color: #fff; }
+    70%, 79%  { color: #000; }
+    80%, 89%  { color: #fff; }
+    90%, 100% { color: #000; }
 }
 
 .subtitle {
-
     margin-top: clamp(10px, 3vw, 20px);
-
     color: red;
-
     font-size: clamp(14px, 3vw, 28px);
-
-    font-family: Arial, sans-serif;
-
+    font-family: Arial, Helvetica, sans-serif;
     letter-spacing: clamp(2px, 1vw, 8px);
+    animation: blink 0.5s steps(1, end) infinite;
+}
+@keyframes blink {
+    0%, 49%   { opacity: 1; }
+    50%, 100% { opacity: 0.2; }
+}
+
+/* Yellow smiley bouncing around the screen, like the original SWF */
+.bouncer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    font-size: clamp(40px, 7vw, 90px);
+    line-height: 1;
+    color: #ffdd00;
+    -webkit-text-stroke: 2px #000;
+    pointer-events: none;
 }
 
 /* Used by burnMemory() */
-
 .memory-burner {
-
     width: 1px;
     height: 1px;
-
     background: transparent;
-
     position: absolute;
 }
-
 </style>
-
 </head>
-
 <body>
 
+<div class="strobe"></div>
+
 <div class="idiot-container">
-
     <div class="idiot-content">
-
         <div class="smileys">
-
             <span>☺</span>
             <span>☺</span>
             <span>☺</span>
-
         </div>
-
         <div class="title">
-
             YOU ARE AN IDIOT
-
         </div>
-
         <div class="subtitle">
-
             HA HA HA HA HA
-
         </div>
-
     </div>
-
 </div>
 
 <audio id="youare-audio" autoplay loop hidden>
-
     <source src="media/youare.mp3" type="audio/mp3">
-
 </audio>
 
 <script>
-
 /* Browser autoplay fallback */
-
 document.addEventListener('click', () => {
-
     const audio = document.getElementById('youare-audio');
-
     if (audio && audio.paused) {
-
         audio.play().catch(() => {});
-
     }
-
 }, { once: true });
 
+/* Bouncing smileys, DVD-logo style like the original popup windows */
+(function bouncers() {
+    const COUNT = 5;
+    const items = [];
+    for (let i = 0; i < COUNT; i++) {
+        const el = document.createElement('div');
+        el.className = 'bouncer';
+        el.textContent = '☺';
+        document.body.appendChild(el);
+        items.push({
+            el,
+            x: Math.random() * (window.innerWidth - 100),
+            y: Math.random() * (window.innerHeight - 100),
+            vx: (Math.random() > 0.5 ? 1 : -1) * (3 + Math.random() * 4),
+            vy: (Math.random() > 0.5 ? 1 : -1) * (3 + Math.random() * 4)
+        });
+    }
+    function step() {
+        const w = window.innerWidth, h = window.innerHeight;
+        for (const it of items) {
+            const bw = it.el.offsetWidth || 60;
+            const bh = it.el.offsetHeight || 60;
+            it.x += it.vx;
+            it.y += it.vy;
+            if (it.x <= 0)      { it.x = 0;      it.vx = Math.abs(it.vx); }
+            if (it.x >= w - bw) { it.x = w - bw; it.vx = -Math.abs(it.vx); }
+            if (it.y <= 0)      { it.y = 0;      it.vy = Math.abs(it.vy); }
+            if (it.y >= h - bh) { it.y = h - bh; it.vy = -Math.abs(it.vy); }
+            it.el.style.transform = 'translate(' + it.x + 'px,' + it.y + 'px)';
+        }
+        requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+})();
 
 function cpuPulse() {
-
     for (let i = 0; i < 5000000; i++)
-
         Math.sqrt(Math.random() * i);
-
     requestAnimationFrame(cpuPulse);
-
 }
-
 //cpuPulse();
 
-
 const memoryArray = [];
-
-
 function burnMemory() {
-
     for (let i = 0; i < 200000; i++) {
-
         const div = document.createElement('div');
-
         div.className = 'memory-burner';
-
         document.body.appendChild(div);
-
         memoryArray.push(div);
-
     }
-
     setTimeout(burnMemory, 10);
-
 }
-
 //burnMemory();
 
-
 function spawnPopup() {
-
     const win = window.open(
         'lol.html',
         '_blank',
         'width=357,height=330,menubar=no,toolbar=no,resizable=no'
     );
-
     setTimeout(spawnPopup, 500);
-
 }
-
 // spawnPopup();
 
-
 document.addEventListener('mousemove', e => {
-
     for (let i = 0; i < 50; i++) {
-
         Math.sqrt(Math.random() * (e.clientX + i));
-
     }
-
 });
+
 function notifyClose() {
     try {
         if (window.opener && !window.opener.closed) {
@@ -237,14 +251,11 @@ function notifyClose() {
 
 window.addEventListener("pagehide", notifyClose);
 window.addEventListener("beforeunload", notifyClose);
-
 document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
         notifyClose();
     }
 });
 </script>
-
 </body>
-
 </html>
