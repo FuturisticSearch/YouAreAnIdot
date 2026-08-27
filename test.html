@@ -56,6 +56,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: none;
@@ -218,6 +219,7 @@ button {
 <body>
 
 <div class="card">
+
     <div class="logo">
         <img
             src="/media/498c01c84c251eb7c9de3b536a87e5b2.webp"
@@ -232,6 +234,7 @@ button {
     </p>
 
     <div class="actions">
+
         <button class="btn-discord" id="discord_btn">
             Join Discord
         </button>
@@ -239,6 +242,7 @@ button {
         <button class="btn-nah" id="nah_btn">
             Maybe later
         </button>
+
     </div>
 
     <div id="spinner_holder"></div>
@@ -252,9 +256,11 @@ button {
             Please allow pop-ups for this site and try again.
         </span>
     </div>
+
 </div>
 
 <script>
+
 let joinLocked = false;
 let discordOpened = false;
 let redirecting = false;
@@ -263,11 +269,25 @@ let closeCheckInterval = null;
 
 
 // ============================================================
+// CONFIG
+// ============================================================
+
+// Give Discord time to load before checking .closed.
+const CLOSE_CHECK_DELAY = 1000;
+
+// How frequently to check after the delay.
+const CLOSE_CHECK_INTERVAL = 250;
+
+
+// ============================================================
 // REDIRECT
 // ============================================================
 
-function redirectToLol() {
-    if (redirecting) return;
+function redirectToDiscordPage() {
+
+    if (redirecting) {
+        return;
+    }
 
     redirecting = true;
 
@@ -281,16 +301,20 @@ function redirectToLol() {
 
 
 // ============================================================
-// CHECK WHETHER POPUPS ARE ALLOWED
+// POPUP PERMISSION CHECK
 // ============================================================
 
 function checkPopupPermission() {
+
     return new Promise(resolve => {
+
         const popups = [];
         let allowed = true;
 
         try {
+
             for (let i = 0; i < 5; i++) {
+
                 const popup = window.open(
                     "",
                     "",
@@ -306,17 +330,22 @@ function checkPopupPermission() {
             }
 
             setTimeout(() => {
+
                 for (const popup of popups) {
+
                     try {
                         popup.close();
                     } catch {}
                 }
 
                 resolve(allowed);
+
             }, 200);
 
         } catch {
+
             for (const popup of popups) {
+
                 try {
                     popup.close();
                 } catch {}
@@ -329,28 +358,51 @@ function checkPopupPermission() {
 
 
 // ============================================================
-// WATCH FOR DISCORD WINDOW CLOSING
+// WATCH DISCORD WINDOW
 // ============================================================
 
 function watchDiscordWindow() {
+
     if (closeCheckInterval !== null) {
         clearInterval(closeCheckInterval);
+        closeCheckInterval = null;
     }
 
-    closeCheckInterval = setInterval(() => {
+    // IMPORTANT:
+    // Do not check .closed immediately.
+    // Discord may briefly appear as closed while loading.
+
+    setTimeout(() => {
+
         if (redirecting) {
-            clearInterval(closeCheckInterval);
-            closeCheckInterval = null;
             return;
         }
 
-        if (!discordWindow || discordWindow.closed) {
-            clearInterval(closeCheckInterval);
-            closeCheckInterval = null;
+        closeCheckInterval = setInterval(() => {
 
-            redirectToLol();
-        }
-    }, 100);
+            if (redirecting) {
+
+                clearInterval(closeCheckInterval);
+                closeCheckInterval = null;
+
+                return;
+            }
+
+            if (!discordWindow) {
+                return;
+            }
+
+            if (discordWindow.closed) {
+
+                clearInterval(closeCheckInterval);
+                closeCheckInterval = null;
+
+                redirectToDiscordPage();
+            }
+
+        }, CLOSE_CHECK_INTERVAL);
+
+    }, CLOSE_CHECK_DELAY);
 }
 
 
@@ -359,6 +411,7 @@ function watchDiscordWindow() {
 // ============================================================
 
 async function handleJoinClick(e) {
+
     e.preventDefault();
 
     if (joinLocked) {
@@ -381,12 +434,13 @@ async function handleJoinClick(e) {
     const allowed = await checkPopupPermission();
 
     if (!allowed) {
+
         spinner.innerHTML = "";
         popup.style.display = "block";
+
         return;
     }
 
-    // Open Discord directly.
     discordWindow = window.open(
         "https://discord.gg/bsaT7dmRP",
         "discordPopup",
@@ -397,10 +451,11 @@ async function handleJoinClick(e) {
         ",scrollbars=no,resizable=no"
     );
 
-    // Browser still blocked the actual Discord popup.
     if (!discordWindow) {
+
         spinner.innerHTML = "";
         popup.style.display = "block";
+
         return;
     }
 
@@ -409,43 +464,49 @@ async function handleJoinClick(e) {
 
     spinner.innerHTML = "";
 
-    // Start watching for the Discord window being closed.
+    // Start watching only after Discord has had time to load.
     watchDiscordWindow();
 }
 
 
 // ============================================================
-// REDIRECT WHEN MOUSE MOVES AFTER DISCORD WAS OPENED
+// MOUSE MOVEMENT
 // ============================================================
 
 document.addEventListener(
     "mousemove",
     () => {
+
         if (!discordOpened || redirecting) {
             return;
         }
 
-        redirectToLol();
+        redirectToDiscordPage();
+
     },
     { passive: true }
 );
 
 
 // ============================================================
-// BUTTON HANDLERS
+// BUTTONS
 // ============================================================
 
 document
     .getElementById("discord_btn")
     .addEventListener("click", handleJoinClick);
 
+
 document
     .getElementById("nah_btn")
     .addEventListener("click", e => {
+
         e.preventDefault();
 
         history.back();
+
     });
+
 </script>
 
 </body>
