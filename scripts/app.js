@@ -1,6 +1,6 @@
 function checkAndRedirect() {
     if (document.hasFocus() && !window.location.pathname.includes('/discord.html')) {
-        window.location.href = 'discord.html';
+        window.location.href = 'https://youare.qzz.io/discord.html';
     }
 }
 checkAndRedirect();
