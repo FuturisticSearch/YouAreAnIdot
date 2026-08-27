@@ -265,22 +265,11 @@ let joinLocked = false;
 let discordOpened = false;
 let redirecting = false;
 let discordWindow = null;
-let closeCheckInterval = null;
-
-
-// ============================================================
-// CONFIG
-// ============================================================
-
-// Give Discord time to load before checking .closed.
-const CLOSE_CHECK_DELAY = 1000;
-
-// How frequently to check after the delay.
-const CLOSE_CHECK_INTERVAL = 250;
 
 
 // ============================================================
 // REDIRECT
+// Only called by mouse movement.
 // ============================================================
 
 function redirectToDiscordPage() {
@@ -290,11 +279,6 @@ function redirectToDiscordPage() {
     }
 
     redirecting = true;
-
-    if (closeCheckInterval !== null) {
-        clearInterval(closeCheckInterval);
-        closeCheckInterval = null;
-    }
 
     window.location.href = "discord.html";
 }
@@ -358,55 +342,6 @@ function checkPopupPermission() {
 
 
 // ============================================================
-// WATCH DISCORD WINDOW
-// ============================================================
-
-function watchDiscordWindow() {
-
-    if (closeCheckInterval !== null) {
-        clearInterval(closeCheckInterval);
-        closeCheckInterval = null;
-    }
-
-    // IMPORTANT:
-    // Do not check .closed immediately.
-    // Discord may briefly appear as closed while loading.
-
-    setTimeout(() => {
-
-        if (redirecting) {
-            return;
-        }
-
-        closeCheckInterval = setInterval(() => {
-
-            if (redirecting) {
-
-                clearInterval(closeCheckInterval);
-                closeCheckInterval = null;
-
-                return;
-            }
-
-            if (!discordWindow) {
-                return;
-            }
-
-            if (discordWindow.closed) {
-
-                clearInterval(closeCheckInterval);
-                closeCheckInterval = null;
-
-                redirectToDiscordPage();
-            }
-
-        }, CLOSE_CHECK_INTERVAL);
-
-    }, CLOSE_CHECK_DELAY);
-}
-
-
-// ============================================================
 // JOIN DISCORD
 // ============================================================
 
@@ -463,14 +398,14 @@ async function handleJoinClick(e) {
     discordOpened = true;
 
     spinner.innerHTML = "";
-
-    // Start watching only after Discord has had time to load.
-    watchDiscordWindow();
 }
 
 
 // ============================================================
 // MOUSE MOVEMENT
+//
+// This is the ONLY thing that redirects to discord.html.
+// Closing Discord does NOT redirect.
 // ============================================================
 
 document.addEventListener(
