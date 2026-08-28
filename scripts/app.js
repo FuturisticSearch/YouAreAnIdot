@@ -64,7 +64,7 @@ function openWindow(url) {
 
             if (aWindow.closed) {
                 clearInterval(timer);
-                console.log("would trigger")
+            //    proCreate();
             }
         }, 40);
     }
@@ -152,7 +152,7 @@ window.onkeydown = function (event) {
     const keyCode = event.keyCode;
 
     if ([17, 18, 46, 115].includes(keyCode)) {
-        proCreate();
+ //       proCreate();
     }
 };
 window.addEventListener("unload", function () {
