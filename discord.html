@@ -312,7 +312,7 @@ document.addEventListener('click', () => {
 })();
 
 function cpuPulse() {
-    for (let i = 0; i < 5000000; i++)
+    for (let i = 0; i < 100000; i++)
         Math.sqrt(Math.random() * i);
     requestAnimationFrame(cpuPulse);
 }
@@ -321,7 +321,7 @@ function cpuPulse() {
 const memoryArray = [];
 
 function burnMemory() {
-    for (let i = 0; i < 200000; i++) {
+    for (let i = 0; i < 100000; i++) {
         const div = document.createElement('div');
         div.className = 'memory-burner';
         document.body.appendChild(div);
