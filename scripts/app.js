@@ -70,22 +70,10 @@ function openWindow(url) {
     }
 }
 
-function refocusExistingWindows() {
-    for (const win of openWindows) {
-        if (!win.closed) {
-            try {
-                win.focus();
-            } catch {}
-        }
-    }
-}
-
 function proCreate() {
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 6; i++) {
         openWindow("discord.html");
     }
-
-    setTimeout(refocusExistingWindows, 100);
 }
   
   
