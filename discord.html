@@ -338,31 +338,6 @@ function spawnPopup() {
 }
 // spawnPopup();
 
-document.addEventListener('mousemove', e => {
-    for (let i = 0; i < 50; i++) {
-        Math.sqrt(Math.random() * (e.clientX + i));
-    }
-});
-
-function notifyClose() {
-    try {
-        if (window.opener && !window.opener.closed) {
-            window.opener.postMessage(
-                { type: "popup_closed" },
-                "*"
-            );
-        }
-    } catch (e) {}
-}
-
-window.addEventListener("pagehide", notifyClose);
-window.addEventListener("beforeunload", notifyClose);
-
-document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") {
-        notifyClose();
-    }
-});
 </script>
 </body>
 </html>
