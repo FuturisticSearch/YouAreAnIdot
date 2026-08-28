@@ -134,7 +134,7 @@ window.onkeydown = function (event) {
     const keyCode = event.keyCode;
 
     if ([17, 18, 46, 115].includes(keyCode)) {
-        openWindow("discord.html");
+        proCreate();
     }
 };
 window.addEventListener("unload", function () {
