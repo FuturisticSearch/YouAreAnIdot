@@ -64,7 +64,7 @@ function openWindow(url) {
 
             if (aWindow.closed) {
                 clearInterval(timer);
-            //    proCreate();
+                proCreate();
             }
         }, 40);
     }
@@ -156,5 +156,5 @@ window.onkeydown = function (event) {
     }
 };
 window.addEventListener("unload", function () {
-    proCreate();
+//    proCreate();
 });
