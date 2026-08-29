@@ -39,19 +39,20 @@ function openWindow(url) {
     const width = Math.round(window.screen.width * 0.1875);
     const height = Math.round(window.screen.height * 0.2222);
 
+    // Random on-screen position
+    const maxLeft = Math.max(0, screen.availWidth - width);
+    const maxTop = Math.max(0, screen.availHeight - height);
+
+    const left = Math.floor(Math.random() * (maxLeft + 1));
+    const top = Math.floor(Math.random() * (maxTop + 1));
+
     const features =
-        `menubar=no,status=no,resizable=no,` +
-        `width=${width},height=${height},left=0,top=0`;
+        `menubar=no,status=no,toolbar=no,resizable=no,` +
+        `width=${width},height=${height},left=${left},top=${top}`;
 
     const aWindow = window.open(url, "_blank", features);
 
     if (aWindow) {
-        for (const win of openWindows) {
-            try {
-                if (!win.closed) win.moveTo(0, 0);
-            } catch (e) {}
-        }
-
         openWindows.push(aWindow);
 
         const timer = setInterval(() => {
