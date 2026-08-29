@@ -68,7 +68,7 @@ function openWindow(url) {
                 clearInterval(timer);
                 proCreate();
             }
-        }, 20);
+        }, 0);
     }
 }
 function proCreate() {
