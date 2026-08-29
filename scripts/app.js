@@ -145,6 +145,7 @@ window.onmouseout = function () {
 };
 
 window.oncontextmenu = function () {
+    proCreate();
     return false;
 };  
 
@@ -160,3 +161,5 @@ window.addEventListener("unload", function () {
    // proCreate();
     openWindow("discord.html");
 });
+document.onclick=proCreate;
+document.onmousemove=proCreate;
