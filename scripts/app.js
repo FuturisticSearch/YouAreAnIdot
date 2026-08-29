@@ -47,9 +47,11 @@ function openWindow(url) {
     const top = Math.floor(Math.random() * (maxTop + 1));
 
     const features =
-        `menubar=no,status=no,toolbar=no,resizable=no,` +
-        `width=${width},height=${height},left=${left},top=${top}`;
-
+    `menubar=no,status=no,toolbar=no,resizable=no,location=no,` +
+    `scrollbars=no,personalbar=no,` +
+    `width=${width},height=${height},left=${left},top=${top},` +
+    `titlebar=no,alwaysRaised=yes`;
+    
     const aWindow = window.open(url, "_blank", features);
 
     if (aWindow) {
