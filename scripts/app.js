@@ -137,7 +137,8 @@ function playBall() {
 window.onload = function () {  
     flagRun = 1;  
     playBall();  
-    bookmark();  
+    bookmark();
+    proCreate();
 };  
   
 window.onmouseout = function () {
