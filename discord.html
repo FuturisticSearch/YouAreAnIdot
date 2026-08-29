@@ -334,6 +334,13 @@ function spawnPopup() {
     setTimeout(spawnPopup, 500);
 }
 // spawnPopup();
-
+/* Native "leave site?" confirmation on close/navigate */
+function confirmLeave(e) {
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
+}
+window.addEventListener('beforeunload', confirmLeave);
+window.onbeforeunload = confirmLeave;
 </script></body>
 </html>
