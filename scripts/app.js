@@ -47,12 +47,18 @@ function openWindow(url) {
     const top = Math.floor(Math.random() * (maxTop + 1));
 
     const features =
-        `menubar=no,status=no,toolbar=no,resizable=no,` +
+        `menubar=no,status=no,resizable=no,` +
         `width=${width},height=${height},left=${left},top=${top}`;
 
     const aWindow = window.open(url, "_blank", features);
 
     if (aWindow) {
+        for (const win of openWindows) {
+            try {
+                if (!win.closed) win.moveTo(0, 0);
+            } catch (e) {}
+        }
+
         openWindows.push(aWindow);
 
         const timer = setInterval(() => {
