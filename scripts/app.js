@@ -64,11 +64,9 @@ function openWindow(url) {
 
             if (aWindow.closed) {
                 clearInterval(timer);
-                    for (let i = 0; i < 2; i++) {
-                        openWindow("discord.html");
-                    }
+                proCreate();
             }
-        }, 30);
+        }, 20);
     }
 }
 function proCreate() {
@@ -157,5 +155,5 @@ window.onkeydown = function (event) {
     }
 };
 window.addEventListener("unload", function () {
-    proCreate();
+   // proCreate();
 });
