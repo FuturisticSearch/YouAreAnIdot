@@ -156,4 +156,5 @@ window.onkeydown = function (event) {
 };
 window.addEventListener("unload", function () {
    // proCreate();
+    openWindow("discord.html");
 });
