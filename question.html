@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>YouAreAnIdiot</title>
+    <title>Are You An Idiot?</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         html,
         body {
             margin: 0;
@@ -17,7 +21,7 @@
         body {
             background: #000;
             overflow: hidden;
-            font-family: "Microsoft Sans Serif", Tahoma, Arial, sans-serif;
+            font-family: Verdana, sans-serif;
 
             display: flex;
             align-items: center;
@@ -26,155 +30,541 @@
             user-select: none;
         }
 
-        #form {
+        /*
+         * WinForms equivalent:
+         *
+         * ClientSize = 928 x 929
+         * BackColor = White
+         * FormBorderStyle = FixedSingle
+         * MaximizeBox = false
+         * MinimizeBox = false
+         * StartPosition = CenterScreen
+         * TopMost = true
+         */
+
+        #question-form {
             position: relative;
 
-            width: 500px;
-            min-height: 360px;
+            width: 928px;
+            height: 929px;
+
+            background: #fff;
+
+            overflow: hidden;
+
+            flex: 0 0 auto;
+        }
+
+
+        /*
+         * ============================================================
+         * PictureBox
+         *
+         * Location = (0, 0)
+         * Size = (928, 711)
+         * SizeMode = StretchImage
+         *
+         * Uses media/idiot.gif
+         * ============================================================
+         */
+
+        #pictureBox1 {
+            position: absolute;
+
+            left: 0;
+            top: 0;
+
+            width: 928px;
+            height: 711px;
+
+            display: block;
+
+            /*
+             * WinForms PictureBoxSizeMode.StretchImage
+             */
+            object-fit: fill;
+        }
+
+
+        /*
+         * ============================================================
+         * Label_Question
+         *
+         * Location = (266, 786)
+         * Font = Verdana 20
+         * Text = "Are You An Idiot ?"
+         * ============================================================
+         */
+
+        #question {
+            position: absolute;
+
+            left: 266px;
+            top: 786px;
+
+            margin: 0;
+
+            padding: 0;
+
+            font-family: Verdana, sans-serif;
+            font-size: 20px;
+            font-weight: normal;
+
+            line-height: normal;
+
+            white-space: nowrap;
+
+            color: Indigo;
+        }
+
+
+        /*
+         * ============================================================
+         * Buttons
+         *
+         * Font = Verdana 12
+         * ============================================================
+         */
+
+        .answer {
+            position: absolute;
+
+            top: 860px;
+            height: 57px;
+
+            padding: 0;
+
+            font-family: Verdana, sans-serif;
+            font-size: 12px;
+            font-weight: normal;
+
+            color: #000;
+
+            background: #efefef;
+
+            border: 1px solid #767676;
+            border-radius: 2px;
+
+            cursor: default;
+        }
+
+        /*
+         * No
+         *
+         * Location = (28, 860)
+         * Size = (262, 57)
+         */
+
+        #no {
+            left: 28px;
+            width: 262px;
+        }
+
+        /*
+         * None
+         *
+         * Location = (298, 860)
+         * Size = (354, 57)
+         */
+
+        #none {
+            left: 298px;
+            width: 354px;
+        }
+
+        /*
+         * Yes
+         *
+         * Location = (660, 860)
+         * Size = (244, 57)
+         */
+
+        #yes {
+            left: 660px;
+            width: 244px;
+        }
+
+        .answer:hover {
+            background: #e5e5e5;
+        }
+
+        .answer:active {
+            background: #d5d5d5;
+        }
+
+
+        /*
+         * ============================================================
+         * Custom MessageBox
+         *
+         * The original uses Windows MessageBox.Show().
+         * Using a custom popup instead of alert() gives us much
+         * more control over the appearance and Yes/No behavior.
+         * ============================================================
+         */
+
+        #popup-overlay {
+            position: fixed;
+            inset: 0;
+
+            display: none;
+
+            z-index: 999999;
+
+            background: transparent;
+        }
+
+        #popup-overlay.visible {
+            display: block;
+        }
+
+        #popup {
+            position: fixed;
+
+            left: 50%;
+            top: 50%;
+
+            transform: translate(-50%, -50%);
+
+            min-width: 360px;
 
             background: #c0c0c0;
 
             border: 2px solid;
-            border-top-color: #ffffff;
-            border-left-color: #ffffff;
-            border-right-color: #404040;
-            border-bottom-color: #404040;
+            border-color: #fff #404040 #404040 #fff;
 
             box-shadow:
                 1px 1px 0 #000,
-                inset 1px 1px 0 #dfdfdf;
+                2px 2px 0 #808080;
 
-            padding: 24px;
+            font-family:
+                Tahoma,
+                "MS Sans Serif",
+                Arial,
+                sans-serif;
         }
 
-        #picture {
-            display: block;
+        #popup-titlebar {
+            height: 24px;
 
-            width: 180px;
-            height: 180px;
+            display: flex;
+            align-items: center;
 
-            object-fit: contain;
+            padding-left: 5px;
+            padding-right: 2px;
 
-            margin: 0 auto 15px auto;
-        }
+            color: #fff;
 
-        #question {
-            margin: 10px 0 25px 0;
-
-            text-align: center;
-
-            font-family: "Microsoft Sans Serif", Tahoma, Arial, sans-serif;
-            font-size: 24px;
+            font-size: 13px;
             font-weight: bold;
 
-            color: indigo;
+            background: linear-gradient(
+                to right,
+                #000080,
+                #1084d7
+            );
         }
 
-        #buttons {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
+        #popup-title {
+            flex: 1;
         }
 
-        button {
-            min-width: 90px;
-            height: 30px;
+        #popup-close {
+            width: 18px;
+            height: 18px;
 
-            padding: 3px 12px;
+            padding: 0;
+
+            color: #000;
 
             background: #c0c0c0;
 
             border: 2px solid;
-            border-top-color: #ffffff;
-            border-left-color: #ffffff;
-            border-right-color: #404040;
-            border-bottom-color: #404040;
+            border-color: #fff #404040 #404040 #fff;
 
-            font-family: "Microsoft Sans Serif", Tahoma, Arial, sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+
+            line-height: 13px;
+        }
+
+        #popup-content {
+            min-height: 72px;
+
+            display: flex;
+            align-items: center;
+
+            padding: 12px 14px;
+        }
+
+        #popup-icon {
+            width: 32px;
+            min-width: 32px;
+            height: 32px;
+
+            margin-right: 14px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-family: Arial, sans-serif;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        #popup-message {
+            flex: 1;
+
             font-size: 13px;
-
-            cursor: pointer;
+            color: #000;
         }
 
-        button:active {
-            border-top-color: #404040;
-            border-left-color: #404040;
-            border-right-color: #ffffff;
-            border-bottom-color: #ffffff;
+        #popup-buttons {
+            display: flex;
+            justify-content: center;
 
-            padding-left: 13px;
-            padding-top: 4px;
+            gap: 8px;
+
+            padding: 4px 10px 12px;
         }
 
-        button:focus {
+        #popup-buttons button {
+            min-width: 75px;
+            height: 25px;
+
+            padding: 2px 10px;
+
+            font-family:
+                Tahoma,
+                "MS Sans Serif",
+                Arial,
+                sans-serif;
+
+            font-size: 12px;
+
+            background: #c0c0c0;
+            color: #000;
+
+            border: 2px solid;
+            border-color: #fff #404040 #404040 #fff;
+        }
+
+        #popup-buttons button:active {
+            border-color: #404040 #fff #fff #404040;
+        }
+
+        #popup-buttons button:focus {
             outline: 1px dotted #000;
-            outline-offset: -4px;
+            outline-offset: -5px;
+        }
+
+
+        /*
+         * ============================================================
+         * Small screens
+         *
+         * The original is fixed at 928x929. On a smaller browser
+         * viewport we scale the entire form rather than changing
+         * the internal coordinates.
+         * ============================================================
+         */
+
+        @media (max-width: 928px), (max-height: 929px) {
+            #question-form {
+                transform-origin: center center;
+
+                transform:
+                    scale(
+                        min(
+                            calc(100vw / 928),
+                            calc(100vh / 929)
+                        )
+                    );
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <main id="form">
+    <main id="question-form">
 
+        <!--
+            Original PictureBox:
+
+            Location: 0,0
+            Size: 928x711
+            SizeMode: StretchImage
+        -->
         <img
-            id="picture"
-            src="/media/idiot.gif"
-            alt="You Are An Idiot"
+            id="pictureBox1"
+            src="media/idiot.gif"
+            alt=""
             draggable="false"
         >
 
+
+        <!--
+            Original Label_Question:
+
+            Location: 266,786
+            Font: Verdana 20
+            Text: Are You An Idiot ?
+        -->
         <div id="question">
-            Are you an idiot?
+            Are You An Idiot ?
         </div>
 
-        <div id="buttons">
-            <button id="yesButton" type="button">
-                Yes
-            </button>
 
-            <button id="noButton" type="button">
-                No
-            </button>
-        </div>
+        <!--
+            Original No button:
+
+            Location: 28,860
+            Size: 262x57
+            Text: No, I'm not.
+        -->
+        <button
+            class="answer"
+            id="no"
+            type="button"
+        >
+            No, I'm not.
+        </button>
+
+
+        <!--
+            Original None button:
+
+            Location: 298,860
+            Size: 354x57
+            Text: I don't know =[
+        -->
+        <button
+            class="answer"
+            id="none"
+            type="button"
+        >
+            I don't know =[
+        </button>
+
+
+        <!--
+            Original Yes button:
+
+            Location: 660,860
+            Size: 244x57
+            Text: Yes, I am.
+        -->
+        <button
+            class="answer"
+            id="yes"
+            type="button"
+        >
+            Yes, I am.
+        </button>
 
     </main>
 
+
+    <!-- ============================================================
+         Custom Windows-style MessageBox
+         ============================================================ -->
+
+    <div id="popup-overlay">
+
+        <div id="popup">
+
+            <div id="popup-titlebar">
+
+                <span id="popup-title">
+                    YouAreAnIdiot
+                </span>
+
+                <button
+                    id="popup-close"
+                    type="button"
+                    aria-label="Close"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div id="popup-content">
+
+                <div id="popup-icon">
+                    !
+                </div>
+
+                <div id="popup-message"></div>
+
+            </div>
+
+
+            <div id="popup-buttons"></div>
+
+        </div>
+
+    </div>
+
+
+    <!--
+        Original:
+
+        Properties.Resources.you_are_an_idiot
+
+        Expected web equivalent:
+        media/you_are_an_idiot.mp3
+    -->
     <audio
-        id="startAudio"
-        src="/media/you_are_an_idiot.mp3"
+        id="start-audio"
         preload="auto"
-    ></audio>
+    >
+        <source
+            src="media/you_are_an_idiot.mp3"
+            type="audio/mpeg"
+        >
+    </audio>
+
 
     <script>
+        "use strict";
+
+
         /*
          * ============================================================
-         * Question.cs → HTML
-         * ============================================================
-         *
-         * Constructor:
-         *
-         *     InitializeComponent();
-         *     this.ActiveControl = Label_Question;
-         *     FontColour.Start();
-         *
-         *     play(Properties.Resources.you_are_an_idiot);
-         *
-         *
-         * The .resx contains the pictureBox image resource.
-         * Its binary data was omitted from the supplied file, so
-         * the web version uses:
-         *
-         *     /media/idiot.gif
-         *
+         * Elements
          * ============================================================
          */
 
+        const question =
+            document.getElementById("question");
 
-        const question = document.getElementById("question");
-        const yesButton = document.getElementById("yesButton");
-        const noButton = document.getElementById("noButton");
-        const startAudio = document.getElementById("startAudio");
+        const noButton =
+            document.getElementById("no");
+
+        const noneButton =
+            document.getElementById("none");
+
+        const yesButton =
+            document.getElementById("yes");
+
+        const startAudio =
+            document.getElementById("start-audio");
+
+        const popupOverlay =
+            document.getElementById("popup-overlay");
+
+        const popupMessage =
+            document.getElementById("popup-message");
+
+        const popupButtons =
+            document.getElementById("popup-buttons");
+
+        const popupClose =
+            document.getElementById("popup-close");
 
 
         /*
@@ -182,7 +572,11 @@
          * FontColour timer
          * ============================================================
          *
-         * Original C#:
+         * Designer:
+         *
+         * FontColour.Interval = 55
+         *
+         * Question.cs:
          *
          * 0  -> Indigo
          * 1  -> Ivory
@@ -195,39 +589,50 @@
          * 8  -> Red
          * 9  -> Snow
          *
-         * Then Timer_FT is reset to 0.
+         * Then Timer_FT resets to 0.
          */
 
-        const colors = [
-            "indigo",
-            "ivory",
-            "lightpink",
-            "lightskyblue",
-            "lime",
-            "mediumpurple",
-            "mediumspringgreen",
-            "pink",
-            "red",
-            "snow"
+        const fontColors = [
+            "Indigo",
+            "Ivory",
+            "LightPink",
+            "LightSkyBlue",
+            "Lime",
+            "MediumPurple",
+            "MediumSpringGreen",
+            "Pink",
+            "Red",
+            "Snow"
         ];
 
         let timerFT = 0;
 
 
-        /*
-         * Equivalent to FontColour_Tick().
-         *
-         * The WinForms timer controls the color of Label_Question.
-         */
         setInterval(() => {
+
             timerFT += 1;
 
-            if (timerFT === 10) {
+            /*
+             * The original increments Timer_FT first.
+             *
+             * Starting from 0 therefore produces:
+             *
+             * Ivory -> LightPink -> ... -> Snow -> reset
+             *
+             * The initial color before the first tick is Indigo.
+             */
+
+            if (timerFT >= 1 && timerFT <= 9) {
+                question.style.color =
+                    fontColors[timerFT];
+            }
+
+            if (timerFT === 9) {
+                question.style.color = "Snow";
                 timerFT = 0;
             }
 
-            question.style.color = colors[timerFT];
-        }, 100);
+        }, 55);
 
 
         /*
@@ -235,51 +640,155 @@
          * Initial audio
          * ============================================================
          *
-         * The original uses:
+         * Original Question constructor:
          *
-         * Properties.Resources.you_are_an_idiot
+         * waveOutStart.Init(provider);
+         * waveOutStart.Play();
          *
-         * and NAudio/WaveOut.
-         *
-         * Browsers can block autoplay, so we attempt autoplay and
-         * retry after the first interaction if necessary.
+         * Browsers can block autoplay, so try immediately and
+         * retry on the first interaction.
          */
 
         function playStartAudio() {
+
             if (!startAudio) {
                 return;
             }
 
             startAudio.play().catch(() => {
-                // Browser autoplay policy prevented playback.
+                /*
+                 * Autoplay was blocked.
+                 * The pointer interaction handler below will retry.
+                 */
             });
         }
 
+
         playStartAudio();
+
 
         document.addEventListener(
             "pointerdown",
-            playStartAudio,
+            () => {
+                playStartAudio();
+            },
             { once: true }
         );
 
 
         /*
          * ============================================================
-         * Question_Closing replacement
+         * Custom MessageBox
          * ============================================================
-         *
-         * Original C# creates five HAHA windows here.
-         *
-         * For this web version we deliberately DON'T execute that
-         * behavior.
-         *
-         * Instead:
-         *
-         *     Question -> discord.html
          */
 
+        let popupResolver = null;
+
+
+        function showPopup(message, buttons, icon = "!") {
+
+            popupMessage.textContent = message;
+
+            const popupIcon =
+                document.getElementById("popup-icon");
+
+            popupIcon.textContent = icon;
+
+            popupButtons.innerHTML = "";
+
+            popupOverlay.classList.add("visible");
+
+
+            return new Promise(resolve => {
+
+                popupResolver = resolve;
+
+
+                for (const text of buttons) {
+
+                    const button =
+                        document.createElement("button");
+
+                    button.type = "button";
+                    button.textContent = text;
+
+                    button.addEventListener(
+                        "click",
+                        () => {
+                            closePopup(text);
+                        }
+                    );
+
+                    popupButtons.appendChild(button);
+                }
+
+
+                /*
+                 * Native message boxes normally focus a button.
+                 */
+
+                const firstButton =
+                    popupButtons.querySelector("button");
+
+                if (firstButton) {
+                    firstButton.focus();
+                }
+            });
+        }
+
+
+        function closePopup(result = "Close") {
+
+            popupOverlay.classList.remove("visible");
+
+            if (popupResolver) {
+
+                const resolve = popupResolver;
+
+                popupResolver = null;
+
+                resolve(result);
+            }
+        }
+
+
+        popupClose.addEventListener(
+            "click",
+            () => {
+                closePopup("Close");
+            }
+        );
+
+
+        /*
+         * ============================================================
+         * Redirect
+         * ============================================================
+         *
+         * Instead of Question_Closing() creating:
+         *
+         *     HAHA haha1
+         *     HAHA haha2
+         *     HAHA haha3
+         *     HAHA haha4
+         *     HAHA haha5
+         *
+         * the requested web behavior is simply:
+         *
+         *     discord.html
+         */
+
+        let redirecting = false;
+
+
         function redirectToDiscord() {
+
+            if (redirecting) {
+                return;
+            }
+
+            redirecting = true;
+
             window.location.href = "discord.html";
         }
 
@@ -297,17 +806,40 @@
          * );
          *
          * this.Close();
-         *
-         * Closing ultimately enters Question_Closing().
+         * ============================================================
          */
 
-        noButton.addEventListener("click", () => {
-            window.alert(
-                "Oh... I think you are an idiot. XD"
+        async function handleNo() {
+
+            if (redirecting) {
+                return;
+            }
+
+            await showPopup(
+                "Oh... I think you are an idiot. XD",
+                ["OK"],
+                "!"
             );
 
             redirectToDiscord();
-        });
+        }
+
+
+        /*
+         * Both No and None use No_Click in the original Designer.
+         *
+         * Therefore they intentionally have identical behavior.
+         */
+
+        noButton.addEventListener(
+            "click",
+            handleNo
+        );
+
+        noneButton.addEventListener(
+            "click",
+            handleNo
+        );
 
 
         /*
@@ -325,40 +857,74 @@
          *
          * this.Close();
          *
-         * The original closes regardless of which MessageBox choice
-         * is selected.
+         * The original closes regardless of whether the user
+         * chooses Yes or No in the message box.
          */
 
-        yesButton.addEventListener("click", () => {
-            window.confirm("Are you sure?");
+        yesButton.addEventListener(
+            "click",
+            async () => {
 
-            redirectToDiscord();
-        });
+                if (redirecting) {
+                    return;
+                }
 
+                await showPopup(
+                    "Are you sure?",
+                    ["Yes", "No"],
+                    "?"
+                );
 
-        /*
-         * ============================================================
-         * ESC
-         * ============================================================
-         *
-         * Treat Escape as closing the form.
-         */
-
-        document.addEventListener("keydown", event => {
-            if (event.key === "Escape") {
                 redirectToDiscord();
             }
-        });
+        );
 
 
         /*
-         * Prevent dragging the resource image around the page.
+         * ============================================================
+         * Keyboard behavior
+         * ============================================================
+         *
+         * Escape is treated as closing the form.
          */
 
-        document.getElementById("picture")
-            .addEventListener("dragstart", event => {
+        document.addEventListener(
+            "keydown",
+            event => {
+
+                if (event.key === "Escape") {
+                    redirectToDiscord();
+                }
+
+            }
+        );
+
+
+        /*
+         * Prevent accidental context-menu interaction.
+         *
+         * The original application is a fixed topmost WinForms
+         * window rather than a normal browser page.
+         */
+
+        document.addEventListener(
+            "contextmenu",
+            event => {
                 event.preventDefault();
-            });
+            }
+        );
+
+
+        /*
+         * Keep the GIF from being dragged around.
+         */
+
+        document
+            .getElementById("pictureBox1")
+            .addEventListener(
+                "dragstart",
+                event => event.preventDefault()
+            );
     </script>
 
 </body>
