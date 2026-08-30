@@ -1,670 +1,830 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta
-name="viewport"
-content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+<!DOCTYPE html>
+<html lang="en">
 
-«»
+<head>
 
-<title>Are you an idiot?</title><style>
+    <meta charset="UTF-8">
 
-    * {
-        box-sizing: border-box;
-    }
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
 
+    <title>Are you an idiot?</title>
 
-    html,
-    body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-    }
+    <style>
 
+        * {
+            box-sizing: border-box;
+        }
 
-    body {
-        background: #008080;
 
-        overflow: hidden;
+        html,
+        body {
+            width: 100%;
+            height: 100%;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-        font-size: 11px;
 
-        user-select: none;
-        -webkit-user-select: none;
+        body {
+            /*
+             * Startup page is intentionally just
+             * the classic Windows 95 teal background.
+             */
+            background: #008080;
 
-        display: flex;
+            overflow: hidden;
 
-        align-items: center;
-        justify-content: center;
-    }
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
+            font-size: 11px;
 
-    /* ============================================================
-       WINDOWS 95 MESSAGE BOX
-       ============================================================ */
+            user-select: none;
+            -webkit-user-select: none;
+        }
 
-    #popup-overlay {
-        position: fixed;
 
-        inset: 0;
+        /* ============================================================
+           WINDOWS 95 MESSAGE BOX
+           ============================================================ */
 
-        display: none;
+        #popup-overlay {
 
-        z-index: 100000;
-    }
+            position: fixed;
 
+            inset: 0;
 
-    #popup-overlay.visible {
-        display: block;
-    }
+            display: none;
 
+            z-index: 100000;
 
-    #popup {
-        position: fixed;
+            overflow: hidden;
+        }
 
-        left: 50%;
-        top: 50%;
 
-        transform:
-            translate(-50%, -50%);
+        #popup-overlay.visible {
+            display: block;
+        }
 
-        min-width: 390px;
 
-        max-width:
-            min(
-                500px,
-                calc(100vw - 30px)
-            );
+        #popup {
 
-        background: #c0c0c0;
+            position: fixed;
 
-        border: 2px solid;
+            left: 50%;
+            top: 50%;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            transform:
+                translate(-50%, -50%);
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            /*
+             * Normal desktop size.
+             */
+            width: 500px;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
-    }
+            /*
+             * Dynamic viewport limit.
+             */
+            max-width:
+                calc(100vw - 30px);
 
+            max-height:
+                calc(100vh - 30px);
 
-    #popup-titlebar {
-        height: 22px;
+            /*
+             * IMPORTANT:
+             *
+             * Do not use min-width: 390px.
+             * That breaks on narrow phones.
+             */
+            min-width: 0;
 
-        display: flex;
+            background: #c0c0c0;
 
-        align-items: center;
+            border: 2px solid;
 
-        padding-left: 4px;
-        padding-right: 2px;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-        background: #000080;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-        color: #ffffff;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-        font-size: 13px;
+            overflow: hidden;
+        }
 
-        font-weight: bold;
 
-        line-height: 18px;
-    }
+        #popup-titlebar {
 
+            height: 22px;
 
-    #popup-title {
-        flex: 1;
+            display: flex;
 
-        white-space: nowrap;
+            align-items: center;
 
-        overflow: hidden;
+            padding-left: 4px;
+            padding-right: 2px;
 
-        text-overflow: ellipsis;
-    }
+            background: #000080;
 
+            color: #ffffff;
 
-    #popup-close {
-        width: 19px;
-        height: 18px;
+            font-size: 13px;
 
-        padding: 0;
+            font-weight: bold;
 
-        background: #c0c0c0;
+            line-height: 18px;
 
-        border: 2px solid;
+            flex-shrink: 0;
+        }
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+        #popup-title {
 
-        font-family:
-            Arial,
-            sans-serif;
+            flex: 1;
 
-        font-size: 11px;
+            min-width: 0;
 
-        font-weight: bold;
+            white-space: nowrap;
 
-        line-height: 13px;
+            overflow: hidden;
 
-        cursor: default;
-    }
+            text-overflow: ellipsis;
+        }
 
 
-    #popup-close:active {
-        border-color:
-            #000000
-            #ffffff
-            #ffffff
-            #000000;
+        #popup-close {
 
-        box-shadow:
-            inset 1px 1px 0 #808080,
-            inset -1px -1px 0 #dfdfdf;
-    }
+            width: 19px;
+            min-width: 19px;
 
+            height: 18px;
 
-    #popup-content {
-        min-height: 90px;
+            padding: 0;
 
-        display: flex;
+            margin-left: 2px;
 
-        align-items: center;
+            background: #c0c0c0;
 
-        padding: 18px;
-    }
+            border: 2px solid;
 
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-    #popup-icon {
-        width: 32px;
-        min-width: 32px;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-        height: 32px;
+            font-family:
+                Arial,
+                sans-serif;
 
-        margin-right: 18px;
+            font-size: 11px;
 
-        display: flex;
+            font-weight: bold;
 
-        align-items: center;
-        justify-content: center;
+            line-height: 13px;
 
-        background: #c0c0c0;
+            cursor: default;
 
-        color: #000000;
+            appearance: none;
+            -webkit-appearance: none;
 
-        font-family:
-            Arial,
-            sans-serif;
+            flex-shrink: 0;
+        }
 
-        font-size: 26px;
 
-        font-weight: bold;
+        #popup-close:active {
 
-        line-height: 32px;
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
 
-        text-align: center;
-    }
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+        }
 
 
-    #popup-message {
-        flex: 1;
+        #popup-content {
 
-        font-size: 13px;
+            min-height: 90px;
 
-        color: #000000;
+            display: flex;
 
-        line-height: 1.35;
-    }
+            align-items: center;
 
+            padding: 18px;
 
-    #popup-buttons {
-        display: flex;
+            min-width: 0;
+        }
 
-        justify-content: center;
 
-        gap: 8px;
+        #popup-icon {
 
-        padding:
-            0
-            12px
-            14px;
-    }
+            width: 32px;
+            min-width: 32px;
 
+            height: 32px;
 
-    #popup-buttons button {
-        min-width: 75px;
+            margin-right: 18px;
 
-        height: 27px;
+            display: flex;
 
-        padding:
-            2px
-            12px;
+            align-items: center;
+            justify-content: center;
 
-        background: #c0c0c0;
+            background: #c0c0c0;
 
-        border: 2px solid;
+            color: #000000;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            font-family:
+                Arial,
+                sans-serif;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            font-size: 26px;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+            font-weight: bold;
 
-        font-size: 12px;
+            line-height: 32px;
 
-        color: #000000;
+            text-align: center;
 
-        cursor: default;
-    }
+            flex-shrink: 0;
+        }
 
 
-    #popup-buttons button:hover {
-        background: #c0c0c0;
-    }
+        #popup-message {
 
+            flex: 1;
 
-    #popup-buttons button:active {
-        border-color:
-            #000000
-            #ffffff
-            #ffffff
-            #000000;
+            min-width: 0;
 
-        box-shadow:
-            inset 1px 1px 0 #808080,
-            inset -1px -1px 0 #dfdfdf;
-    }
+            font-size: 13px;
 
+            color: #000000;
 
-    #popup-buttons button:focus {
-        outline: 1px dotted #000000;
+            line-height: 1.35;
 
-        outline-offset: -5px;
-    }
+            overflow-wrap: break-word;
+        }
 
-</style></head><body><!-- ============================================================
-     PERMISSION MESSAGE
-     ============================================================ --><div id="popup-overlay"><div id="popup"><div id="popup-titlebar">
 
-    <span id="popup-title">
-        YouAreAnIdiot
-    </span>
+        #popup-buttons {
 
+            display: flex;
 
-    <button
-        id="popup-close"
-        type="button"
-    >×</button>
+            justify-content: center;
 
-</div>
+            gap: 8px;
 
+            padding:
+                0
+                12px
+                14px;
 
-<div id="popup-content">
+            flex-wrap: wrap;
+        }
 
-    <div id="popup-icon">
-        !
+
+        #popup-buttons button {
+
+            min-width: 75px;
+
+            height: 27px;
+
+            padding:
+                2px
+                12px;
+
+            background: #c0c0c0;
+
+            border: 2px solid;
+
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
+
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
+
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
+
+            font-size: 12px;
+
+            color: #000000;
+
+            cursor: default;
+
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+
+        #popup-buttons button:hover {
+            background: #c0c0c0;
+        }
+
+
+        #popup-buttons button:active {
+
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
+
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+        }
+
+
+        #popup-buttons button:focus {
+
+            outline:
+                1px dotted #000000;
+
+            outline-offset: -5px;
+        }
+
+
+        /* ============================================================
+           SMALL SCREEN MESSAGE BOX
+           ============================================================ */
+
+        @media (max-width: 520px) {
+
+            #popup {
+
+                width:
+                    calc(100vw - 30px);
+
+                max-width:
+                    calc(100vw - 30px);
+            }
+
+
+            #popup-content {
+                padding: 14px;
+            }
+
+
+            #popup-icon {
+                margin-right: 12px;
+            }
+
+
+            #popup-message {
+                font-size: 12px;
+            }
+
+
+            #popup-buttons {
+
+                gap: 6px;
+
+                padding:
+                    0
+                    10px
+                    12px;
+            }
+
+
+            #popup-buttons button {
+                min-width: 70px;
+            }
+
+        }
+
+
+        /* ============================================================
+           VERY SMALL SCREEN
+           ============================================================ */
+
+        @media (max-width: 360px) {
+
+            #popup {
+
+                width:
+                    calc(100vw - 16px);
+
+                max-width:
+                    calc(100vw - 16px);
+            }
+
+
+            #popup-content {
+                padding: 10px;
+            }
+
+
+            #popup-icon {
+
+                width: 28px;
+                min-width: 28px;
+
+                height: 28px;
+
+                margin-right: 8px;
+
+                font-size: 22px;
+
+                line-height: 28px;
+            }
+
+
+            #popup-message {
+                font-size: 11px;
+            }
+
+
+            #popup-buttons {
+
+                padding:
+                    0
+                    8px
+                    10px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <!--
+        Intentionally empty.
+
+        There is NO "Are You An Idiot?" text here.
+        The normal startup page is only the teal background.
+    -->
+
+
+    <div id="popup-overlay">
+
+        <div id="popup">
+
+            <div id="popup-titlebar">
+
+                <span id="popup-title">
+                    YouAreAnIdiot
+                </span>
+
+                <button
+                    id="popup-close"
+                    type="button"
+                >×</button>
+
+            </div>
+
+
+            <div id="popup-content">
+
+                <div id="popup-icon">
+                    !
+                </div>
+
+
+                <div id="popup-message"></div>
+
+            </div>
+
+
+            <div id="popup-buttons"></div>
+
+        </div>
+
     </div>
 
 
-    <div id="popup-message"></div>
+    <audio
+        id="autoplay-test-audio"
+        preload="auto"
+        loop
+    >
 
-</div>
+        <source
+            src="/media/test.mp3"
+            type="audio/mpeg"
+        >
+
+    </audio>
 
 
-<div id="popup-buttons"></div>
-
-</div></div><!-- ============================================================
-     AUDIO USED FOR AUTOPLAY TEST
-     ============================================================ --><audio
-id="autoplay-test-audio"
-preload="auto"
-loop«»
-
-<source
-src="/media/test.mp3"
-type="audio/mpeg"
-
-«»
-
-</audio><script>
+<script>
 
 "use strict";
 
+
 /* ============================================================
-CONFIGURATION
-============================================================ */
+   CONFIGURATION
+   ============================================================ */
 
 const POPUP_TEST_COUNT = 3;
 
 const TEST_PAGE =
-"test.html";
+    "test.html";
 
 const TARGET_PAGE =
-"popup.html";
+    "popup.html";
 
 const DISCORD_PAGE =
-"discord.html";
+    "discord.html";
 
 const TARGET_CHECK_INTERVAL =
-250;
+    250;
 
 const AUTOPLAY_CHECK_INTERVAL =
-250;
+    250;
+
+
+/*
+ * popup.html's actual design size.
+ *
+ * Keep these identical to popup.html.
+ */
+const QUESTION_WIDTH = 928;
+const QUESTION_HEIGHT = 929;
+
+
+/*
+ * Minimum amount of the desktop window that
+ * should remain visible around the edges.
+ */
+const SCREEN_MARGIN = 20;
+
 
 /* ============================================================
-ELEMENTS
-============================================================ */
+   ELEMENTS
+   ============================================================ */
 
 const popupOverlay =
-document.getElementById(
-"popup-overlay"
-);
+    document.getElementById(
+        "popup-overlay"
+    );
 
 const popupMessage =
-document.getElementById(
-"popup-message"
-);
+    document.getElementById(
+        "popup-message"
+    );
 
 const popupButtons =
-document.getElementById(
-"popup-buttons"
-);
+    document.getElementById(
+        "popup-buttons"
+    );
 
 const popupClose =
-document.getElementById(
-"popup-close"
-);
+    document.getElementById(
+        "popup-close"
+    );
 
 const popupIcon =
-document.getElementById(
-"popup-icon"
-);
+    document.getElementById(
+        "popup-icon"
+    );
 
 const autoplayAudio =
-document.getElementById(
-"autoplay-test-audio"
-);
+    document.getElementById(
+        "autoplay-test-audio"
+    );
+
 
 /* ============================================================
-STATE
-============================================================ */
+   STATE
+   ============================================================ */
 
 const popupResults =
-new Set();
+    new Set();
+
 
 let popupTestStarted =
-false;
+    false;
+
 
 let popupAllowed =
-false;
+    false;
+
 
 let autoplayTestComplete =
-false;
+    false;
+
 
 let autoplayAllowed =
-false;
+    false;
+
 
 let permissionMessageVisible =
-false;
+    false;
+
 
 let popupResolver =
-null;
+    null;
+
 
 let openingTarget =
-false;
+    false;
+
 
 let targetPopup =
-null;
+    null;
+
 
 let targetPopupFinished =
-false;
+    false;
+
 
 let targetPopupMonitor =
-null;
+    null;
 
-/*
-
-* Prevent multiple automatic attempts to open
-* popup.html at the same time.
-  */
 
 let permissionStartupComplete =
-false;
+    false;
 
-/*
-
-* Prevent popup.html from being opened again
-* after the initial successful opening.
-  */
 
 let initialPopupOpenAttempted =
-false;
+    false;
+
 
 /* ============================================================
-MESSAGE BOX
-============================================================ */
+   MESSAGE BOX
+   ============================================================ */
 
 function showPopup(
-message,
-buttons = ["OK"],
-icon = "!"
+    message,
+    buttons = ["OK"],
+    icon = "!"
 ) {
 
-popupMessage.textContent =
-    message;
+    popupMessage.textContent =
+        message;
 
 
-popupIcon.textContent =
-    icon;
+    popupIcon.textContent =
+        icon;
 
 
-popupButtons.innerHTML =
-    "";
+    popupButtons.innerHTML =
+        "";
 
 
-popupOverlay.classList.add(
-    "visible"
-);
+    popupOverlay.classList.add(
+        "visible"
+    );
 
 
-return new Promise(
-    resolve => {
+    return new Promise(
+        resolve => {
 
-        popupResolver =
-            resolve;
+            popupResolver =
+                resolve;
 
 
-        for (
-            const text of buttons
-        ) {
+            for (
+                const text of buttons
+            ) {
 
-            const button =
-                document.createElement(
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                button.type =
+                    "button";
+
+
+                button.textContent =
+                    text;
+
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        closePopup(
+                            text
+                        );
+
+                    }
+                );
+
+
+                popupButtons.appendChild(
+                    button
+                );
+
+            }
+
+
+            const firstButton =
+                popupButtons.querySelector(
                     "button"
                 );
 
 
-            button.type =
-                "button";
+            if (firstButton) {
 
+                firstButton.focus();
 
-            button.textContent =
-                text;
-
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    closePopup(
-                        text
-                    );
-
-                }
-            );
-
-
-            popupButtons.appendChild(
-                button
-            );
+            }
 
         }
-
-
-        const firstButton =
-            popupButtons.querySelector(
-                "button"
-            );
-
-
-        if (firstButton) {
-
-            firstButton.focus();
-
-        }
-
-    }
-);
-
-}
-
-function closePopup(
-result = "Close"
-) {
-
-popupOverlay.classList.remove(
-    "visible"
-);
-
-
-if (popupResolver) {
-
-    const resolve =
-        popupResolver;
-
-    popupResolver =
-        null;
-
-    resolve(result);
-
-}
-
-}
-
-popupClose.addEventListener(
-"click",
-() => {
-
-    closePopup(
-        "Close"
     );
 
 }
 
+
+function closePopup(
+    result = "Close"
+) {
+
+    popupOverlay.classList.remove(
+        "visible"
+    );
+
+
+    if (popupResolver) {
+
+        const resolve =
+            popupResolver;
+
+        popupResolver =
+            null;
+
+        resolve(result);
+
+    }
+
+}
+
+
+popupClose.addEventListener(
+    "click",
+    () => {
+
+        closePopup(
+            "Close"
+        );
+
+    }
 );
 
+
 /* ============================================================
-AUTOPLAY TEST
-SAME LOGIC AS question.html
-============================================================ */
+   AUTOPLAY TEST
+   ============================================================ */
 
 async function testAutoplayPermission() {
 
-if (
-    autoplayTestComplete
-) {
+    if (
+        autoplayTestComplete
+    ) {
 
-    return autoplayAllowed;
+        return autoplayAllowed;
 
-}
-
-
-autoplayTestComplete =
-    true;
+    }
 
 
-try {
-
-    autoplayAudio.pause();
+    autoplayTestComplete =
+        true;
 
 
     try {
-
-        autoplayAudio.currentTime =
-            0;
-
-    } catch (_) {
-
-        /* Ignore. */
-
-    }
-
-
-    const playPromise =
-        autoplayAudio.play();
-
-
-    if (
-        playPromise &&
-        typeof playPromise.then ===
-        "function"
-    ) {
-
-        await playPromise;
-
-    }
-
-
-    await new Promise(
-        resolve => {
-
-            setTimeout(
-                resolve,
-                100
-            );
-
-        }
-    );
-
-
-    autoplayAllowed =
-        !autoplayAudio.paused &&
-        !autoplayAudio.ended;
-
-
-    if (
-        !autoplayAllowed
-    ) {
 
         autoplayAudio.pause();
 
@@ -674,52 +834,117 @@ try {
             autoplayAudio.currentTime =
                 0;
 
-        } catch (_) {
+        } catch (_) {}
 
-            /* Ignore. */
+
+        const playPromise =
+            autoplayAudio.play();
+
+
+        if (
+            playPromise &&
+            typeof playPromise.then ===
+            "function"
+        ) {
+
+            await playPromise;
 
         }
 
-    }
 
-} catch (_) {
+        await new Promise(
+            resolve => {
 
-    autoplayAllowed =
-        false;
+                setTimeout(
+                    resolve,
+                    100
+                );
+
+            }
+        );
 
 
-    try {
+        autoplayAllowed =
+            !autoplayAudio.paused &&
+            !autoplayAudio.ended;
 
-        autoplayAudio.pause();
 
-        autoplayAudio.currentTime =
-            0;
+        if (
+            !autoplayAllowed
+        ) {
+
+            autoplayAudio.pause();
+
+
+            try {
+
+                autoplayAudio.currentTime =
+                    0;
+
+            } catch (_) {}
+
+        }
 
     } catch (_) {
 
-        /* Ignore. */
+        autoplayAllowed =
+            false;
+
+
+        try {
+
+            autoplayAudio.pause();
+
+            autoplayAudio.currentTime =
+                0;
+
+        } catch (_) {}
 
     }
 
-}
+
+    updatePermissionMessage();
+
+    maybeOpenQuestionPopup();
 
 
-updatePermissionMessage();
-
-
-maybeOpenQuestionPopup();
-
-
-return autoplayAllowed;
+    return autoplayAllowed;
 
 }
+
 
 /* ============================================================
-PERIODIC AUTOPLAY TEST
-============================================================ */
+   PERIODIC AUTOPLAY TEST
+   ============================================================ */
 
 setInterval(
-() => {
+    () => {
+
+        if (
+            autoplayAllowed
+        ) {
+
+            return;
+
+        }
+
+
+        autoplayTestComplete =
+            false;
+
+
+        testAutoplayPermission();
+
+    },
+    AUTOPLAY_CHECK_INTERVAL
+);
+
+
+/* ============================================================
+   USER INTERACTION AUTOPLAY UNLOCK
+   ============================================================ */
+
+function tryUnlockAutoplay() {
 
     if (
         autoplayAllowed
@@ -730,1107 +955,1062 @@ setInterval(
     }
 
 
-    autoplayTestComplete =
-        false;
+    try {
+
+        const playPromise =
+            autoplayAudio.play();
 
 
-    testAutoplayPermission();
+        if (
+            playPromise &&
+            typeof playPromise.then ===
+            "function"
+        ) {
 
-},
-AUTOPLAY_CHECK_INTERVAL
-);
+            playPromise
+                .then(
+                    () => {
 
-/* ============================================================
-USER-INTERACTION AUTOPLAY UNLOCK
-============================================================ */
+                        autoplayAllowed =
+                            !autoplayAudio.paused &&
+                            !autoplayAudio.ended;
 
-function tryUnlockAutoplay() {
 
-if (
-    autoplayAllowed
-) {
+                        if (
+                            autoplayAllowed
+                        ) {
 
-    return;
+                            autoplayTestComplete =
+                                true;
+
+                            updatePermissionMessage();
+
+                            maybeOpenQuestionPopup();
+
+                        }
+
+                    }
+                )
+                .catch(
+                    () => {
+
+                        autoplayAllowed =
+                            false;
+
+                        updatePermissionMessage();
+
+                    }
+                );
+
+        } else {
+
+            autoplayAllowed =
+                !autoplayAudio.paused &&
+                !autoplayAudio.ended;
+
+
+            if (
+                autoplayAllowed
+            ) {
+
+                autoplayTestComplete =
+                    true;
+
+                updatePermissionMessage();
+
+                maybeOpenQuestionPopup();
+
+            }
+
+        }
+
+    } catch (_) {
+
+        autoplayAllowed =
+            false;
+
+    }
 
 }
 
 
-try {
+document.addEventListener(
+    "pointerdown",
+    tryUnlockAutoplay,
+    {
+        passive: true
+    }
+);
 
-    const playPromise =
-        autoplayAudio.play();
 
+document.addEventListener(
+    "keydown",
+    tryUnlockAutoplay,
+    {
+        passive: true
+    }
+);
+
+
+/* ============================================================
+   POPUP PERMISSION TEST
+   ============================================================ */
+
+function testPopupPermission() {
 
     if (
-        playPromise &&
-        typeof playPromise.then ===
-        "function"
+        popupTestStarted
     ) {
 
-        playPromise
-            .then(
-                () => {
+        return popupAllowed;
 
-                    autoplayAllowed =
-                        !autoplayAudio.paused &&
-                        !autoplayAudio.ended;
+    }
 
 
-                    if (
-                        autoplayAllowed
-                    ) {
-
-                        autoplayTestComplete =
-                            true;
-
-                        updatePermissionMessage();
-
-                        maybeOpenQuestionPopup();
-
-                    }
-
-                }
-            )
-            .catch(
-                () => {
-
-                    autoplayAllowed =
-                        false;
-
-                    updatePermissionMessage();
-
-                }
-            );
-
-    } else {
-
-        autoplayAllowed =
-            !autoplayAudio.paused &&
-            !autoplayAudio.ended;
+    popupTestStarted =
+        true;
 
 
-        if (
-            autoplayAllowed
-        ) {
+    popupResults.clear();
 
-            autoplayTestComplete =
-                true;
+
+    for (
+        let i = 0;
+        i < POPUP_TEST_COUNT;
+        i++
+    ) {
+
+        try {
+
+            const testPopup =
+                window.open(
+                    `${TEST_PAGE}?id=${i}`,
+                    `youare_popup_test_${i}`,
+                    [
+                        "width=1",
+                        "height=1",
+                        "left=-10000",
+                        "top=-10000"
+                    ].join(",")
+                );
+
+
+            void testPopup;
+
+        } catch (_) {}
+
+    }
+
+
+    setTimeout(
+        () => {
 
             updatePermissionMessage();
 
             maybeOpenQuestionPopup();
 
-        }
 
-    }
+            if (
+                !popupAllowed &&
+                !permissionMessageVisible
+            ) {
 
-} catch (_) {
+                showPermissionMessage();
 
-    autoplayAllowed =
-        false;
+            }
 
-}
+        },
+        1500
+    );
 
-}
-
-document.addEventListener(
-"pointerdown",
-tryUnlockAutoplay,
-{
-passive: true
-}
-);
-
-document.addEventListener(
-"keydown",
-tryUnlockAutoplay,
-{
-passive: true
-}
-);
-
-/* ============================================================
-POPUP PERMISSION TEST
-SAME LOGIC AS question.html
-============================================================ */
-
-function testPopupPermission() {
-
-if (
-    popupTestStarted
-) {
 
     return popupAllowed;
 
 }
 
 
-popupTestStarted =
-    true;
+/* ============================================================
+   POPUP TEST RESULT
+   ============================================================ */
+
+window.addEventListener(
+    "message",
+    event => {
+
+        if (
+            event.origin !==
+            window.location.origin
+        ) {
+
+            return;
+
+        }
 
 
-popupResults.clear();
+        const data =
+            event.data;
 
 
-for (
-    let i = 0;
-    i < POPUP_TEST_COUNT;
-    i++
-) {
+        if (
+            !data ||
+            data.type !==
+            "YOUARE_POPUP_TEST_SUCCESS"
+        ) {
 
-    try {
+            return;
 
-        const testPopup =
-            window.open(
-                `${TEST_PAGE}?id=${i}`,
-                `youare_popup_test_${i}`,
-                [
-                    "width=1",
-                    "height=1",
-                    "left=-10000",
-                    "top=-10000"
-                ].join(",")
-            );
+        }
 
 
-        void testPopup;
-
-    } catch (_) {
-
-        /*
-         * Blocked popup simply does not
-         * report success.
-         */
-
-    }
-
-}
+        const id =
+            String(data.id);
 
 
-/*
- * Do not immediately assume failure.
- *
- * test.html may send its result slightly later.
- */
+        if (
+            ![
+                "0",
+                "1",
+                "2"
+            ].includes(id)
+        ) {
 
-setTimeout(
-    () => {
+            return;
+
+        }
+
+
+        popupResults.add(
+            id
+        );
+
+
+        if (
+            popupResults.size >=
+            POPUP_TEST_COUNT
+        ) {
+
+            popupAllowed =
+                true;
+
+        }
+
 
         updatePermissionMessage();
 
         maybeOpenQuestionPopup();
 
-        if (
-            !popupAllowed &&
-            !permissionMessageVisible
-        ) {
-
-            showPermissionMessage();
-
-        }
-
-    },
-    1500
+    }
 );
 
 
-return popupAllowed;
-
-}
-
 /* ============================================================
-POPUP TEST RESULT HANDLING
-============================================================ */
-
-window.addEventListener(
-"message",
-event => {
-
-    if (
-        event.origin !==
-        window.location.origin
-    ) {
-
-        return;
-
-    }
-
-
-    const data =
-        event.data;
-
-
-    if (
-        !data ||
-        data.type !==
-        "YOUARE_POPUP_TEST_SUCCESS"
-    ) {
-
-        return;
-
-    }
-
-
-    const id =
-        String(data.id);
-
-
-    if (
-        ![
-            "0",
-            "1",
-            "2"
-        ].includes(id)
-    ) {
-
-        return;
-
-    }
-
-
-    popupResults.add(
-        id
-    );
-
-
-    if (
-        popupResults.size >=
-        POPUP_TEST_COUNT
-    ) {
-
-        popupAllowed =
-            true;
-
-    }
-
-
-    updatePermissionMessage();
-
-
-    /*
-     * This is important:
-     *
-     * Once popup permission succeeds, the
-     * actual popup.html is opened when autoplay
-     * is also available.
-     */
-
-    maybeOpenQuestionPopup();
-
-}
-
-);
-
-/* ============================================================
-PERMISSION MESSAGE
-============================================================ */
+   PERMISSION MESSAGE
+   ============================================================ */
 
 function getPermissionMessage() {
 
-if (
-    popupAllowed &&
-    autoplayAllowed
-) {
-
-    return null;
-
-}
-
-
-if (
-    !popupAllowed &&
-    autoplayAllowed
-) {
-
-    return (
-        "This recreation requires pop-up windows " +
-        "to be enabled in your browser. Please allow " +
-        "pop-ups for this site."
-    );
-
-}
-
-
-if (
-    popupAllowed &&
-    !autoplayAllowed
-) {
-
-    return (
-        "This recreation requires audio autoplay " +
-        "to be enabled in your browser. Please allow " +
-        "autoplay for this site."
-    );
-
-}
-
-
-return (
-    "This recreation requires pop-up windows and " +
-    "audio autoplay to be enabled in your browser. " +
-    "Please allow both for this site."
-);
-
-}
-
-function updatePermissionMessage() {
-
-const message =
-    getPermissionMessage();
-
-
-/*
- * Both permissions succeeded.
- */
-
-if (
-    !message
-) {
-
     if (
-        permissionMessageVisible &&
-        popupResolver
+        popupAllowed &&
+        autoplayAllowed
     ) {
 
-        closePopup(
-            "Permissions complete"
+        return null;
+
+    }
+
+
+    if (
+        !popupAllowed &&
+        autoplayAllowed
+    ) {
+
+        return (
+            "This recreation requires pop-up windows " +
+            "to be enabled in your browser. Please allow " +
+            "pop-ups for this site."
         );
 
     }
+
+
+    if (
+        popupAllowed &&
+        !autoplayAllowed
+    ) {
+
+        return (
+            "This recreation requires audio autoplay " +
+            "to be enabled in your browser. Please allow " +
+            "autoplay for this site."
+        );
+
+    }
+
+
+    return (
+        "This recreation requires pop-up windows and " +
+        "audio autoplay to be enabled in your browser. " +
+        "Please allow both for this site."
+    );
+
+}
+
+
+function updatePermissionMessage() {
+
+    const message =
+        getPermissionMessage();
+
+
+    if (
+        !message
+    ) {
+
+        if (
+            permissionMessageVisible &&
+            popupResolver
+        ) {
+
+            closePopup(
+                "Permissions complete"
+            );
+
+        }
+
+
+        permissionMessageVisible =
+            false;
+
+
+        maybeOpenQuestionPopup();
+
+        return;
+
+    }
+
+
+    if (
+        !permissionMessageVisible
+    ) {
+
+        return;
+
+    }
+
+
+    popupMessage.textContent =
+        message;
+
+}
+
+
+async function showPermissionMessage() {
+
+    const message =
+        getPermissionMessage();
+
+
+    if (
+        !message
+    ) {
+
+        maybeOpenQuestionPopup();
+
+        return;
+
+    }
+
+
+    if (
+        permissionMessageVisible
+    ) {
+
+        return;
+
+    }
+
+
+    permissionMessageVisible =
+        true;
+
+
+    await showPopup(
+        message,
+        ["OK"],
+        "!"
+    );
 
 
     permissionMessageVisible =
         false;
 
 
-    maybeOpenQuestionPopup();
+    tryUnlockAutoplay();
 
-    return;
-
-}
-
-
-if (
-    !permissionMessageVisible
-) {
-
-    return;
-
-}
-
-
-popupMessage.textContent =
-    message;
-
-}
-
-async function showPermissionMessage() {
-
-const message =
-    getPermissionMessage();
-
-
-if (
-    !message
-) {
-
-    maybeOpenQuestionPopup();
-
-    return;
-
-}
-
-
-if (
-    permissionMessageVisible
-) {
-
-    return;
-
-}
-
-
-permissionMessageVisible =
-    true;
-
-
-await showPopup(
-    message,
-    ["OK"],
-    "!"
-);
-
-
-permissionMessageVisible =
-    false;
-
-
-/*
- * The OK interaction itself gives the browser
- * another user interaction opportunity.
- */
-
-tryUnlockAutoplay();
-
-
-/*
- * Retry popup permission as well.
- */
-
-if (
-    !popupAllowed
-) {
-
-    popupTestStarted =
-        false;
-
-    popupResults.clear();
-
-    testPopupPermission();
-
-}
-
-
-/*
- * If both permissions have already become
- * available, open popup.html immediately.
- */
-
-maybeOpenQuestionPopup();
-
-}
-
-/* ============================================================
-RESIZE REQUEST FROM popup.html
-============================================================ */
-
-window.addEventListener(
-"message",
-event => {
 
     if (
-        event.origin !==
-        window.location.origin
+        !popupAllowed
     ) {
 
-        return;
+        popupTestStarted =
+            false;
+
+        popupResults.clear();
+
+        testPopupPermission();
 
     }
 
 
-    const data =
-        event.data;
+    maybeOpenQuestionPopup();
 
+}
+
+
+/* ============================================================
+   DISCORD RESIZE REQUEST
+   ============================================================ */
+
+window.addEventListener(
+    "message",
+    event => {
+
+        if (
+            event.origin !==
+            window.location.origin
+        ) {
+
+            return;
+
+        }
+
+
+        const data =
+            event.data;
+
+
+        if (
+            !data ||
+            data.type !==
+            "YOUARE_REQUEST_DISCORD_SIZE"
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            !targetPopup ||
+            event.source !== targetPopup
+        ) {
+
+            return;
+
+        }
+
+
+        const width =
+            Number(data.width);
+
+
+        const height =
+            Number(data.height);
+
+
+        if (
+            !Number.isFinite(width) ||
+            !Number.isFinite(height) ||
+            width < 1 ||
+            height < 1
+        ) {
+
+            return;
+
+        }
+
+
+        const safeWidth =
+            Math.round(
+                Math.min(
+                    width,
+                    Math.max(
+                        1,
+                        screen.availWidth
+                    )
+                )
+            );
+
+
+        const safeHeight =
+            Math.round(
+                Math.min(
+                    height,
+                    Math.max(
+                        1,
+                        screen.availHeight
+                    )
+                )
+            );
+
+
+        try {
+
+            targetPopup.resizeTo(
+                safeWidth,
+                safeHeight
+            );
+
+        } catch (_) {}
+
+
+        try {
+
+            targetPopup.focus();
+
+        } catch (_) {}
+
+    }
+);
+
+
+/* ============================================================
+   DYNAMIC QUESTION POPUP SIZE
+   ============================================================ */
+
+/*
+ * Calculates the browser-window dimensions required
+ * to display popup.html at the largest possible
+ * proportional size.
+ *
+ * Base design:
+ *
+ *     928 × 929
+ *
+ * Same ratio as popup.html.
+ */
+
+function getQuestionPopupDimensions() {
+
+    const availableWidth =
+        Math.max(
+            1,
+            Number(screen.availWidth) -
+            SCREEN_MARGIN * 2
+        );
+
+
+    const availableHeight =
+        Math.max(
+            1,
+            Number(screen.availHeight) -
+            SCREEN_MARGIN * 2
+        );
+
+
+    const aspectRatio =
+        QUESTION_WIDTH /
+        QUESTION_HEIGHT;
+
+
+    let width =
+        availableWidth;
+
+
+    let height =
+        width /
+        aspectRatio;
+
+
+    /*
+     * If the height doesn't fit,
+     * calculate from height instead.
+     */
 
     if (
-        !data ||
-        data.type !==
-        "YOUARE_REQUEST_DISCORD_SIZE"
+        height >
+        availableHeight
     ) {
 
-        return;
+        height =
+            availableHeight;
+
+        width =
+            height *
+            aspectRatio;
 
     }
 
 
     /*
-     * Only the actual popup.html window
-     * can request the resize.
+     * Never request more than the actual
+     * available screen dimensions.
      */
 
-    if (
-        !targetPopup ||
-        event.source !== targetPopup
-    ) {
-
-        return;
-
-    }
-
-
-    const width =
-        Number(data.width);
-
-
-    const height =
-        Number(data.height);
-
-
-    if (
-        !Number.isFinite(width) ||
-        !Number.isFinite(height) ||
-        width < 1 ||
-        height < 1
-    ) {
-
-        return;
-
-    }
-
-
-    const safeWidth =
-        Math.round(
-            Math.min(
-                width,
-                Math.max(
-                    1,
-                    screen.availWidth
-                )
-            )
+    width =
+        Math.min(
+            width,
+            availableWidth
         );
 
-
-    const safeHeight =
-        Math.round(
-            Math.min(
-                height,
-                Math.max(
-                    1,
-                    screen.availHeight
-                )
-            )
-        );
-
-
-    try {
-
-        targetPopup.resizeTo(
-            safeWidth,
-            safeHeight
-        );
-
-    } catch (_) {}
-
-
-    try {
-
-        targetPopup.focus();
-
-    } catch (_) {}
-
-}
-
-);
-
-/* ============================================================
-INITIAL / FAKE WINDOW SIZE
-============================================================ */
-
-function getPopupFeatures() {
-
-const availableWidth =
-    Math.max(
-        380,
-        screen.availWidth - 40
-    );
-
-
-const availableHeight =
-    Math.max(
-        380,
-        screen.availHeight - 40
-    );
-
-
-/*
- * Fake question-window aspect ratio.
- *
- * popup.html starts at this size.
- *
- * It can later request the Discord size.
- */
-
-const aspectRatio =
-    928 / 929;
-
-
-let width =
-    Math.min(
-        800,
-        availableWidth
-    );
-
-
-let height =
-    width /
-    aspectRatio;
-
-
-if (
-    height >
-    Math.min(
-        800,
-        availableHeight
-    )
-) {
 
     height =
         Math.min(
-            800,
+            height,
             availableHeight
         );
 
 
     width =
-        height *
-        aspectRatio;
+        Math.max(
+            1,
+            Math.floor(width)
+        );
+
+
+    height =
+        Math.max(
+            1,
+            Math.floor(height)
+        );
+
+
+    return {
+        width,
+        height
+    };
 
 }
 
-
-width =
-    Math.max(
-        300,
-        Math.floor(width)
-    );
-
-
-height =
-    Math.max(
-        300,
-        Math.floor(height)
-    );
-
-
-const left =
-    Math.max(
-        0,
-        Math.floor(
-            (
-                screen.availWidth -
-                width
-            ) / 2
-        )
-    );
-
-
-const top =
-    Math.max(
-        0,
-        Math.floor(
-            (
-                screen.availHeight -
-                height
-            ) / 2
-        )
-    );
-
-
-return [
-    `width=${width}`,
-    `height=${height}`,
-    `left=${left}`,
-    `top=${top}`,
-    "resizable=yes",
-    "scrollbars=no",
-    "toolbar=no",
-    "menubar=no",
-    "location=no",
-    "status=no"
-].join(",");
-
-}
 
 /* ============================================================
-REAL POPUP CLOSED HANDLER
-============================================================ */
+   POPUP FEATURES
+   ============================================================ */
+
+function getPopupFeatures() {
+
+    const dimensions =
+        getQuestionPopupDimensions();
+
+
+    const left =
+        Math.max(
+            0,
+            Math.floor(
+                (
+                    screen.availWidth -
+                    dimensions.width
+                ) / 2
+            )
+        );
+
+
+    const top =
+        Math.max(
+            0,
+            Math.floor(
+                (
+                    screen.availHeight -
+                    dimensions.height
+                ) / 2
+            )
+        );
+
+
+    return [
+
+        `width=${dimensions.width}`,
+
+        `height=${dimensions.height}`,
+
+        `left=${left}`,
+
+        `top=${top}`,
+
+        "resizable=yes",
+
+        "scrollbars=no",
+
+        "toolbar=no",
+
+        "menubar=no",
+
+        "location=no",
+
+        "status=no"
+
+    ].join(",");
+
+}
+
+
+/* ============================================================
+   REAL POPUP CLOSED HANDLER
+   ============================================================ */
 
 function handleTargetPopupClosed() {
 
-if (
-    targetPopupFinished
-) {
+    if (
+        targetPopupFinished
+    ) {
 
-    return;
+        return;
 
-}
+    }
 
 
-targetPopupFinished =
-    true;
-
-
-if (
-    targetPopupMonitor
-) {
-
-    clearInterval(
-        targetPopupMonitor
-    );
-
-    targetPopupMonitor =
-        null;
-
-}
-
-
-targetPopup =
-    null;
-
-
-/*
- * The real popup has been closed.
- *
- * Instead of opening another popup or
- * redirecting to discord.html, load
- * /scripts/app.js into this page.
- */
-
-const existingScript =
-    document.querySelector(
-        'script[data-youare-app-script="true"]'
-    );
-
-
-if (
-    existingScript
-) {
-
-    return;
-
-}
-
-
-const appScript =
-    document.createElement(
-        "script"
-    );
-
-
-appScript.src =
-    "/scripts/app.js";
-
-
-appScript.async =
-    false;
-
-
-appScript.dataset.youareAppScript =
-    "true";
-
-
-document.head.appendChild(
-    appScript
-);
-
-}
-
-/* ============================================================
-MONITOR REAL POPUP
-============================================================ */
-
-function monitorTargetPopup(
-popup
-) {
-
-if (
-    targetPopupMonitor
-) {
-
-    clearInterval(
-        targetPopupMonitor
-    );
-
-}
-
-
-targetPopupMonitor =
-    setInterval(
-        () => {
-
-            try {
-
-                if (
-                    popup.closed
-                ) {
-
-                    handleTargetPopupClosed();
-
-                }
-
-            } catch (_) {
-
-                /*
-                 * Keep monitoring.
-                 */
-
-            }
-
-        },
-        TARGET_CHECK_INTERVAL
-    );
-
-}
-
-/* ============================================================
-OPEN QUESTION POPUP
-============================================================ */
-
-function openQuestionPopup() {
-
-if (
-    openingTarget ||
-    targetPopup
-) {
-
-    return;
-
-}
-
-
-if (
-    !popupAllowed ||
-    !autoplayAllowed
-) {
-
-    return;
-
-}
-
-
-openingTarget =
-    true;
-
-
-targetPopupFinished =
-    false;
-
-
-const features =
-    getPopupFeatures();
-
-
-let popup =
-    null;
-
-
-try {
-
-    popup =
-        window.open(
-            TARGET_PAGE,
-            "YouAreAnIdiotQuestion",
-            features
-        );
-
-} catch (_) {
-
-    popup =
-        null;
-
-}
-
-
-/*
- * Browser blocked the actual popup.
- */
-
-if (
-    !popup
-) {
-
-    openingTarget =
-        false;
-
-    popupAllowed =
-        false;
-
-    popupTestStarted =
-        false;
-
-    popupResults.clear();
-
-
-    showPermissionMessage();
-
-    return;
-
-}
-
-
-/*
- * Save the actual WindowProxy immediately.
- */
-
-targetPopup =
-    popup;
-
-
-openingTarget =
-    false;
-
-
-/*
- * Start monitoring immediately.
- */
-
-monitorTargetPopup(
-popup
-);
-
-
-try {
-
-    popup.focus();
-
-} catch (_) {}
-
-}
-
-/* ============================================================
-OPEN ONLY WHEN BOTH CHECKS SUCCEEDED
-============================================================ */
-
-function maybeOpenQuestionPopup() {
-
-if (
-    initialPopupOpenAttempted
-) {
-
-    return;
-
-}
-
-
-if (
-    !permissionStartupComplete
-) {
-
-    return;
-
-}
-
-
-if (
-    !popupAllowed ||
-    !autoplayAllowed
-) {
-
-    return;
-
-}
-
-
-if (
-    targetPopup ||
-    openingTarget
-) {
-
-    return;
-
-}
-
-
-initialPopupOpenAttempted =
-    true;
-
-
-/*
- * Close the permission message if it is
- * still visible.
- */
-
-if (
-    permissionMessageVisible
-) {
-
-    closePopup(
-        "Permissions complete"
-    );
-
-    permissionMessageVisible =
-        false;
-
-}
-
-
-openQuestionPopup();
-
-}
-
-/* ============================================================
-STARTUP
-============================================================ */
-
-window.addEventListener(
-"load",
-async () => {
-
-    /*
-     * Same order as question.html:
-     *
-     * 1. popup test
-     * 2. autoplay test
-     * 3. permission message
-     */
-
-    testPopupPermission();
-
-
-    await testAutoplayPermission();
-
-
-    permissionStartupComplete =
+    targetPopupFinished =
         true;
 
 
-    /*
-     * If both succeeded while startup was
-     * running, open popup.html.
-     */
+    if (
+        targetPopupMonitor
+    ) {
 
-    maybeOpenQuestionPopup();
+        clearInterval(
+            targetPopupMonitor
+        );
+
+        targetPopupMonitor =
+            null;
+
+    }
 
 
-    /*
-     * Otherwise show the appropriate
-     * combined permission message.
-     */
+    targetPopup =
+        null;
+
+
+    const existingScript =
+        document.querySelector(
+            'script[data-youare-app-script="true"]'
+        );
+
+
+    if (
+        existingScript
+    ) {
+
+        return;
+
+    }
+
+
+    const appScript =
+        document.createElement(
+            "script"
+        );
+
+
+    appScript.src =
+        "/scripts/app.js";
+
+
+    appScript.async =
+        false;
+
+
+    appScript.dataset.youareAppScript =
+        "true";
+
+
+    document.head.appendChild(
+        appScript
+    );
+
+}
+
+
+/* ============================================================
+   MONITOR REAL POPUP
+   ============================================================ */
+
+function monitorTargetPopup(
+    popup
+) {
+
+    if (
+        targetPopupMonitor
+    ) {
+
+        clearInterval(
+            targetPopupMonitor
+        );
+
+    }
+
+
+    targetPopupMonitor =
+        setInterval(
+            () => {
+
+                try {
+
+                    if (
+                        popup.closed
+                    ) {
+
+                        handleTargetPopupClosed();
+
+                    }
+
+                } catch (_) {}
+
+            },
+            TARGET_CHECK_INTERVAL
+        );
+
+}
+
+
+/* ============================================================
+   OPEN QUESTION POPUP
+   ============================================================ */
+
+function openQuestionPopup() {
+
+    if (
+        openingTarget ||
+        targetPopup
+    ) {
+
+        return;
+
+    }
+
 
     if (
         !popupAllowed ||
         !autoplayAllowed
     ) {
 
-        await showPermissionMessage();
+        return;
 
     }
 
-},
-{
-    once: true
-}
 
-);
+    openingTarget =
+        true;
 
-/* ============================================================
-RETEST ON FOCUS
-============================================================ */
 
-window.addEventListener(
-"focus",
-() => {
+    targetPopupFinished =
+        false;
 
-    /*
-     * Don't restart permission testing after
-     * the actual popup has opened.
-     */
+
+    const features =
+        getPopupFeatures();
+
+
+    let popup =
+        null;
+
+
+    try {
+
+        popup =
+            window.open(
+                TARGET_PAGE,
+                "YouAreAnIdiotQuestion",
+                features
+            );
+
+    } catch (_) {
+
+        popup =
+            null;
+
+    }
+
 
     if (
-        !targetPopup &&
-        !permissionMessageVisible
+        !popup
     ) {
 
+        openingTarget =
+            false;
+
+
+        popupAllowed =
+            false;
+
+
+        popupTestStarted =
+            false;
+
+
+        popupResults.clear();
+
+
+        showPermissionMessage();
+
+        return;
+
+    }
+
+
+    targetPopup =
+        popup;
+
+
+    openingTarget =
+        false;
+
+
+    monitorTargetPopup(
+        popup
+    );
+
+
+    try {
+
+        popup.focus();
+
+    } catch (_) {}
+
+}
+
+
+/* ============================================================
+   OPEN ONLY AFTER BOTH CHECKS
+   ============================================================ */
+
+function maybeOpenQuestionPopup() {
+
+    if (
+        initialPopupOpenAttempted
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !permissionStartupComplete
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !popupAllowed ||
+        !autoplayAllowed
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        targetPopup ||
+        openingTarget
+    ) {
+
+        return;
+
+    }
+
+
+    initialPopupOpenAttempted =
+        true;
+
+
+    if (
+        permissionMessageVisible
+    ) {
+
+        closePopup(
+            "Permissions complete"
+        );
+
+        permissionMessageVisible =
+            false;
+
+    }
+
+
+    openQuestionPopup();
+
+}
+
+
+/* ============================================================
+   STARTUP
+   ============================================================ */
+
+window.addEventListener(
+    "load",
+    async () => {
+
+        testPopupPermission();
+
+
+        await testAutoplayPermission();
+
+
+        permissionStartupComplete =
+            true;
+
+
+        maybeOpenQuestionPopup();
+
+
         if (
-            !popupAllowed
+            !popupAllowed ||
+            !autoplayAllowed
         ) {
 
-            popupTestStarted =
-                false;
+            await showPermissionMessage();
 
-            popupResults.clear();
+        }
 
-            testPopupPermission();
+    },
+    {
+        once: true
+    }
+);
+
+
+/* ============================================================
+   RETEST ON FOCUS
+   ============================================================ */
+
+window.addEventListener(
+    "focus",
+    () => {
+
+        if (
+            !targetPopup &&
+            !permissionMessageVisible
+        ) {
+
+            if (
+                !popupAllowed
+            ) {
+
+                popupTestStarted =
+                    false;
+
+                popupResults.clear();
+
+                testPopupPermission();
+
+            }
+
+
+            if (
+                !autoplayAllowed
+            ) {
+
+                autoplayTestComplete =
+                    false;
+
+                testAutoplayPermission();
+
+            }
 
         }
 
@@ -1839,62 +2019,50 @@ window.addEventListener(
             !autoplayAllowed
         ) {
 
-            autoplayTestComplete =
-                false;
-
-            testAutoplayPermission();
+            tryUnlockAutoplay();
 
         }
 
     }
-
-
-    if (
-        !autoplayAllowed
-    ) {
-
-        tryUnlockAutoplay();
-
-    }
-
-}
-
 );
+
 
 /* ============================================================
-ESCAPE
-============================================================ */
+   ESCAPE
+   ============================================================ */
 
 document.addEventListener(
-"keydown",
-event => {
+    "keydown",
+    event => {
 
-    if (
-        event.key === "Escape"
-    ) {
+        if (
+            event.key === "Escape"
+        ) {
 
-        closePopup(
-            "Close"
-        );
+            closePopup(
+                "Close"
+            );
+
+        }
 
     }
-
-}
-
 );
+
 
 /* ============================================================
-RIGHT CLICK
-============================================================ */
+   RIGHT CLICK
+   ============================================================ */
 
 document.addEventListener(
-"contextmenu",
-event => {
+    "contextmenu",
+    event => {
 
-    event.preventDefault();
+        event.preventDefault();
 
-}
-
+    }
 );
 
-</script></body></html>
+</script>
+
+</body>
+</html>
