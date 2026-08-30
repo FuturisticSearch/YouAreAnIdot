@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>YouAreAnIdiot</title>
+
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #008080;
+        }
+    </style>
+</head>
+
+<body>
+
+<script>
+"use strict";
+
+let popupWindow = null;
+
+function openPopup() {
+
+    const screenWidth =
+        window.screen.availWidth ||
+        window.innerWidth;
+
+    const screenHeight =
+        window.screen.availHeight ||
+        window.innerHeight;
+
+
+    /*
+     * Original design size.
+     *
+     * The popup never requests more space than
+     * the available screen.
+     */
+    const baseWidth = 928;
+    const baseHeight = 929;
+
+
+    const width =
+        Math.min(
+            baseWidth,
+            Math.max(
+                320,
+                screenWidth - 16
+            )
+        );
+
+
+    const height =
+        Math.min(
+            baseHeight,
+            Math.max(
+                240,
+                screenHeight - 16
+            )
+        );
+
+
+    /*
+     * Center using the available screen area.
+     */
+    const left =
+        Math.max(
+            0,
+            Math.round(
+                (screenWidth - width) / 2
+            )
+        );
+
+
+    const top =
+        Math.max(
+            0,
+            Math.round(
+                (screenHeight - height) / 2
+            )
+        );
+
+
+    const features = [
+        `width=${width}`,
+        `height=${height}`,
+        `left=${left}`,
+        `top=${top}`,
+        "resizable=yes",
+        "scrollbars=no",
+        "menubar=no",
+        "toolbar=no",
+        "location=no",
+        "status=no"
+    ].join(",");
+
+
+    try {
+
+        popupWindow =
+            window.open(
+                "popup.html",
+                "YouAreAnIdiotPopup",
+                features
+            );
+
+    } catch (_) {
+
+        popupWindow = null;
+
+    }
+
+
+    /*
+     * If the browser blocked the popup,
+     * clicking again can retry it.
+     */
+    if (
+        popupWindow &&
+        !popupWindow.closed
+    ) {
+
+        try {
+            popupWindow.focus();
+        } catch (_) {}
+
+        return true;
+    }
+
+
+    return false;
+}
+
+
+/*
+ * First attempt.
+ */
+openPopup();
+
+
+/*
+ * Backup for browsers that block an automatic
+ * popup unless it comes from a user gesture.
+ */
+document.addEventListener(
+    "pointerdown",
+    () => {
+
+        if (
+            popupWindow &&
+            !popupWindow.closed
+        ) {
+            return;
+        }
+
+        if (!openPopup()) {
+
+            /*
+             * Final fallback:
+             * open the actual page in the current tab.
+             */
+            window.location.href =
+                "popup.html";
+        }
+
+    },
+    {
+        once: true
+    }
+);
+
+
+/*
+ * Keyboard fallback.
+ */
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key !== "Enter" &&
+            event.key !== " "
+        ) {
+            return;
+        }
+
+
+        if (
+            popupWindow &&
+            !popupWindow.closed
+        ) {
+            return;
+        }
+
+
+        if (!openPopup()) {
+
+            window.location.href =
+                "popup.html";
+
+        }
+
+    },
+    {
+        once: true
+    }
+);
+</script>
+
+</body>
+</html>
