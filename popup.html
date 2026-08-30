@@ -314,13 +314,17 @@
             transform:
                 translate(-50%, -50%);
 
-            min-width: 390px;
+            width: min(
+                500px,
+                calc(100vw - 30px),
+                calc(100vh - 30px)
+            );
 
-            max-width:
-                min(
-                    500px,
-                    calc(100vw - 30px)
-                );
+            min-width: min(
+                390px,
+                calc(100vw - 30px),
+                calc(100vh - 30px)
+            );
 
             background: #c0c0c0;
 
