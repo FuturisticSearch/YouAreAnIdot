@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -13,6 +12,10 @@
     <title>Are You An Idiot?</title>
 
     <style>
+
+        /* ============================================================
+           WINDOWS 95 / 98 CLASSIC BASE
+           ============================================================ */
 
         * {
             box-sizing: border-box;
@@ -31,9 +34,12 @@
 
             font-family:
                 "MS Sans Serif",
+                "Microsoft Sans Serif",
                 Tahoma,
                 Arial,
                 sans-serif;
+
+            font-size: 11px;
 
             user-select: none;
             -webkit-user-select: none;
@@ -42,6 +48,11 @@
             align-items: center;
             justify-content: center;
         }
+
+
+        /* ============================================================
+           MAIN WINDOW
+           ============================================================ */
 
         #question-window {
             position: absolute;
@@ -60,6 +71,9 @@
 
             background: #c0c0c0;
 
+            /*
+             * Classic Windows 95/98 outer bevel.
+             */
             border: 2px solid;
 
             border-color:
@@ -69,11 +83,16 @@
                 #ffffff;
 
             box-shadow:
-                1px 1px 0 #dfdfdf,
-                2px 2px 0 #808080;
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
             overflow: hidden;
         }
+
+
+        /* ============================================================
+           TITLE BAR
+           ============================================================ */
 
         #titlebar {
             position: absolute;
@@ -82,12 +101,12 @@
             right: 3px;
             top: 3px;
 
-            height: 25px;
+            height: 22px;
 
             display: flex;
             align-items: center;
 
-            padding-left: 5px;
+            padding-left: 4px;
             padding-right: 2px;
 
             background: #000080;
@@ -96,12 +115,15 @@
 
             font-family:
                 "MS Sans Serif",
+                "Microsoft Sans Serif",
                 Tahoma,
                 Arial,
                 sans-serif;
 
             font-size: 13px;
             font-weight: bold;
+
+            line-height: 18px;
 
             cursor: move;
 
@@ -110,12 +132,23 @@
 
         #title {
             flex: 1;
+
             pointer-events: none;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
+
+        /* ============================================================
+           WINDOWS 95 TITLE BAR BUTTONS
+           ============================================================ */
+
         .window-button {
-            width: 21px;
-            height: 21px;
+            width: 19px;
+            height: 18px;
 
             padding: 0;
             margin-left: 2px;
@@ -125,6 +158,7 @@
             justify-content: center;
 
             background: #c0c0c0;
+
             color: #000000;
 
             border: 2px solid;
@@ -135,12 +169,18 @@
                 #000000
                 #ffffff;
 
-            font-family: Arial, sans-serif;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-            font-size: 12px;
+            font-family:
+                Arial,
+                sans-serif;
+
+            font-size: 11px;
             font-weight: bold;
 
-            line-height: 15px;
+            line-height: 13px;
 
             cursor: default;
 
@@ -154,20 +194,33 @@
                 #ffffff
                 #ffffff
                 #000000;
+
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+
+            padding-left: 1px;
+            padding-top: 1px;
         }
 
         .window-button:disabled {
             opacity: 1;
+            color: #000000;
         }
+
+
+        /* ============================================================
+           MAIN IMAGE
+           ============================================================ */
 
         #pictureBox1 {
             position: absolute;
 
             left: 3px;
-            top: 31px;
+            top: 28px;
 
             width: 918px;
-            height: 711px;
+            height: 714px;
 
             display: block;
 
@@ -175,6 +228,11 @@
 
             pointer-events: none;
         }
+
+
+        /* ============================================================
+           QUESTION AREA
+           ============================================================ */
 
         #question-area {
             position: absolute;
@@ -194,7 +252,12 @@
         #question {
             margin: 0;
 
-            font-family: Verdana, sans-serif;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
             font-size: 20px;
             font-weight: normal;
@@ -208,19 +271,29 @@
             text-align: center;
         }
 
+
+        /* ============================================================
+           ANSWER BUTTONS
+           ============================================================ */
+
         .answer {
             position: absolute;
 
             top: 860px;
-
             height: 57px;
 
             padding: 0;
 
             background: #c0c0c0;
+
             color: #000000;
 
-            font-family: Verdana, sans-serif;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
             font-size: 12px;
             font-weight: normal;
@@ -269,6 +342,7 @@
             outline-offset: -5px;
         }
 
+
         #no {
             left: 28px;
             width: 262px;
@@ -284,6 +358,11 @@
             width: 244px;
         }
 
+
+        /* ============================================================
+           CUSTOM MESSAGE BOX OVERLAY
+           ============================================================ */
+
         #popup-overlay {
             position: fixed;
 
@@ -298,13 +377,19 @@
             display: block;
         }
 
+
+        /* ============================================================
+           WINDOWS 95 MESSAGE BOX
+           ============================================================ */
+
         #popup {
             position: fixed;
 
             left: 50%;
             top: 50%;
 
-            transform: translate(-50%, -50%);
+            transform:
+                translate(-50%, -50%);
 
             min-width: 390px;
 
@@ -325,28 +410,41 @@
                 #ffffff;
 
             box-shadow:
-                1px 1px 0 #dfdfdf,
-                2px 2px 0 #808080;
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
             font-family:
                 "MS Sans Serif",
+                "Microsoft Sans Serif",
                 Tahoma,
                 Arial,
                 sans-serif;
         }
 
+
+        /* ============================================================
+           MESSAGE BOX TITLE BAR
+           ============================================================ */
+
         #popup-titlebar {
-            height: 25px;
+            height: 22px;
 
             display: flex;
             align-items: center;
 
-            padding-left: 5px;
+            padding-left: 4px;
             padding-right: 2px;
 
             background: #000080;
 
             color: #ffffff;
+
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
             font-size: 13px;
             font-weight: bold;
@@ -354,11 +452,21 @@
 
         #popup-title {
             flex: 1;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
+
+        /* ============================================================
+           MESSAGE BOX CLOSE BUTTON
+           ============================================================ */
+
         #popup-close {
-            width: 21px;
-            height: 21px;
+            width: 19px;
+            height: 18px;
 
             padding: 0;
 
@@ -372,10 +480,18 @@
                 #000000
                 #ffffff;
 
-            font-family: Arial, sans-serif;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-            font-size: 12px;
+            font-family:
+                Arial,
+                sans-serif;
+
+            font-size: 11px;
             font-weight: bold;
+
+            line-height: 13px;
 
             cursor: default;
         }
@@ -386,7 +502,16 @@
                 #ffffff
                 #ffffff
                 #000000;
+
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
         }
+
+
+        /* ============================================================
+           MESSAGE CONTENT
+           ============================================================ */
 
         #popup-content {
             min-height: 90px;
@@ -397,6 +522,11 @@
 
             padding: 18px;
         }
+
+
+        /* ============================================================
+           CLASSIC WARNING ICON
+           ============================================================ */
 
         #popup-icon {
             width: 32px;
@@ -411,17 +541,29 @@
             align-items: center;
             justify-content: center;
 
-            font-family: Arial, sans-serif;
+            background: #c0c0c0;
 
-            font-size: 27px;
+            color: #000000;
+
+            font-family:
+                Arial,
+                sans-serif;
+
+            font-size: 26px;
             font-weight: bold;
+
+            line-height: 32px;
+
+            text-align: center;
         }
+
 
         #popup-message {
             flex: 1;
 
             font-family:
                 "MS Sans Serif",
+                "Microsoft Sans Serif",
                 Tahoma,
                 Arial,
                 sans-serif;
@@ -432,6 +574,11 @@
 
             line-height: 1.35;
         }
+
+
+        /* ============================================================
+           MESSAGE BOX BUTTON AREA
+           ============================================================ */
 
         #popup-buttons {
             display: flex;
@@ -445,6 +592,11 @@
                 12px
                 14px;
         }
+
+
+        /* ============================================================
+           CLASSIC WINDOWS BUTTON
+           ============================================================ */
 
         #popup-buttons button {
             min-width: 75px;
@@ -471,6 +623,7 @@
 
             font-family:
                 "MS Sans Serif",
+                "Microsoft Sans Serif",
                 Tahoma,
                 Arial,
                 sans-serif;
@@ -478,6 +631,12 @@
             font-size: 12px;
 
             color: #000000;
+
+            cursor: default;
+        }
+
+        #popup-buttons button:hover {
+            background: #c0c0c0;
         }
 
         #popup-buttons button:active {
@@ -498,10 +657,15 @@
         }
 
     </style>
-
 </head>
 
+
 <body>
+
+
+    <!-- ============================================================
+         MAIN WINDOWS 95-STYLE WINDOW
+         ============================================================ -->
 
     <main id="question-window">
 
@@ -533,12 +697,14 @@
 
         </div>
 
+
         <img
             id="pictureBox1"
             src="media/idiot.gif"
             alt=""
             draggable="false"
         >
+
 
         <div id="question-area">
 
@@ -548,6 +714,7 @@
 
         </div>
 
+
         <button
             class="answer"
             id="no"
@@ -556,6 +723,7 @@
             No, I'm not.
         </button>
 
+
         <button
             class="answer"
             id="none"
@@ -563,6 +731,7 @@
         >
             I don't know =[
         </button>
+
 
         <button
             class="answer"
@@ -574,6 +743,11 @@
 
     </main>
 
+
+
+    <!-- ============================================================
+         CUSTOM WINDOWS 95 MESSAGE BOX
+         ============================================================ -->
 
     <div id="popup-overlay">
 
@@ -592,6 +766,7 @@
 
             </div>
 
+
             <div id="popup-content">
 
                 <div id="popup-icon">
@@ -602,12 +777,18 @@
 
             </div>
 
+
             <div id="popup-buttons"></div>
 
         </div>
 
     </div>
 
+
+
+    <!-- ============================================================
+         AUDIO
+         ============================================================ -->
 
     <audio
         id="idiot-audio"
@@ -621,6 +802,7 @@
         >
 
     </audio>
+
 
 
     <script>
@@ -702,6 +884,7 @@
                     viewportWidth - 4
                 );
 
+
             const availableHeight =
                 Math.max(
                     1,
@@ -752,6 +935,7 @@
                         renderedWidth
                     );
 
+
                 const maxY =
                     Math.max(
                         0,
@@ -768,6 +952,7 @@
                         ),
                         maxX
                     );
+
 
                 windowY =
                     Math.min(
@@ -834,9 +1019,7 @@
                     event.origin !==
                     window.location.origin
                 ) {
-
                     return;
-
                 }
 
 
@@ -849,9 +1032,7 @@
                     data.type !==
                     "YOUARE_POPUP_TEST_SUCCESS"
                 ) {
-
                     return;
-
                 }
 
 
@@ -866,9 +1047,7 @@
                         "2"
                     ].includes(id)
                 ) {
-
                     return;
-
                 }
 
 
@@ -894,9 +1073,7 @@
         function testPopupPermission() {
 
             if (popupTestStarted) {
-
                 return popupAllowed;
-
             }
 
 
@@ -927,15 +1104,21 @@
 
 
                     /*
-                     * test.html is responsible for closing
-                     * itself after sending the success message.
+                     * test.html closes itself after
+                     * sending the confirmation message.
+                     *
+                     * If Firefox delays/restores the
+                     * popup, its later message is still
+                     * accepted.
                      */
+
                     void popup;
 
                 } catch (_) {
 
                     /*
-                     * Blocked popups simply won't report.
+                     * Blocked popup simply does not
+                     * report success.
                      */
 
                 }
@@ -960,9 +1143,7 @@
         async function testAutoplayPermission() {
 
             if (autoplayTestComplete) {
-
                 return autoplayAllowed;
-
             }
 
 
@@ -1078,8 +1259,10 @@
             popupMessage.textContent =
                 message;
 
+
             popupIcon.textContent =
                 icon;
+
 
             popupButtons.innerHTML =
                 "";
@@ -1109,6 +1292,7 @@
 
                         button.type =
                             "button";
+
 
                         button.textContent =
                             text;
@@ -1175,6 +1359,18 @@
         }
 
 
+        popupClose.addEventListener(
+            "click",
+            () => {
+
+                closePopup(
+                    "Close"
+                );
+
+            }
+        );
+
+
         /* ============================================================
            DYNAMIC PERMISSION MESSAGE
            ============================================================ */
@@ -1237,6 +1433,10 @@
                 getPermissionMessage();
 
 
+            /*
+             * Both permissions are now available.
+             * Remove the permission dialog automatically.
+             */
             if (!message) {
 
                 if (
@@ -1260,9 +1460,7 @@
 
 
             if (!permissionMessageVisible) {
-
                 return;
-
             }
 
 
@@ -1279,9 +1477,7 @@
 
 
             if (!message) {
-
                 return;
-
             }
 
 
@@ -1312,9 +1508,7 @@
 
                 testPopupPermission();
 
-
                 await testAutoplayPermission();
-
 
                 await showPermissionMessage();
 
@@ -1434,9 +1628,7 @@
         function redirectToDiscord() {
 
             if (redirecting) {
-
                 return;
-
             }
 
 
@@ -1456,9 +1648,7 @@
         async function handleNo() {
 
             if (redirecting) {
-
                 return;
-
             }
 
 
@@ -1495,9 +1685,7 @@
             async () => {
 
                 if (redirecting) {
-
                     return;
-
                 }
 
 
@@ -1510,15 +1698,11 @@
 
 
                 /*
-                 * IMPORTANT:
+                 * Both Yes AND No redirect.
                  *
-                 * Both answers redirect.
-                 *
-                 * "No" does NOT cancel the redirect.
-                 *
-                 * Closing the popup also returns "Close",
-                 * which therefore redirects as well.
+                 * Closing the message box also redirects.
                  */
+
                 if (
                     result === "Yes" ||
                     result === "No" ||
@@ -1608,6 +1792,7 @@
 
 
                 dragging = true;
+
 
                 dragPointerId =
                     event.pointerId;
@@ -1713,6 +1898,7 @@
                         renderedWidth
                     );
 
+
                 const minVisibleY =
                     Math.min(
                         30,
@@ -1724,6 +1910,7 @@
                     -renderedWidth +
                     minVisible;
 
+
                 const maxX =
                     window.innerWidth -
                     minVisible;
@@ -1732,6 +1919,7 @@
                 const minY =
                     -renderedHeight +
                     minVisibleY;
+
 
                 const maxY =
                     window.innerHeight -
