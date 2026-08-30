@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
 
     <title>Are You An Idiot?</title>
 
@@ -22,10 +25,6 @@
             background: #008080;
             overflow: hidden;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
             font-family:
                 "MS Sans Serif",
                 Tahoma,
@@ -33,6 +32,11 @@
                 sans-serif;
 
             user-select: none;
+            -webkit-user-select: none;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
 
@@ -43,13 +47,30 @@
         #question-window {
             position: absolute;
 
+            /*
+             * Everything inside this window uses the original
+             * 928 × 929 coordinate system.
+             */
             width: 928px;
             height: 929px;
+
+            left: 50%;
+            top: 50%;
+
+            transform:
+                translate(-50%, -50%)
+                scale(1);
+
+            transform-origin: center center;
 
             background: #c0c0c0;
 
             border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
             box-shadow:
                 1px 1px 0 #dfdfdf,
@@ -92,6 +113,8 @@
             font-weight: bold;
 
             cursor: move;
+
+            touch-action: none;
         }
 
         #title {
@@ -101,7 +124,9 @@
         }
 
 
-        /* Windows 95/98 title buttons */
+        /* ============================================================
+           TITLE BAR BUTTONS
+           ============================================================ */
 
         .window-button {
             width: 21px;
@@ -132,6 +157,17 @@
             line-height: 15px;
 
             cursor: default;
+
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .window-button:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
         }
 
         .window-button:disabled {
@@ -140,7 +176,7 @@
 
 
         /* ============================================================
-           GIF / PICTURE BOX
+           GIF
            ============================================================ */
 
         #pictureBox1 {
@@ -197,7 +233,7 @@
 
 
         /* ============================================================
-           WIN95/98 ANSWER BUTTONS
+           ANSWER BUTTONS
            ============================================================ */
 
         .answer {
@@ -218,9 +254,6 @@
 
             border: 2px solid;
 
-            /*
-             * Classic raised Win95/98 button.
-             */
             border-color:
                 #ffffff
                 #000000
@@ -239,9 +272,9 @@
             -webkit-appearance: none;
         }
 
-        /*
-         * Win95/98 pressed-button appearance.
-         */
+        .answer:hover {
+            background: #c0c0c0;
+        }
 
         .answer:active {
             border-color:
@@ -258,24 +291,10 @@
             padding-top: 2px;
         }
 
-        /*
-         * Keep the classic gray appearance instead of modern
-         * browser hover effects.
-         */
-
-        .answer:hover {
-            background: #c0c0c0;
-        }
-
-        /*
-         * Dotted focus rectangle characteristic of old Windows UI.
-         */
-
         .answer:focus {
             outline: 1px dotted #000000;
             outline-offset: -5px;
         }
-
 
         #no {
             left: 28px;
@@ -294,7 +313,7 @@
 
 
         /* ============================================================
-           CUSTOM WINDOWS 95/98 MESSAGE BOX
+           CUSTOM MESSAGE BOX
            ============================================================ */
 
         #popup-overlay {
@@ -468,8 +487,6 @@
             font-size: 12px;
 
             color: #000000;
-
-            cursor: default;
         }
 
         #popup-buttons button:active {
@@ -487,26 +504,6 @@
         #popup-buttons button:focus {
             outline: 1px dotted #000000;
             outline-offset: -5px;
-        }
-
-
-        /* ============================================================
-           SMALL SCREENS
-           ============================================================ */
-
-        @media (max-width: 928px), (max-height: 929px) {
-
-            #question-window {
-                transform-origin: center center;
-
-                transform:
-                    scale(
-                        min(
-                            calc(100vw / 932),
-                            calc(100vh / 933)
-                        )
-                    );
-            }
         }
     </style>
 </head>
@@ -688,7 +685,141 @@
 
 
         /* ============================================================
-           RAINBOW TEXT
+           RESPONSIVE WINDOW SCALING
+           ============================================================
+           
+           The internal coordinate system remains exactly:
+
+               928 × 929
+
+           The whole window is then uniformly scaled so that BOTH
+           dimensions fit inside the current viewport.
+
+           This works for:
+             - desktop
+             - laptops
+             - tablets
+             - portrait phones
+             - landscape phones
+             - very small browser windows
+         ============================================================ */
+
+        const BASE_WIDTH = 928;
+        const BASE_HEIGHT = 929;
+
+        let scale = 1;
+
+        let windowX = 0;
+        let windowY = 0;
+
+        let manuallyPositioned = false;
+
+
+        function updateScale() {
+
+            const viewportWidth =
+                window.innerWidth;
+
+            const viewportHeight =
+                window.innerHeight;
+
+
+            /*
+             * Leave a tiny amount of breathing room around the
+             * window so its outer border isn't clipped.
+             */
+
+            const availableWidth =
+                Math.max(1, viewportWidth - 4);
+
+            const availableHeight =
+                Math.max(1, viewportHeight - 4);
+
+
+            scale = Math.min(
+                availableWidth / BASE_WIDTH,
+                availableHeight / BASE_HEIGHT
+            );
+
+
+            /*
+             * Never upscale beyond the original size.
+             */
+
+            scale = Math.min(scale, 1);
+
+
+            if (!manuallyPositioned) {
+
+                questionWindow.style.left = "50%";
+                questionWindow.style.top = "50%";
+
+                questionWindow.style.transform =
+                    `translate(-50%, -50%) scale(${scale})`;
+
+            } else {
+
+                questionWindow.style.transform =
+                    `scale(${scale})`;
+
+                /*
+                 * Keep the dragged window within the viewport
+                 * as much as possible after an orientation change.
+                 */
+
+                const renderedWidth =
+                    BASE_WIDTH * scale;
+
+                const renderedHeight =
+                    BASE_HEIGHT * scale;
+
+
+                const maxX =
+                    Math.max(0, viewportWidth - renderedWidth);
+
+                const maxY =
+                    Math.max(0, viewportHeight - renderedHeight);
+
+
+                windowX =
+                    Math.min(
+                        Math.max(windowX, 0),
+                        maxX
+                    );
+
+                windowY =
+                    Math.min(
+                        Math.max(windowY, 0),
+                        maxY
+                    );
+
+
+                questionWindow.style.left =
+                    `${windowX}px`;
+
+                questionWindow.style.top =
+                    `${windowY}px`;
+            }
+        }
+
+
+        updateScale();
+
+        window.addEventListener(
+            "resize",
+            updateScale
+        );
+
+        window.addEventListener(
+            "orientationchange",
+            () => {
+                setTimeout(updateScale, 50);
+            }
+        );
+
+
+        /* ============================================================
+           RAINBOW QUESTION
            ============================================================ */
 
         const fontColors = [
@@ -706,11 +837,15 @@
 
         let timerFT = 0;
 
+
         setInterval(() => {
 
             timerFT++;
 
-            if (timerFT >= 1 && timerFT <= 9) {
+            if (
+                timerFT >= 1 &&
+                timerFT <= 9
+            ) {
                 question.style.color =
                     fontColors[timerFT];
             }
@@ -735,11 +870,16 @@
             idiotAudio
                 .play()
                 .catch(() => {
-                    // Browser blocked autoplay.
+                    /*
+                     * Mobile browsers commonly block autoplay.
+                     * The first interaction retries it.
+                     */
                 });
         }
 
+
         playAudio();
+
 
         document.addEventListener(
             "pointerdown",
@@ -756,7 +896,12 @@
 
         let popupResolver = null;
 
-        function showPopup(message, buttons, icon = "!") {
+
+        function showPopup(
+            message,
+            buttons,
+            icon = "!"
+        ) {
 
             popupMessage.textContent =
                 message;
@@ -771,14 +916,18 @@
                 "visible"
             );
 
+
             return new Promise(resolve => {
 
                 popupResolver = resolve;
 
+
                 for (const text of buttons) {
 
                     const button =
-                        document.createElement("button");
+                        document.createElement(
+                            "button"
+                        );
 
                     button.type = "button";
 
@@ -797,6 +946,7 @@
                     );
                 }
 
+
                 const firstButton =
                     popupButtons.querySelector(
                         "button"
@@ -809,11 +959,14 @@
         }
 
 
-        function closePopup(result = "Close") {
+        function closePopup(
+            result = "Close"
+        ) {
 
             popupOverlay.classList.remove(
                 "visible"
             );
+
 
             if (popupResolver) {
 
@@ -840,6 +993,7 @@
            ============================================================ */
 
         let redirecting = false;
+
 
         function redirectToDiscord() {
 
@@ -919,19 +1073,6 @@
 
 
         /* ============================================================
-           DISABLE MINIMIZE / MAXIMIZE
-           ============================================================ */
-
-        document.getElementById(
-            "minimize"
-        ).disabled = true;
-
-        document.getElementById(
-            "maximize"
-        ).disabled = true;
-
-
-        /* ============================================================
            ESCAPE
            ============================================================ */
 
@@ -961,18 +1102,17 @@
 
         /* ============================================================
            DRAGGABLE WINDOW
-           ============================================================
-           
-           Only the blue title bar is draggable.
-           
-           The window itself uses absolute positioning, so moving it
-           doesn't cause the page to scroll or move.
            ============================================================ */
 
         let dragging = false;
 
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
+        let dragPointerId = null;
+
+        let dragStartPointerX = 0;
+        let dragStartPointerY = 0;
+
+        let dragStartWindowX = 0;
+        let dragStartWindowY = 0;
 
 
         titlebar.addEventListener(
@@ -980,7 +1120,7 @@
             event => {
 
                 /*
-                 * Don't start dragging when clicking a title-bar button.
+                 * Don't drag when clicking the title-bar controls.
                  */
 
                 if (
@@ -991,16 +1131,54 @@
                     return;
                 }
 
+
                 dragging = true;
 
-                const rect =
-                    questionWindow.getBoundingClientRect();
+                dragPointerId =
+                    event.pointerId;
 
-                dragOffsetX =
-                    event.clientX - rect.left;
 
-                dragOffsetY =
-                    event.clientY - rect.top;
+                /*
+                 * If this is the first drag, convert the centered
+                 * window position into actual viewport coordinates.
+                 */
+
+                if (!manuallyPositioned) {
+
+                    const rect =
+                        questionWindow.getBoundingClientRect();
+
+                    windowX =
+                        rect.left;
+
+                    windowY =
+                        rect.top;
+
+                    manuallyPositioned = true;
+
+                    questionWindow.style.left =
+                        `${windowX}px`;
+
+                    questionWindow.style.top =
+                        `${windowY}px`;
+
+                    questionWindow.style.transform =
+                        `scale(${scale})`;
+                }
+
+
+                dragStartPointerX =
+                    event.clientX;
+
+                dragStartPointerY =
+                    event.clientY;
+
+                dragStartWindowX =
+                    windowX;
+
+                dragStartWindowY =
+                    windowY;
+
 
                 titlebar.setPointerCapture(
                     event.pointerId
@@ -1015,41 +1193,94 @@
             "pointermove",
             event => {
 
-                if (!dragging) {
+                if (
+                    !dragging ||
+                    event.pointerId !== dragPointerId
+                ) {
                     return;
                 }
 
+
                 /*
-                 * Account for the current visual scale on small
-                 * screens.
+                 * Pointer movement is in CSS pixels.
+                 * The window position is also in CSS pixels.
+                 *
+                 * Therefore no division by scale is needed here.
                  */
 
-                const scale =
-                    questionWindow.getBoundingClientRect().width /
-                    questionWindow.offsetWidth;
+                windowX =
+                    dragStartWindowX +
+                    (event.clientX -
+                     dragStartPointerX);
 
-                const newLeft =
-                    event.clientX -
-                    (dragOffsetX * scale);
+                windowY =
+                    dragStartWindowY +
+                    (event.clientY -
+                     dragStartPointerY);
 
-                const newTop =
-                    event.clientY -
-                    (dragOffsetY * scale);
+
+                const renderedWidth =
+                    BASE_WIDTH * scale;
+
+                const renderedHeight =
+                    BASE_HEIGHT * scale;
+
+
+                /*
+                 * Keep at least part of the window visible.
+                 * This also prevents accidentally losing the
+                 * window on a phone.
+                 */
+
+                const minVisible =
+                    Math.min(
+                        30,
+                        renderedWidth
+                    );
+
+                const minVisibleY =
+                    Math.min(
+                        30,
+                        renderedHeight
+                    );
+
+
+                const minX =
+                    -renderedWidth +
+                    minVisible;
+
+                const maxX =
+                    window.innerWidth -
+                    minVisible;
+
+
+                const minY =
+                    -renderedHeight +
+                    minVisibleY;
+
+                const maxY =
+                    window.innerHeight -
+                    minVisibleY;
+
+
+                windowX =
+                    Math.min(
+                        Math.max(windowX, minX),
+                        maxX
+                    );
+
+                windowY =
+                    Math.min(
+                        Math.max(windowY, minY),
+                        maxY
+                    );
 
 
                 questionWindow.style.left =
-                    `${newLeft}px`;
+                    `${windowX}px`;
 
                 questionWindow.style.top =
-                    `${newTop}px`;
-
-                /*
-                 * Once manually dragged, stop using the body's
-                 * flex centering.
-                 */
-
-                questionWindow.style.margin =
-                    "0";
+                    `${windowY}px`;
 
                 questionWindow.style.transform =
                     `scale(${scale})`;
@@ -1059,18 +1290,27 @@
 
         function stopDragging(event) {
 
-            if (!dragging) {
+            if (
+                !dragging ||
+                event.pointerId !== dragPointerId
+            ) {
                 return;
             }
 
+
             dragging = false;
+
+            dragPointerId = null;
+
 
             try {
                 titlebar.releasePointerCapture(
                     event.pointerId
                 );
             } catch (_) {
-                // Pointer capture may already have been released.
+                /*
+                 * Pointer capture may already have been released.
+                 */
             }
         }
 
@@ -1086,9 +1326,9 @@
         );
 
 
-        /*
-         * Prevent dragging the GIF itself.
-         */
+        /* ============================================================
+           PREVENT GIF DRAGGING
+           ============================================================ */
 
         document
             .getElementById("pictureBox1")
