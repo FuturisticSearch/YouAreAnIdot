@@ -1,622 +1,640 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="UTF-8"><meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
->
+<!DOCTYPE html>
+<html lang="en">
 
-<title>Are You An Idiot?</title>
+<head>
+    <meta charset="UTF-8">
 
-<style>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
 
-    * {
-        box-sizing: border-box;
-    }
+    <title>Are You An Idiot?</title>
 
-    html,
-    body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
+    <style>
 
-    body {
-        background: transparent;
-        overflow: hidden;
+        * {
+            box-sizing: border-box;
+        }
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
-        font-size: 11px;
+        body {
+            background: transparent;
+            overflow: hidden;
 
-        user-select: none;
-        -webkit-user-select: none;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+            font-size: 11px;
 
-    #question-window {
-        position: absolute;
+            user-select: none;
+            -webkit-user-select: none;
 
-        width: 928px;
-        height: 929px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        left: 50%;
-        top: 50%;
+        #question-window {
+            position: absolute;
 
-        transform:
-            translate(-50%, -50%)
-            scale(1);
+            width: 928px;
+            height: 929px;
 
-        transform-origin: center center;
+            left: 50%;
+            top: 50%;
 
-        background: #c0c0c0;
+            transform:
+                translate(-50%, -50%)
+                scale(1);
 
-        border: 2px solid;
+            transform-origin: center center;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            background: #c0c0c0;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            border: 2px solid;
 
-        overflow: hidden;
-    }
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-    #titlebar {
-        position: absolute;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-        left: 3px;
-        right: 3px;
-        top: 3px;
+            overflow: hidden;
+        }
 
-        height: 22px;
+        #titlebar {
+            position: absolute;
 
-        display: flex;
-        align-items: center;
+            left: 3px;
+            right: 3px;
+            top: 3px;
 
-        padding-left: 4px;
-        padding-right: 2px;
+            height: 22px;
 
-        background: #000080;
-        color: #ffffff;
+            display: flex;
+            align-items: center;
 
-        font-size: 13px;
-        font-weight: bold;
+            padding-left: 4px;
+            padding-right: 2px;
 
-        line-height: 18px;
+            background: #000080;
+            color: #ffffff;
 
-        cursor: move;
-        touch-action: none;
-    }
+            font-size: 13px;
+            font-weight: bold;
 
-    #title {
-        flex: 1;
+            line-height: 18px;
 
-        pointer-events: none;
+            cursor: move;
+            touch-action: none;
+        }
 
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+        #title {
+            flex: 1;
 
-    .window-button {
-        width: 19px;
-        height: 18px;
+            pointer-events: none;
 
-        padding: 0;
-        margin-left: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        .window-button {
+            width: 19px;
+            height: 18px;
 
-        background: #c0c0c0;
-        color: #000000;
+            padding: 0;
+            margin-left: 2px;
 
-        border: 2px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            background: #c0c0c0;
+            color: #000000;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            border: 2px solid;
 
-        font-family: Arial, sans-serif;
-        font-size: 11px;
-        font-weight: bold;
-        line-height: 13px;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-        appearance: none;
-        -webkit-appearance: none;
-    }
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-    .window-button:active {
-        border-color:
-            #000000
-            #ffffff
-            #ffffff
-            #000000;
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 13px;
 
-        box-shadow:
-            inset 1px 1px 0 #808080,
-            inset -1px -1px 0 #dfdfdf;
-    }
+            appearance: none;
+            -webkit-appearance: none;
+        }
 
-    #pictureBox1 {
-        position: absolute;
+        .window-button:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
 
-        left: 3px;
-        top: 28px;
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+        }
 
-        width: 918px;
-        height: 714px;
+        #pictureBox1 {
+            position: absolute;
 
-        display: block;
+            left: 3px;
+            top: 28px;
 
-        object-fit: fill;
-        pointer-events: none;
-    }
+            width: 918px;
+            height: 714px;
 
-    #question-area {
-        position: absolute;
+            display: block;
 
-        left: 3px;
-        right: 3px;
+            object-fit: fill;
+            pointer-events: none;
+        }
 
-        top: 750px;
-        height: 90px;
+        #question-area {
+            position: absolute;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+            left: 3px;
+            right: 3px;
 
-    #question {
-        margin: 0;
+            top: 750px;
+            height: 90px;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        font-size: 20px;
-        font-weight: normal;
+        #question {
+            margin: 0;
 
-        line-height: 1.2;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-        white-space: nowrap;
+            font-size: 20px;
+            font-weight: normal;
 
-        color: Indigo;
-        text-align: center;
-    }
+            line-height: 1.2;
 
-    .answer {
-        position: absolute;
+            white-space: nowrap;
 
-        top: 860px;
-        height: 57px;
+            color: Indigo;
+            text-align: center;
+        }
 
-        padding: 0;
+        .answer {
+            position: absolute;
 
-        background: #c0c0c0;
-        color: #000000;
+            top: 860px;
+            height: 57px;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+            padding: 0;
 
-        font-size: 12px;
+            background: #c0c0c0;
+            color: #000000;
 
-        border: 2px solid;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            font-size: 12px;
 
-        border-radius: 0;
+            border: 2px solid;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-        cursor: default;
+            border-radius: 0;
 
-        appearance: none;
-        -webkit-appearance: none;
-    }
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-    .answer:hover {
-        background: #c0c0c0;
-    }
+            cursor: default;
 
-    .answer:active {
-        border-color:
-            #000000
-            #ffffff
-            #ffffff
-            #000000;
+            appearance: none;
+            -webkit-appearance: none;
+        }
 
-        box-shadow:
-            inset 1px 1px 0 #808080,
-            inset -1px -1px 0 #dfdfdf;
+        .answer:hover {
+            background: #c0c0c0;
+        }
 
-        padding-left: 2px;
-        padding-top: 2px;
-    }
+        .answer:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
 
-    .answer:focus {
-        outline: 1px dotted #000000;
-        outline-offset: -5px;
-    }
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
 
-    #no {
-        left: 28px;
-        width: 262px;
-    }
+            padding-left: 2px;
+            padding-top: 2px;
+        }
 
-    #none {
-        left: 298px;
-        width: 354px;
-    }
+        .answer:focus {
+            outline: 1px dotted #000000;
+            outline-offset: -5px;
+        }
 
-    #yes {
-        left: 660px;
-        width: 244px;
-    }
+        #no {
+            left: 28px;
+            width: 262px;
+        }
 
-    #popup-overlay {
-        position: fixed;
+        #none {
+            left: 298px;
+            width: 354px;
+        }
 
-        inset: 0;
+        #yes {
+            left: 660px;
+            width: 244px;
+        }
 
-        display: none;
+        #popup-overlay {
+            position: fixed;
 
-        z-index: 100000;
-    }
+            inset: 0;
 
-    #popup-overlay.visible {
-        display: block;
-    }
+            display: none;
 
-    #popup {
-        position: fixed;
+            z-index: 100000;
+        }
 
-        left: 50%;
-        top: 50%;
+        #popup-overlay.visible {
+            display: block;
+        }
 
-        transform:
-            translate(-50%, -50%);
+        #popup {
+            position: fixed;
 
-        min-width: 390px;
+            left: 50%;
+            top: 50%;
 
-        max-width:
-            min(
-                500px,
-                calc(100vw - 30px)
-            );
+            transform:
+                translate(-50%, -50%);
 
-        background: #c0c0c0;
+            min-width: 390px;
 
-        border: 2px solid;
+            max-width:
+                min(
+                    500px,
+                    calc(100vw - 30px)
+                );
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            background: #c0c0c0;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
-    }
+            border: 2px solid;
 
-    #popup-titlebar {
-        height: 22px;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-        display: flex;
-        align-items: center;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
+        }
 
-        padding-left: 4px;
-        padding-right: 2px;
+        #popup-titlebar {
+            height: 22px;
 
-        background: #000080;
-        color: #ffffff;
+            display: flex;
+            align-items: center;
 
-        font-size: 13px;
-        font-weight: bold;
-    }
+            padding-left: 4px;
+            padding-right: 2px;
 
-    #popup-title {
-        flex: 1;
+            background: #000080;
+            color: #ffffff;
 
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+            font-size: 13px;
+            font-weight: bold;
+        }
 
-    #popup-close {
-        width: 19px;
-        height: 18px;
+        #popup-title {
+            flex: 1;
 
-        padding: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        background: #c0c0c0;
+        #popup-close {
+            width: 19px;
+            height: 18px;
 
-        border: 2px solid;
+            padding: 0;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            background: #c0c0c0;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            border: 2px solid;
 
-        font-family: Arial, sans-serif;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-        font-size: 11px;
-        font-weight: bold;
-        line-height: 13px;
-    }
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-    #popup-close:active {
-        border-color:
-            #000000
-            #ffffff
-            #ffffff
-            #000000;
+            font-family: Arial, sans-serif;
 
-        box-shadow:
-            inset 1px 1px 0 #808080,
-            inset -1px -1px 0 #dfdfdf;
-    }
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 13px;
+        }
 
-    #popup-content {
-        min-height: 90px;
+        #popup-close:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
 
-        display: flex;
-        align-items: center;
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+        }
 
-        padding: 18px;
-    }
+        #popup-content {
+            min-height: 90px;
 
-    #popup-icon {
-        width: 32px;
-        min-width: 32px;
+            display: flex;
+            align-items: center;
 
-        height: 32px;
+            padding: 18px;
+        }
 
-        margin-right: 18px;
+        #popup-icon {
+            width: 32px;
+            min-width: 32px;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+            height: 32px;
 
-        color: #000000;
+            margin-right: 18px;
 
-        font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-        font-size: 26px;
-        font-weight: bold;
-        line-height: 32px;
+            color: #000000;
 
-        text-align: center;
-    }
+            font-family: Arial, sans-serif;
 
-    #popup-message {
-        flex: 1;
+            font-size: 26px;
+            font-weight: bold;
+            line-height: 32px;
 
-        font-size: 13px;
+            text-align: center;
+        }
 
-        color: #000000;
+        #popup-message {
+            flex: 1;
 
-        line-height: 1.35;
-    }
+            font-size: 13px;
 
-    #popup-buttons {
-        display: flex;
+            color: #000000;
 
-        justify-content: center;
+            line-height: 1.35;
+        }
 
-        gap: 8px;
+        #popup-buttons {
+            display: flex;
 
-        padding:
-            0
-            12px
-            14px;
-    }
+            justify-content: center;
 
-    #popup-buttons button {
-        min-width: 75px;
+            gap: 8px;
 
-        height: 27px;
+            padding:
+                0
+                12px
+                14px;
+        }
 
-        padding:
-            2px
-            12px;
+        #popup-buttons button {
+            min-width: 75px;
 
-        background: #c0c0c0;
+            height: 27px;
 
-        border: 2px solid;
+            padding:
+                2px
+                12px;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            background: #c0c0c0;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            border: 2px solid;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-        font-size: 12px;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-        color: #000000;
-    }
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-    #popup-buttons button:hover {
-        background: #c0c0c0;
-    }
+            font-size: 12px;
 
-    #popup-buttons button:active {
-        border-color:
-            #000000
-            #ffffff
-            #ffffff
-            #000000;
+            color: #000000;
+        }
 
-        box-shadow:
-            inset 1px 1px 0 #808080,
-            inset -1px -1px 0 #dfdfdf;
-    }
+        #popup-buttons button:hover {
+            background: #c0c0c0;
+        }
 
-    #popup-buttons button:focus {
-        outline: 1px dotted #000000;
-        outline-offset: -5px;
-    }
+        #popup-buttons button:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
 
-</style>
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+        }
 
-</head><body><main id="question-window"><div id="titlebar">
+        #popup-buttons button:focus {
+            outline: 1px dotted #000000;
+            outline-offset: -5px;
+        }
 
-    <span id="title">
-        Are You An Idiot?
-    </span>
+    </style>
+</head>
 
-    <button
-        class="window-button"
-        id="minimize"
-        type="button"
-        disabled
-    >_</button>
+<body>
 
-    <button
-        class="window-button"
-        id="maximize"
-        type="button"
-        disabled
-    >□</button>
+<main id="question-window">
 
-    <button
-        class="window-button"
-        id="close"
-        type="button"
-    >×</button>
+    <div id="titlebar">
 
-</div>
-
-<img
-    id="pictureBox1"
-    src="media/idiot.gif"
-    alt=""
-    draggable="false"
->
-
-<div id="question-area">
-
-    <div id="question">
-        Are You An Idiot ?
-    </div>
-
-</div>
-
-<button
-    class="answer"
-    id="no"
-    type="button"
->
-    No, I'm not.
-</button>
-
-<button
-    class="answer"
-    id="none"
-    type="button"
->
-    I don't know =[
-</button>
-
-<button
-    class="answer"
-    id="yes"
-    type="button"
->
-    Yes, I am.
-</button>
-
-</main><div id="popup-overlay"><div id="popup">
-
-    <div id="popup-titlebar">
-
-        <span id="popup-title">
-            YouAreAnIdiot
+        <span id="title">
+            Are You An Idiot?
         </span>
 
         <button
-            id="popup-close"
+            class="window-button"
+            id="minimize"
+            type="button"
+            disabled
+        >_</button>
+
+        <button
+            class="window-button"
+            id="maximize"
+            type="button"
+            disabled
+        >□</button>
+
+        <button
+            class="window-button"
+            id="close"
             type="button"
         >×</button>
 
     </div>
 
-    <div id="popup-content">
+    <img
+        id="pictureBox1"
+        src="media/idiot.gif"
+        alt=""
+        draggable="false"
+    >
 
-        <div id="popup-icon">
-            !
+    <div id="question-area">
+
+        <div id="question">
+            Are You An Idiot ?
         </div>
-
-        <div id="popup-message"></div>
 
     </div>
 
-    <div id="popup-buttons"></div>
+    <button
+        class="answer"
+        id="no"
+        type="button"
+    >
+        No, I'm not.
+    </button>
+
+    <button
+        class="answer"
+        id="none"
+        type="button"
+    >
+        I don't know =[
+    </button>
+
+    <button
+        class="answer"
+        id="yes"
+        type="button"
+    >
+        Yes, I am.
+    </button>
+
+</main>
+
+
+<div id="popup-overlay">
+
+    <div id="popup">
+
+        <div id="popup-titlebar">
+
+            <span id="popup-title">
+                YouAreAnIdiot
+            </span>
+
+            <button
+                id="popup-close"
+                type="button"
+            >×</button>
+
+        </div>
+
+        <div id="popup-content">
+
+            <div id="popup-icon">
+                !
+            </div>
+
+            <div id="popup-message"></div>
+
+        </div>
+
+        <div id="popup-buttons"></div>
+
+    </div>
 
 </div>
 
-</div><audio
-id="idiot-audio"
-preload="auto"
-loop
 
-«»
-
-<source
-    src="/media/youare-long.mp3"
-    type="audio/mpeg"
+<audio
+    id="idiot-audio"
+    preload="auto"
+    loop
 >
+    <source
+        src="/media/youare-long.mp3"
+        type="audio/mpeg"
+    >
+</audio>
 
-</audio><script>
+
+<script>
 
 "use strict";
 
@@ -698,8 +716,11 @@ function updateScale() {
 
     if (!manuallyPositioned) {
 
-        questionWindow.style.left = "50%";
-        questionWindow.style.top = "50%";
+        questionWindow.style.left =
+            "50%";
+
+        questionWindow.style.top =
+            "50%";
 
         questionWindow.style.transform =
             `translate(-50%, -50%) scale(${scale})`;
@@ -718,13 +739,15 @@ function updateScale() {
         const maxX =
             Math.max(
                 0,
-                window.innerWidth - renderedWidth
+                window.innerWidth -
+                renderedWidth
             );
 
         const maxY =
             Math.max(
                 0,
-                window.innerHeight - renderedHeight
+                window.innerHeight -
+                renderedHeight
             );
 
         windowX =
@@ -750,21 +773,30 @@ function updateScale() {
 
 updateScale();
 
+
 window.addEventListener(
     "resize",
     updateScale
 );
 
+
 window.addEventListener(
     "orientationchange",
     () => {
-        setTimeout(updateScale, 50);
+
+        setTimeout(
+            updateScale,
+            50
+        );
+
     }
 );
 
 
 /* ============================================================
    DISCORD SIZE CALCULATION
+   IMPORTANT:
+   This is only used after the user continues.
    ============================================================ */
 
 function getDiscordPopupSize() {
@@ -781,23 +813,32 @@ function getDiscordPopupSize() {
         screenWidth <= 0 ||
         screenHeight <= 0
     ) {
+
         return {
             width: 320,
             height: 320
         };
+
     }
 
     return {
+
         width: Math.max(
             1,
-            Math.round(screenWidth * 0.1875)
+            Math.round(
+                screenWidth * 0.1875
+            )
         ),
 
         height: Math.max(
             1,
-            Math.round(screenHeight * 0.2222)
+            Math.round(
+                screenHeight * 0.2222
+            )
         )
+
     };
+
 }
 
 
@@ -807,10 +848,16 @@ function getDiscordPopupSize() {
 
 function requestOpenerResize() {
 
-    const opener = window.opener;
+    const opener =
+        window.opener;
 
-    if (!opener || opener.closed) {
+    if (
+        !opener ||
+        opener.closed
+    ) {
+
         return false;
+
     }
 
     const size =
@@ -845,6 +892,7 @@ function requestOpenerResize() {
         return false;
 
     }
+
 }
 
 
@@ -853,6 +901,10 @@ function resizeSelfToDiscordSize() {
     const size =
         getDiscordPopupSize();
 
+    /*
+     * Send the resize request immediately
+     * before navigating.
+     */
     requestOpenerResize();
 
     try {
@@ -861,52 +913,26 @@ function resizeSelfToDiscordSize() {
             typeof window.resizeTo ===
             "function"
         ) {
+
             window.resizeTo(
                 size.width,
                 size.height
             );
+
         }
 
     } catch (_) {}
 
+    /*
+     * Send again after resizeTo().
+     * This is still part of the user's
+     * explicit continuation action.
+     */
     requestOpenerResize();
 
     return size;
+
 }
-
-
-/* ============================================================
-   INITIAL RESIZE HANDSHAKE
-   ============================================================ */
-
-function initialPopupResize() {
-
-    resizeSelfToDiscordSize();
-
-    requestAnimationFrame(
-        () => {
-            resizeSelfToDiscordSize();
-        }
-    );
-
-    setTimeout(
-        resizeSelfToDiscordSize,
-        30
-    );
-
-    setTimeout(
-        resizeSelfToDiscordSize,
-        80
-    );
-
-    setTimeout(
-        resizeSelfToDiscordSize,
-        150
-    );
-}
-
-
-initialPopupResize();
 
 
 /* ============================================================
@@ -959,13 +985,18 @@ function showPopup(
                 button.addEventListener(
                     "click",
                     () => {
-                        closePopup(text);
+
+                        closePopup(
+                            text
+                        );
+
                     }
                 );
 
                 popupButtons.appendChild(
                     button
                 );
+
             }
 
             const firstButton =
@@ -974,10 +1005,14 @@ function showPopup(
                 );
 
             if (firstButton) {
+
                 firstButton.focus();
+
             }
+
         }
     );
+
 }
 
 
@@ -998,14 +1033,20 @@ function closePopup(
             null;
 
         resolve(result);
+
     }
+
 }
 
 
 popupClose.addEventListener(
     "click",
     () => {
-        closePopup("Close");
+
+        closePopup(
+            "Close"
+        );
+
     }
 );
 
@@ -1026,10 +1067,15 @@ function playAudio() {
             typeof playPromise.catch ===
             "function"
         ) {
-            playPromise.catch(() => {});
+
+            playPromise.catch(
+                () => {}
+            );
+
         }
 
     } catch (_) {}
+
 }
 
 
@@ -1064,6 +1110,7 @@ const fontColors = [
 
 ];
 
+
 let timerFT = 0;
 
 
@@ -1076,16 +1123,21 @@ setInterval(
             timerFT >= 1 &&
             timerFT <= 9
         ) {
+
             question.style.color =
                 fontColors[timerFT];
+
         }
 
-        if (timerFT >= 9) {
+        if (
+            timerFT >= 9
+        ) {
 
             question.style.color =
                 "Snow";
 
             timerFT = 0;
+
         }
 
     },
@@ -1108,31 +1160,28 @@ function redirectToDiscord() {
 
     redirecting = true;
 
+    /*
+     * IMPORTANT:
+     *
+     * No resize request is made when popup.html
+     * loads.
+     *
+     * No resize request is made while the
+     * question is sitting on screen.
+     *
+     * The resize happens ONLY when this function
+     * is reached by the user's continuation action.
+     */
+
     resizeSelfToDiscordSize();
 
-    const resizeTimer =
-        setTimeout(
-            () => {
-                requestOpenerResize();
-            },
-            60
-        );
+    /*
+     * Navigate immediately.
+     * No artificial timeout.
+     */
+    window.location.href =
+        "discord.html";
 
-    setTimeout(
-        () => {
-
-            clearTimeout(
-                resizeTimer
-            );
-
-            requestOpenerResize();
-
-            window.location.href =
-                "discord.html";
-
-        },
-        180
-    );
 }
 
 
@@ -1152,7 +1201,12 @@ async function handleNo() {
         "!"
     );
 
+    /*
+     * Resize + redirect only after
+     * the user presses OK.
+     */
     redirectToDiscord();
+
 }
 
 
@@ -1160,6 +1214,7 @@ noButton.addEventListener(
     "click",
     handleNo
 );
+
 
 noneButton.addEventListener(
     "click",
@@ -1186,13 +1241,20 @@ yesButton.addEventListener(
                 "?"
             );
 
+        /*
+         * Both choices continue to Discord,
+         * exactly like question.html.
+         */
         if (
             result === "Yes" ||
             result === "No" ||
             result === "Close"
         ) {
+
             redirectToDiscord();
+
         }
+
     }
 );
 
@@ -1215,8 +1277,12 @@ document.addEventListener(
     "keydown",
     event => {
 
-        if (event.key === "Escape") {
+        if (
+            event.key === "Escape"
+        ) {
+
             redirectToDiscord();
+
         }
 
     }
@@ -1230,7 +1296,9 @@ document.addEventListener(
 document.addEventListener(
     "contextmenu",
     event => {
+
         event.preventDefault();
+
     }
 );
 
@@ -1259,7 +1327,9 @@ titlebar.addEventListener(
                 ".window-button"
             )
         ) {
+
             return;
+
         }
 
         dragging = true;
@@ -1267,7 +1337,9 @@ titlebar.addEventListener(
         dragPointerId =
             event.pointerId;
 
-        if (!manuallyPositioned) {
+        if (
+            !manuallyPositioned
+        ) {
 
             const rect =
                 questionWindow.getBoundingClientRect();
@@ -1289,6 +1361,7 @@ titlebar.addEventListener(
 
             questionWindow.style.transform =
                 `scale(${scale})`;
+
         }
 
         dragStartPointerX =
@@ -1308,6 +1381,7 @@ titlebar.addEventListener(
         );
 
         event.preventDefault();
+
     }
 );
 
@@ -1321,7 +1395,9 @@ titlebar.addEventListener(
             event.pointerId !==
             dragPointerId
         ) {
+
             return;
+
         }
 
         windowX =
@@ -1374,13 +1450,19 @@ titlebar.addEventListener(
 
         windowX =
             Math.min(
-                Math.max(windowX, minX),
+                Math.max(
+                    windowX,
+                    minX
+                ),
                 maxX
             );
 
         windowY =
             Math.min(
-                Math.max(windowY, minY),
+                Math.max(
+                    windowY,
+                    minY
+                ),
                 maxY
             );
 
@@ -1392,6 +1474,7 @@ titlebar.addEventListener(
 
         questionWindow.style.transform =
             `scale(${scale})`;
+
     }
 );
 
@@ -1403,10 +1486,13 @@ function stopDragging(event) {
         event.pointerId !==
         dragPointerId
     ) {
+
         return;
+
     }
 
     dragging = false;
+
     dragPointerId = null;
 
     try {
@@ -1416,6 +1502,7 @@ function stopDragging(event) {
         );
 
     } catch (_) {}
+
 }
 
 
@@ -1423,6 +1510,7 @@ titlebar.addEventListener(
     "pointerup",
     stopDragging
 );
+
 
 titlebar.addEventListener(
     "pointercancel",
@@ -1439,28 +1527,14 @@ document
     .addEventListener(
         "dragstart",
         event => {
+
             event.preventDefault();
+
         }
     );
 
 
-/* ============================================================
-   LOAD
-   ============================================================ */
+</script>
 
-window.addEventListener(
-    "load",
-    () => {
-
-        updateScale();
-
-        resizeSelfToDiscordSize();
-
-    },
-    {
-        once: true
-    }
-);
-
-</script></body>
+</body>
 </html>
