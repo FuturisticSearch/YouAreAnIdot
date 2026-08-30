@@ -351,7 +351,7 @@ preload="auto"
 loop«»
 
 <source
-src="/media/youare-long.mp3"
+src="/media/test.mp3"
 type="audio/mpeg"
 
 «»
@@ -376,6 +376,9 @@ const DISCORD_PAGE =
 "discord.html";
 
 const TARGET_CHECK_INTERVAL =
+250;
+
+const AUTOPLAY_CHECK_INTERVAL =
 250;
 
 /* ============================================================
@@ -710,6 +713,32 @@ maybeOpenQuestionPopup();
 return autoplayAllowed;
 
 }
+
+/* ============================================================
+PERIODIC AUTOPLAY TEST
+============================================================ */
+
+setInterval(
+() => {
+
+    if (
+        autoplayAllowed
+    ) {
+
+        return;
+
+    }
+
+
+    autoplayTestComplete =
+        false;
+
+
+    testAutoplayPermission();
+
+},
+AUTOPLAY_CHECK_INTERVAL
+);
 
 /* ============================================================
 USER-INTERACTION AUTOPLAY UNLOCK
@@ -1291,14 +1320,14 @@ function getPopupFeatures() {
 
 const availableWidth =
     Math.max(
-        320,
+        380,
         screen.availWidth - 40
     );
 
 
 const availableHeight =
     Math.max(
-        320,
+        380,
         screen.availHeight - 40
     );
 
@@ -1317,7 +1346,7 @@ const aspectRatio =
 
 let width =
     Math.min(
-        820,
+        800,
         availableWidth
     );
 
@@ -1330,14 +1359,14 @@ let height =
 if (
     height >
     Math.min(
-        820,
+        800,
         availableHeight
     )
 ) {
 
     height =
         Math.min(
-            820,
+            800,
             availableHeight
         );
 
@@ -1351,14 +1380,14 @@ if (
 
 width =
     Math.max(
-        320,
+        300,
         Math.floor(width)
     );
 
 
 height =
     Math.max(
-        320,
+        300,
         Math.floor(height)
     );
 
@@ -1636,7 +1665,7 @@ openingTarget =
  */
 
 monitorTargetPopup(
-    popup
+popup
 );
 
 
