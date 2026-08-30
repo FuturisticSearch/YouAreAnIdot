@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Popup Test</title>
+</head>
+
+<body>
+
+<script>
+"use strict";
+
+/*
+ * This page is only used to confirm that a popup
+ * was actually opened and loaded.
+ *
+ * The parent page supplies:
+ *
+ *     ?id=0
+ *     ?id=1
+ *     ?id=2
+ *
+ * We send the ID back to the opener.
+ */
+
+const params = new URLSearchParams(
+    window.location.search
+);
+
+const id = params.get("id");
+
+/*
+ * Only communicate with a real opener.
+ */
+if (window.opener && !window.opener.closed) {
+
+    try {
+
+        window.opener.postMessage(
+            {
+                type: "YOUARE_POPUP_TEST_SUCCESS",
+                id: id
+            },
+            window.location.origin
+        );
+
+    } catch (_) {
+        /*
+         * Ignore communication failures.
+         */
+    }
+}
+
+/*
+ * Give the message a moment to reach the parent,
+ * then close ourselves.
+ */
+setTimeout(() => {
+
+    try {
+        window.close();
+    } catch (_) {
+        /* Ignore close failures. */
+    }
+
+}, 100);
+</script>
+
+</body>
+</html>
