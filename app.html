@@ -4,13 +4,9 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 >
 
-<title>Are You An Idiot?</title>
+<title>Are you an idiot?</title>
 
 <style>
-
-    /* ============================================================
-       CLASSIC WINDOWS 95 BASE
-       ============================================================ */
 
     * {
         box-sizing: border-box;
@@ -25,7 +21,6 @@
 
     body {
         background: #008080;
-
         overflow: hidden;
 
         font-family:
@@ -39,11 +34,15 @@
 
         user-select: none;
         -webkit-user-select: none;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
 
     /* ============================================================
-       POPUP OVERLAY
+       WINDOWS 95 MESSAGE BOX
        ============================================================ */
 
     #popup-overlay {
@@ -61,10 +60,6 @@
     }
 
 
-    /* ============================================================
-       WINDOWS 95 MESSAGE BOX
-       ============================================================ */
-
     #popup {
         position: fixed;
 
@@ -74,13 +69,10 @@
         transform:
             translate(-50%, -50%);
 
-        min-width: 390px;
-
-        max-width:
-            min(
-                500px,
-                calc(100vw - 30px)
-            );
+        width: min(
+            500px,
+            calc(100vw - 30px)
+        );
 
         background: #c0c0c0;
 
@@ -95,25 +87,17 @@
         box-shadow:
             inset 1px 1px 0 #dfdfdf,
             inset -1px -1px 0 #808080;
-
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
     }
 
 
     /* ============================================================
-       MESSAGE BOX TITLE BAR
+       TITLE BAR
        ============================================================ */
 
     #popup-titlebar {
         height: 22px;
 
         display: flex;
-
         align-items: center;
 
         padding-left: 4px;
@@ -124,8 +108,9 @@
         color: #ffffff;
 
         font-size: 13px;
-
         font-weight: bold;
+
+        line-height: 18px;
     }
 
 
@@ -135,14 +120,9 @@
         white-space: nowrap;
 
         overflow: hidden;
-
         text-overflow: ellipsis;
     }
 
-
-    /* ============================================================
-       MESSAGE BOX CLOSE BUTTON
-       ============================================================ */
 
     #popup-close {
         width: 19px;
@@ -151,8 +131,6 @@
         padding: 0;
 
         background: #c0c0c0;
-
-        color: #000000;
 
         border: 2px solid;
 
@@ -166,20 +144,13 @@
             inset 1px 1px 0 #dfdfdf,
             inset -1px -1px 0 #808080;
 
-        font-family:
-            Arial,
-            sans-serif;
-
+        font-family: Arial, sans-serif;
         font-size: 11px;
-
         font-weight: bold;
 
         line-height: 13px;
 
         cursor: default;
-
-        appearance: none;
-        -webkit-appearance: none;
     }
 
 
@@ -211,10 +182,6 @@
     }
 
 
-    /* ============================================================
-       WARNING ICON
-       ============================================================ */
-
     #popup-icon {
         width: 32px;
         min-width: 32px;
@@ -228,16 +195,11 @@
         align-items: center;
         justify-content: center;
 
-        background: #c0c0c0;
-
         color: #000000;
 
-        font-family:
-            Arial,
-            sans-serif;
+        font-family: Arial, sans-serif;
 
         font-size: 26px;
-
         font-weight: bold;
 
         line-height: 32px;
@@ -246,19 +208,8 @@
     }
 
 
-    /* ============================================================
-       MESSAGE
-       ============================================================ */
-
     #popup-message {
         flex: 1;
-
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
 
         font-size: 13px;
 
@@ -269,7 +220,7 @@
 
 
     /* ============================================================
-       BUTTON AREA
+       BUTTONS
        ============================================================ */
 
     #popup-buttons {
@@ -286,10 +237,6 @@
     }
 
 
-    /* ============================================================
-       CLASSIC BUTTON
-       ============================================================ */
-
     #popup-buttons button {
         min-width: 75px;
 
@@ -300,8 +247,6 @@
             12px;
 
         background: #c0c0c0;
-
-        color: #000000;
 
         border: 2px solid;
 
@@ -324,10 +269,9 @@
 
         font-size: 12px;
 
-        cursor: default;
+        color: #000000;
 
-        appearance: none;
-        -webkit-appearance: none;
+        cursor: default;
     }
 
 
@@ -341,38 +285,18 @@
         box-shadow:
             inset 1px 1px 0 #808080,
             inset -1px -1px 0 #dfdfdf;
-
-        padding-left: 13px;
-        padding-top: 3px;
     }
 
 
     #popup-buttons button:focus {
         outline: 1px dotted #000000;
-
         outline-offset: -5px;
-    }
-
-
-    /* ============================================================
-       SMALL SCREENS
-       ============================================================ */
-
-    @media (max-width: 430px) {
-
-        #popup {
-            min-width: 0;
-
-            width:
-                calc(100vw - 30px);
-        }
-
     }
 
 </style>
 
 </head><body><!-- ============================================================
-     PERMISSION POPUP
+     PERMISSION MESSAGE
      ============================================================ -->
 
 <div id="popup-overlay">
@@ -399,7 +323,6 @@
                 !
             </div>
 
-
             <div id="popup-message"></div>
 
         </div>
@@ -412,9 +335,42 @@
 </div>
 
 
+
 <script>
 
     "use strict";
+
+
+    /* ============================================================
+       CONFIGURATION
+       ============================================================ */
+
+    const POPUP_TEST_COUNT = 3;
+
+    const TEST_PAGE =
+        "test.html";
+
+    const TARGET_PAGE =
+        "popup.html";
+
+
+    /*
+     * Maximum browser-window size.
+     *
+     * popup.html contains the original 928×929
+     * Windows-style design, but we deliberately
+     * open the browser window smaller than that.
+     */
+    const MAX_POPUP_WIDTH = 820;
+    const MAX_POPUP_HEIGHT = 820;
+
+
+    /*
+     * Keep some room around the popup so that
+     * mobile browsers do not attempt to create a
+     * window larger than the available display.
+     */
+    const SCREEN_MARGIN = 40;
 
 
     /* ============================================================
@@ -426,18 +382,15 @@
             "popup-overlay"
         );
 
-
     const popupMessage =
         document.getElementById(
             "popup-message"
         );
 
-
     const popupButtons =
         document.getElementById(
             "popup-buttons"
         );
-
 
     const popupClose =
         document.getElementById(
@@ -445,218 +398,79 @@
         );
 
 
-    const popupIcon =
-        document.getElementById(
-            "popup-icon"
-        );
-
-
     /* ============================================================
        POPUP TEST STATE
        ============================================================ */
 
-    const POPUP_TEST_COUNT = 3;
-
-
     const popupResults =
         new Set();
-
 
     let popupTestStarted =
         false;
 
-
     let popupAllowed =
         false;
 
-
-    let popupTestFinished =
-        false;
-
-
-    let popupQuestionOpened =
+    let openingTarget =
         false;
 
 
     /* ============================================================
-       PERMISSION MESSAGE STATE
+       MESSAGE BOX
        ============================================================ */
-
-    let permissionMessageVisible =
-        false;
-
 
     let popupResolver =
         null;
 
 
-    /* ============================================================
-       OPEN QUESTION POPUP
-       ============================================================ */
-
-    function openQuestionPopup() {
-
-        if (
-            popupQuestionOpened
-        ) {
-            return;
-        }
-
-
-        popupQuestionOpened =
-            true;
-
-
-        /*
-         * Use the real viewport size.
-         *
-         * The 928x929 question window is scaled
-         * by popup.html itself, so this window only
-         * needs to provide a reasonable outer size.
-         */
-
-        const screenWidth =
-            window.screen.availWidth ||
-            window.innerWidth;
-
-
-        const screenHeight =
-            window.screen.availHeight ||
-            window.innerHeight;
-
-
-        const maxWidth =
-            Math.max(
-                320,
-                screenWidth - 40
-            );
-
-
-        const maxHeight =
-            Math.max(
-                320,
-                screenHeight - 80
-            );
-
-
-        /*
-         * popup.html is deliberately smaller than
-         * the full screen so its own responsive
-         * scaling can fit the question correctly.
-         */
-
-        const width =
-            Math.min(
-                928,
-                maxWidth
-            );
-
-
-        const height =
-            Math.min(
-                929,
-                maxHeight
-            );
-
-
-        const left =
-            Math.max(
-                0,
-                Math.round(
-                    (
-                        screenWidth -
-                        width
-                    ) / 2
-                )
-            );
-
-
-        const top =
-            Math.max(
-                0,
-                Math.round(
-                    (
-                        screenHeight -
-                        height
-                    ) / 2
-                )
-            );
-
-
-        let popup = null;
-
-
-        try {
-
-            popup =
-                window.open(
-                    "popup.html",
-                    "YouAreAnIdiot",
-                    [
-                        `width=${width}`,
-                        `height=${height}`,
-                        `left=${left}`,
-                        `top=${top}`,
-                        "resizable=yes",
-                        "scrollbars=no",
-                        "menubar=no",
-                        "toolbar=no",
-                        "location=no",
-                        "status=no"
-                    ].join(",")
-                );
-
-        } catch (_) {
-
-            popup = null;
-
-        }
-
-
-        /*
-         * If the actual question popup was blocked,
-         * show the same permission message.
-         */
-
-        if (!popup) {
-
-            popupQuestionOpened =
-                false;
-
-
-            showPopup(
-                "This recreation requires pop-up windows " +
-                "to be enabled in your browser. Please allow " +
-                "pop-ups for this site.",
-                ["OK"],
-                "!"
-            );
-
-        }
-
-    }
-
-
-    /* ============================================================
-       SHOW CUSTOM POPUP
-       ============================================================ */
-
     function showPopup(
         message,
-        buttons,
-        icon = "!"
+        buttons = ["OK"]
     ) {
 
         popupMessage.textContent =
             message;
 
 
-        popupIcon.textContent =
-            icon;
-
-
         popupButtons.innerHTML =
             "";
+
+
+        for (
+            const text of buttons
+        ) {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type =
+                "button";
+
+
+            button.textContent =
+                text;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    closePopup(
+                        text
+                    );
+
+                }
+            );
+
+
+            popupButtons.appendChild(
+                button
+            );
+
+        }
 
 
         popupOverlay.classList.add(
@@ -664,8 +478,17 @@
         );
 
 
-        permissionMessageVisible =
-            true;
+        const firstButton =
+            popupButtons.querySelector(
+                "button"
+            );
+
+
+        if (firstButton) {
+
+            firstButton.focus();
+
+        }
 
 
         return new Promise(
@@ -674,65 +497,11 @@
                 popupResolver =
                     resolve;
 
-
-                for (
-                    const text of buttons
-                ) {
-
-                    const button =
-                        document.createElement(
-                            "button"
-                        );
-
-
-                    button.type =
-                        "button";
-
-
-                    button.textContent =
-                        text;
-
-
-                    button.addEventListener(
-                        "click",
-                        () => {
-
-                            closePopup(
-                                text
-                            );
-
-                        }
-                    );
-
-
-                    popupButtons.appendChild(
-                        button
-                    );
-
-                }
-
-
-                const firstButton =
-                    popupButtons.querySelector(
-                        "button"
-                    );
-
-
-                if (firstButton) {
-
-                    firstButton.focus();
-
-                }
-
             }
         );
 
     }
 
-
-    /* ============================================================
-       CLOSE CUSTOM POPUP
-       ============================================================ */
 
     function closePopup(
         result = "Close"
@@ -743,37 +512,15 @@
         );
 
 
-        permissionMessageVisible =
-            false;
-
-
         if (popupResolver) {
 
             const resolve =
                 popupResolver;
 
-
             popupResolver =
                 null;
 
-
             resolve(result);
-
-        }
-
-
-        /*
-         * If the test failed, allow another attempt
-         * after the user has changed browser settings.
-         */
-
-        if (
-            !popupAllowed &&
-            !popupTestFinished
-        ) {
-
-            popupTestStarted =
-                false;
 
         }
 
@@ -793,19 +540,14 @@
 
 
     /* ============================================================
-       EXACT SAME MESSAGE HANDLING AS QUESTION.HTML
+       POPUP PERMISSION MESSAGE
        ============================================================ */
 
+    let permissionMessageVisible =
+        false;
+
+
     function getPermissionMessage() {
-
-        if (
-            popupAllowed
-        ) {
-
-            return null;
-
-        }
-
 
         return (
             "This recreation requires pop-up windows " +
@@ -816,58 +558,46 @@
     }
 
 
-    function updatePermissionMessage() {
+    async function showPermissionMessage() {
 
-        const message =
-            getPermissionMessage();
-
-
-        /*
-         * All three test windows have responded.
-         */
-
-        if (!message) {
-
-            if (
-                permissionMessageVisible &&
-                popupResolver
-            ) {
-
-                closePopup(
-                    "Permissions complete"
-                );
-
-            }
-
-
-            permissionMessageVisible =
-                false;
-
-
-            /*
-             * Automatically launch the real
-             * popup.html as soon as the third
-             * test response arrives.
-             */
-
-            openQuestionPopup();
-
+        if (popupAllowed) {
             return;
-
         }
 
 
+        if (permissionMessageVisible) {
+            return;
+        }
+
+
+        permissionMessageVisible =
+            true;
+
+
+        await showPopup(
+            getPermissionMessage(),
+            ["OK"]
+        );
+
+
+        permissionMessageVisible =
+            false;
+
+
         /*
-         * If the permission popup is currently
-         * visible, update its message.
+         * The user may have enabled popups while
+         * the message was displayed.
+         *
+         * Run the test again after they dismiss it.
          */
+        if (!popupAllowed) {
 
-        if (
-            permissionMessageVisible
-        ) {
+            popupTestStarted =
+                false;
 
-            popupMessage.textContent =
-                message;
+            popupResults.clear();
+
+            testPopupPermission();
 
         }
 
@@ -875,7 +605,7 @@
 
 
     /* ============================================================
-       TEST RESULT HANDLER
+       TEST RESULT HANDLING
        ============================================================ */
 
     window.addEventListener(
@@ -886,7 +616,6 @@
              * Only accept messages from this
              * exact origin.
              */
-
             if (
                 event.origin !==
                 window.location.origin
@@ -917,9 +646,9 @@
 
 
             /*
-             * Same IDs as question.html.
+             * Only accept the three IDs that
+             * this page generated.
              */
-
             if (
                 ![
                     "0",
@@ -933,21 +662,16 @@
             }
 
 
-            /*
-             * Set automatically prevents duplicate
-             * responses from counting twice.
-             */
-
-            popupResults.add(
-                id
-            );
+            popupResults.add(id);
 
 
             /*
-             * Exactly three unique successful
-             * responses means popups are working.
+             * IMPORTANT:
+             *
+             * Do not require all responses to arrive
+             * immediately. A browser may delay a popup
+             * or its message.
              */
-
             if (
                 popupResults.size >=
                 POPUP_TEST_COUNT
@@ -957,29 +681,244 @@
                     true;
 
 
-                popupTestFinished =
-                    true;
+                closePopup(
+                    "Permissions complete"
+                );
+
+
+                openQuestionPopup();
 
             }
-
-
-            updatePermissionMessage();
 
         }
     );
 
 
     /* ============================================================
-       THREE-WINDOW POPUP TEST
+       CALCULATE POPUP WINDOW SIZE
+       ============================================================ */
+
+    function getPopupFeatures() {
+
+        /*
+         * screen.availWidth / availHeight are used
+         * instead of innerWidth / innerHeight because
+         * window.open() creates a browser window,
+         * not an element inside this document.
+         */
+
+        const availableWidth =
+            Math.max(
+                320,
+                screen.availWidth -
+                SCREEN_MARGIN
+            );
+
+
+        const availableHeight =
+            Math.max(
+                320,
+                screen.availHeight -
+                SCREEN_MARGIN
+            );
+
+
+        /*
+         * Preserve the 928:929 aspect ratio of
+         * the original question window.
+         */
+        const aspectRatio =
+            928 / 929;
+
+
+        let width =
+            Math.min(
+                MAX_POPUP_WIDTH,
+                availableWidth
+            );
+
+
+        let height =
+            width /
+            aspectRatio;
+
+
+        /*
+         * Height may be the limiting dimension
+         * on a portrait/mobile display.
+         */
+        if (
+            height >
+            Math.min(
+                MAX_POPUP_HEIGHT,
+                availableHeight
+            )
+        ) {
+
+            height =
+                Math.min(
+                    MAX_POPUP_HEIGHT,
+                    availableHeight
+                );
+
+
+            width =
+                height *
+                aspectRatio;
+
+        }
+
+
+        width =
+            Math.max(
+                320,
+                Math.floor(width)
+            );
+
+
+        height =
+            Math.max(
+                320,
+                Math.floor(height)
+            );
+
+
+        /*
+         * Center the browser window on the
+         * available screen area.
+         */
+        const left =
+            Math.max(
+                0,
+                Math.floor(
+                    (
+                        screen.availWidth -
+                        width
+                    ) / 2
+                )
+            );
+
+
+        const top =
+            Math.max(
+                0,
+                Math.floor(
+                    (
+                        screen.availHeight -
+                        height
+                    ) / 2
+                )
+            );
+
+
+        return [
+            `width=${width}`,
+            `height=${height}`,
+            `left=${left}`,
+            `top=${top}`,
+            "resizable=yes",
+            "scrollbars=no",
+            "toolbar=no",
+            "menubar=no",
+            "location=no",
+            "status=no"
+        ].join(",");
+
+    }
+
+
+    /* ============================================================
+       OPEN QUESTION POPUP
+       ============================================================ */
+
+    function openQuestionPopup() {
+
+        if (openingTarget) {
+            return;
+        }
+
+
+        openingTarget =
+            true;
+
+
+        const features =
+            getPopupFeatures();
+
+
+        let popup = null;
+
+
+        try {
+
+            popup =
+                window.open(
+                    TARGET_PAGE,
+                    "YouAreAnIdiotQuestion",
+                    features
+                );
+
+        } catch (_) {
+
+            popup = null;
+
+        }
+
+
+        /*
+         * If the browser refused the popup despite
+         * the permission test, reset the state and
+         * show the normal permission message.
+         */
+        if (!popup) {
+
+            openingTarget =
+                false;
+
+            popupAllowed =
+                false;
+
+            popupTestStarted =
+                false;
+
+            popupResults.clear();
+
+
+            showPermissionMessage();
+
+            return;
+
+        }
+
+
+        /*
+         * Focus it when browsers permit this.
+         */
+        try {
+
+            popup.focus();
+
+        } catch (_) {
+
+            /* Ignore browser restrictions. */
+
+        }
+
+    }
+
+
+    /* ============================================================
+       START THREE-POPUP TEST
        ============================================================ */
 
     function testPopupPermission() {
 
         if (
-            popupTestStarted
+            popupTestStarted ||
+            popupAllowed
         ) {
 
-            return popupAllowed;
+            return;
 
         }
 
@@ -991,19 +930,6 @@
         popupResults.clear();
 
 
-        popupAllowed =
-            false;
-
-
-        popupTestFinished =
-            false;
-
-
-        /*
-         * Open all three test windows exactly
-         * like question.html.
-         */
-
         for (
             let i = 0;
             i < POPUP_TEST_COUNT;
@@ -1012,9 +938,9 @@
 
             try {
 
-                const popup =
+                const testPopup =
                     window.open(
-                        `test.html?id=${i}`,
+                        `${TEST_PAGE}?id=${i}`,
                         `youare_popup_test_${i}`,
                         [
                             "width=1",
@@ -1026,18 +952,22 @@
 
 
                 /*
-                 * Do not require the response
-                 * immediately.
+                 * test.html is responsible for
+                 * reporting success and closing
+                 * itself.
                  *
-                 * test.html can report later.
+                 * We intentionally do not inspect
+                 * the returned window here because
+                 * some browsers return a WindowProxy
+                 * even when the popup is subsequently
+                 * blocked/delayed.
                  */
-
-                void popup;
+                void testPopup;
 
             } catch (_) {
 
                 /*
-                 * Blocked popups simply don't
+                 * A blocked popup simply won't
                  * report success.
                  */
 
@@ -1046,7 +976,30 @@
         }
 
 
-        return popupAllowed;
+        /*
+         * Give blocked/delayed browsers time to
+         * report their responses before displaying
+         * the permission message.
+         */
+        setTimeout(
+            () => {
+
+                if (
+                    popupAllowed ||
+                    popupResults.size >=
+                    POPUP_TEST_COUNT
+                ) {
+
+                    return;
+
+                }
+
+
+                showPermissionMessage();
+
+            },
+            1500
+        );
 
     }
 
@@ -1060,42 +1013,11 @@
         () => {
 
             /*
-             * This is intentionally started
-             * immediately on visiting index.html.
+             * Start immediately after the page has
+             * loaded. The popup test is therefore
+             * associated with the initial navigation.
              */
-
             testPopupPermission();
-
-
-            /*
-             * If the browser blocks the test
-             * windows, there will be no success
-             * messages. Show the same permission
-             * dialog after a reasonable grace
-             * period.
-             *
-             * Importantly, this does NOT invalidate
-             * late responses.
-             */
-
-            setTimeout(
-                () => {
-
-                    if (
-                        !popupAllowed
-                    ) {
-
-                        showPopup(
-                            getPermissionMessage(),
-                            ["OK"],
-                            "!"
-                        );
-
-                    }
-
-                },
-                1500
-            );
 
         },
         {
@@ -1105,7 +1027,33 @@
 
 
     /* ============================================================
-       ESCAPE
+       RETEST WHEN WINDOW GETS FOCUS
+       ============================================================ */
+
+    window.addEventListener(
+        "focus",
+        () => {
+
+            if (
+                !popupAllowed &&
+                !permissionMessageVisible
+            ) {
+
+                popupTestStarted =
+                    false;
+
+                popupResults.clear();
+
+                testPopupPermission();
+
+            }
+
+        }
+    );
+
+
+    /* ============================================================
+       ESCAPE / CONTEXT MENU
        ============================================================ */
 
     document.addEventListener(
@@ -1116,17 +1064,15 @@
                 event.key === "Escape"
             ) {
 
-                closePopup();
+                closePopup(
+                    "Close"
+                );
 
             }
 
         }
     );
 
-
-    /* ============================================================
-       RIGHT CLICK
-       ============================================================ */
 
     document.addEventListener(
         "contextmenu",
