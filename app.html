@@ -1,368 +1,395 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<!DOCTYPE html>
+<html lang="en">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
->
+<head>
 
-<title>Are you an idiot?</title>
+    <meta charset="UTF-8">
 
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
 
-<style>
+    <title>Are you an idiot?</title>
 
-    * {
-        box-sizing: border-box;
-    }
 
+    <style>
 
-    html,
-    body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
 
-    body {
-        background: #008080;
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
 
-        overflow: hidden;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+        body {
+            background: #008080;
 
-        font-size: 11px;
+            overflow: hidden;
 
-        user-select: none;
-        -webkit-user-select: none;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-        display: flex;
+            font-size: 11px;
 
-        align-items: center;
-        justify-content: center;
-    }
+            user-select: none;
+            -webkit-user-select: none;
 
+            display: flex;
 
-    /* ============================================================
-       WINDOWS 95 MESSAGE BOX
-       ============================================================ */
+            align-items: center;
+            justify-content: center;
+        }
 
-    #popup-overlay {
-        position: fixed;
 
-        inset: 0;
+        /* ============================================================
+           WINDOWS 95 MESSAGE BOX
+           ============================================================ */
 
-        display: none;
+        #popup-overlay {
+            position: fixed;
 
-        z-index: 100000;
-    }
+            inset: 0;
 
+            display: none;
 
-    #popup-overlay.visible {
-        display: block;
-    }
+            z-index: 100000;
+        }
 
 
-    #popup {
-        position: fixed;
+        #popup-overlay.visible {
+            display: block;
+        }
 
-        left: 50%;
-        top: 50%;
 
-        transform:
-            translate(-50%, -50%);
+        #popup {
+            position: fixed;
 
-        min-width: 390px;
+            left: 50%;
+            top: 50%;
 
-        max-width:
-            min(
-                500px,
-                calc(100vw - 30px)
-            );
+            transform:
+                translate(-50%, -50%);
 
-        background: #c0c0c0;
+            min-width: 390px;
 
-        border: 2px solid;
+            max-width:
+                min(
+                    500px,
+                    calc(100vw - 30px)
+                );
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            background: #c0c0c0;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            border: 2px solid;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
-    }
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-    #popup-titlebar {
-        height: 22px;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
+        }
 
-        display: flex;
 
-        align-items: center;
+        #popup-titlebar {
+            height: 22px;
 
-        padding-left: 4px;
-        padding-right: 2px;
+            display: flex;
 
-        background: #000080;
+            align-items: center;
 
-        color: #ffffff;
+            padding-left: 4px;
+            padding-right: 2px;
 
-        font-size: 13px;
+            background: #000080;
 
-        font-weight: bold;
+            color: #ffffff;
 
-        line-height: 18px;
-    }
+            font-size: 13px;
 
+            font-weight: bold;
 
-    #popup-title {
-        flex: 1;
+            line-height: 18px;
+        }
 
-        white-space: nowrap;
 
-        overflow: hidden;
+        #popup-title {
+            flex: 1;
 
-        text-overflow: ellipsis;
-    }
+            white-space: nowrap;
 
+            overflow: hidden;
 
-    #popup-close {
-        width: 19px;
-        height: 18px;
+            text-overflow: ellipsis;
+        }
 
-        padding: 0;
 
-        background: #c0c0c0;
+        #popup-close {
+            width: 19px;
+            height: 18px;
 
-        border: 2px solid;
+            padding: 0;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            background: #c0c0c0;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            border: 2px solid;
 
-        font-family:
-            Arial,
-            sans-serif;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-        font-size: 11px;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-        font-weight: bold;
+            font-family:
+                Arial,
+                sans-serif;
 
-        line-height: 13px;
+            font-size: 11px;
 
-        cursor: default;
-    }
+            font-weight: bold;
 
+            line-height: 13px;
 
-    #popup-close:active {
-        border-color:
-            #000000
-            #ffffff
-            #ffffff
-            #000000;
+            cursor: default;
+        }
 
-        box-shadow:
-            inset 1px 1px 0 #808080,
-            inset -1px -1px 0 #dfdfdf;
-    }
 
+        #popup-close:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
 
-    #popup-content {
-        min-height: 90px;
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+        }
 
-        display: flex;
 
-        align-items: center;
+        #popup-content {
+            min-height: 90px;
 
-        padding: 18px;
-    }
+            display: flex;
 
+            align-items: center;
 
-    #popup-icon {
-        width: 32px;
-        min-width: 32px;
+            padding: 18px;
+        }
 
-        height: 32px;
 
-        margin-right: 18px;
+        #popup-icon {
+            width: 32px;
+            min-width: 32px;
 
-        display: flex;
+            height: 32px;
 
-        align-items: center;
-        justify-content: center;
+            margin-right: 18px;
 
-        background: #c0c0c0;
+            display: flex;
 
-        color: #000000;
+            align-items: center;
+            justify-content: center;
 
-        font-family:
-            Arial,
-            sans-serif;
+            background: #c0c0c0;
 
-        font-size: 26px;
+            color: #000000;
 
-        font-weight: bold;
+            font-family:
+                Arial,
+                sans-serif;
 
-        line-height: 32px;
+            font-size: 26px;
 
-        text-align: center;
-    }
+            font-weight: bold;
 
+            line-height: 32px;
 
-    #popup-message {
-        flex: 1;
+            text-align: center;
+        }
 
-        font-size: 13px;
 
-        color: #000000;
+        #popup-message {
+            flex: 1;
 
-        line-height: 1.35;
-    }
+            font-size: 13px;
 
+            color: #000000;
 
-    #popup-buttons {
-        display: flex;
+            line-height: 1.35;
+        }
 
-        justify-content: center;
 
-        gap: 8px;
+        #popup-buttons {
+            display: flex;
 
-        padding:
-            0
-            12px
-            14px;
-    }
+            justify-content: center;
 
+            gap: 8px;
 
-    #popup-buttons button {
-        min-width: 75px;
+            padding:
+                0
+                12px
+                14px;
+        }
 
-        height: 27px;
 
-        padding:
-            2px
-            12px;
+        #popup-buttons button {
+            min-width: 75px;
 
-        background: #c0c0c0;
+            height: 27px;
 
-        border: 2px solid;
+            padding:
+                2px
+                12px;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            background: #c0c0c0;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            border: 2px solid;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-        font-size: 12px;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-        color: #000000;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-        cursor: default;
-    }
+            font-size: 12px;
 
+            color: #000000;
 
-    #popup-buttons button:active {
-        border-color:
-            #000000
-            #ffffff
-            #ffffff
-            #000000;
+            cursor: default;
+        }
 
-        box-shadow:
-            inset 1px 1px 0 #808080,
-            inset -1px -1px 0 #dfdfdf;
-    }
 
+        #popup-buttons button:hover {
+            background: #c0c0c0;
+        }
 
-    #popup-buttons button:focus {
-        outline: 1px dotted #000000;
 
-        outline-offset: -5px;
-    }
+        #popup-buttons button:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
 
-</style>
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+        }
 
-</head><body><!-- ============================================================
+
+        #popup-buttons button:focus {
+            outline: 1px dotted #000000;
+
+            outline-offset: -5px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ============================================================
      PERMISSION MESSAGE
-     ============================================================ --><div id="popup-overlay"><div id="popup">
+     ============================================================ -->
 
-    <div id="popup-titlebar">
+<div id="popup-overlay">
 
-        <span id="popup-title">
-            YouAreAnIdiot
-        </span>
+    <div id="popup">
 
+        <div id="popup-titlebar">
 
-        <button
-            id="popup-close"
-            type="button"
-        >×</button>
-
-    </div>
+            <span id="popup-title">
+                YouAreAnIdiot
+            </span>
 
 
-    <div id="popup-content">
+            <button
+                id="popup-close"
+                type="button"
+            >×</button>
 
-        <div id="popup-icon">
-            !
         </div>
 
 
-        <div id="popup-message"></div>
+        <div id="popup-content">
+
+            <div id="popup-icon">
+                !
+            </div>
+
+
+            <div id="popup-message"></div>
+
+        </div>
+
+
+        <div id="popup-buttons"></div>
 
     </div>
 
-
-    <div id="popup-buttons"></div>
-
 </div>
 
-</div><!-- ============================================================
+
+<!-- ============================================================
      AUDIO USED FOR AUTOPLAY TEST
-     ============================================================ --><audio
-id="autoplay-test-audio"
-preload="auto"
-loop
+     ============================================================ -->
 
-«»
-
-<source
-    src="/media/youare-long.mp3"
-    type="audio/mpeg"
+<audio
+    id="autoplay-test-audio"
+    preload="auto"
+    loop
 >
 
-</audio><script>
+    <source
+        src="/media/youare-long.mp3"
+        type="audio/mpeg"
+    >
+
+</audio>
+
+
+<script>
 
 "use strict";
 
@@ -371,17 +398,13 @@ loop
    CONFIGURATION
    ============================================================ */
 
-const POPUP_TEST_COUNT =
-    3;
-
+const POPUP_TEST_COUNT = 3;
 
 const TEST_PAGE =
     "test.html";
 
-
 const TARGET_PAGE =
     "popup.html";
-
 
 const DISCORD_PAGE =
     "discord.html";
@@ -455,16 +478,16 @@ let autoplayAllowed =
     false;
 
 
-let openingTarget =
-    false;
-
-
 let permissionMessageVisible =
     false;
 
 
 let popupResolver =
     null;
+
+
+let openingTarget =
+    false;
 
 
 let targetPopup =
@@ -477,6 +500,15 @@ let targetPopupFinished =
 
 let targetPopupMonitor =
     null;
+
+
+/*
+ * Prevent multiple automatic attempts to open
+ * popup.html at the same time.
+ */
+
+let permissionStartupComplete =
+    false;
 
 
 /* ============================================================
@@ -605,7 +637,331 @@ popupClose.addEventListener(
 
 
 /* ============================================================
+   AUTOPLAY TEST
+   SAME LOGIC AS question.html
+   ============================================================ */
+
+async function testAutoplayPermission() {
+
+    if (
+        autoplayTestComplete
+    ) {
+
+        return autoplayAllowed;
+
+    }
+
+
+    autoplayTestComplete =
+        true;
+
+
+    try {
+
+        autoplayAudio.pause();
+
+
+        try {
+
+            autoplayAudio.currentTime =
+                0;
+
+        } catch (_) {
+
+            /* Ignore. */
+
+        }
+
+
+        const playPromise =
+            autoplayAudio.play();
+
+
+        if (
+            playPromise &&
+            typeof playPromise.then ===
+            "function"
+        ) {
+
+            await playPromise;
+
+        }
+
+
+        await new Promise(
+            resolve => {
+
+                setTimeout(
+                    resolve,
+                    100
+                );
+
+            }
+        );
+
+
+        autoplayAllowed =
+            !autoplayAudio.paused &&
+            !autoplayAudio.ended;
+
+
+        if (
+            !autoplayAllowed
+        ) {
+
+            autoplayAudio.pause();
+
+
+            try {
+
+                autoplayAudio.currentTime =
+                    0;
+
+            } catch (_) {
+
+                /* Ignore. */
+
+            }
+
+        }
+
+    } catch (_) {
+
+        autoplayAllowed =
+            false;
+
+
+        try {
+
+            autoplayAudio.pause();
+
+            autoplayAudio.currentTime =
+                0;
+
+        } catch (_) {
+
+            /* Ignore. */
+
+        }
+
+    }
+
+
+    updatePermissionMessage();
+
+
+    maybeOpenQuestionPopup();
+
+
+    return autoplayAllowed;
+
+}
+
+
+/* ============================================================
+   USER-INTERACTION AUTOPLAY UNLOCK
+   ============================================================ */
+
+function tryUnlockAutoplay() {
+
+    if (
+        autoplayAllowed
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const playPromise =
+            autoplayAudio.play();
+
+
+        if (
+            playPromise &&
+            typeof playPromise.then ===
+            "function"
+        ) {
+
+            playPromise
+                .then(
+                    () => {
+
+                        autoplayAllowed =
+                            !autoplayAudio.paused &&
+                            !autoplayAudio.ended;
+
+
+                        if (
+                            autoplayAllowed
+                        ) {
+
+                            autoplayTestComplete =
+                                true;
+
+                            updatePermissionMessage();
+
+                            maybeOpenQuestionPopup();
+
+                        }
+
+                    }
+                )
+                .catch(
+                    () => {
+
+                        autoplayAllowed =
+                            false;
+
+                        updatePermissionMessage();
+
+                    }
+                );
+
+        } else {
+
+            autoplayAllowed =
+                !autoplayAudio.paused &&
+                !autoplayAudio.ended;
+
+
+            if (
+                autoplayAllowed
+            ) {
+
+                autoplayTestComplete =
+                    true;
+
+                updatePermissionMessage();
+
+                maybeOpenQuestionPopup();
+
+            }
+
+        }
+
+    } catch (_) {
+
+        autoplayAllowed =
+            false;
+
+    }
+
+}
+
+
+document.addEventListener(
+    "pointerdown",
+    tryUnlockAutoplay,
+    {
+        passive: true
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    tryUnlockAutoplay,
+    {
+        passive: true
+    }
+);
+
+
+/* ============================================================
    POPUP PERMISSION TEST
+   SAME LOGIC AS question.html
+   ============================================================ */
+
+function testPopupPermission() {
+
+    if (
+        popupTestStarted
+    ) {
+
+        return popupAllowed;
+
+    }
+
+
+    popupTestStarted =
+        true;
+
+
+    popupResults.clear();
+
+
+    for (
+        let i = 0;
+        i < POPUP_TEST_COUNT;
+        i++
+    ) {
+
+        try {
+
+            const testPopup =
+                window.open(
+                    `${TEST_PAGE}?id=${i}`,
+                    `youare_popup_test_${i}`,
+                    [
+                        "width=1",
+                        "height=1",
+                        "left=-10000",
+                        "top=-10000"
+                    ].join(",")
+                );
+
+
+            void testPopup;
+
+        } catch (_) {
+
+            /*
+             * Blocked popup simply does not
+             * report success.
+             */
+
+        }
+
+    }
+
+
+    /*
+     * Do not immediately assume failure.
+     *
+     * test.html may send its result slightly later.
+     */
+
+    setTimeout(
+        () => {
+
+            updatePermissionMessage();
+
+            maybeOpenQuestionPopup();
+
+            if (
+                !popupAllowed &&
+                !permissionMessageVisible
+            ) {
+
+                showPermissionMessage();
+
+            }
+
+        },
+        1500
+    );
+
+
+    return popupAllowed;
+
+}
+
+
+/* ============================================================
+   POPUP TEST RESULT HANDLING
    ============================================================ */
 
 window.addEventListener(
@@ -672,201 +1028,23 @@ window.addEventListener(
 
         updatePermissionMessage();
 
+
+        /*
+         * This is important:
+         *
+         * Once popup permission succeeds, the
+         * actual popup.html is opened when autoplay
+         * is also available.
+         */
+
+        maybeOpenQuestionPopup();
+
     }
 );
 
 
-function testPopupPermission() {
-
-    if (
-        popupTestStarted
-    ) {
-
-        return popupAllowed;
-
-    }
-
-
-    popupTestStarted =
-        true;
-
-
-    popupResults.clear();
-
-
-    for (
-        let i = 0;
-        i < POPUP_TEST_COUNT;
-        i++
-    ) {
-
-        try {
-
-            const popup =
-                window.open(
-                    `${TEST_PAGE}?id=${i}`,
-                    `youare_popup_test_${i}`,
-                    [
-                        "width=1",
-                        "height=1",
-                        "left=-10000",
-                        "top=-10000"
-                    ].join(",")
-                );
-
-
-            void popup;
-
-        } catch (_) {
-
-            /*
-             * Blocked popup simply does not
-             * report success.
-             */
-
-        }
-
-    }
-
-
-    return popupAllowed;
-
-}
-
-
 /* ============================================================
-   AUTOPLAY TEST
-   ============================================================ */
-
-async function testAutoplayPermission() {
-
-    if (
-        autoplayTestComplete
-    ) {
-
-        return autoplayAllowed;
-
-    }
-
-
-    autoplayTestComplete =
-        true;
-
-
-    try {
-
-        autoplayAudio.pause();
-
-
-        try {
-
-            autoplayAudio.currentTime =
-                0;
-
-        } catch (_) {
-
-            /*
-             * Ignore.
-             */
-
-        }
-
-
-        const playPromise =
-            autoplayAudio.play();
-
-
-        if (
-            playPromise &&
-            typeof playPromise.then ===
-            "function"
-        ) {
-
-            await playPromise;
-
-        }
-
-
-        /*
-         * Match question.html:
-         *
-         * Give the browser a short moment to
-         * actually enter the playing state.
-         */
-
-        await new Promise(
-            resolve => {
-
-                setTimeout(
-                    resolve,
-                    100
-                );
-
-            }
-        );
-
-
-        autoplayAllowed =
-            !autoplayAudio.paused &&
-            !autoplayAudio.ended;
-
-
-        if (
-            !autoplayAllowed
-        ) {
-
-            autoplayAudio.pause();
-
-
-            try {
-
-                autoplayAudio.currentTime =
-                    0;
-
-            } catch (_) {
-
-                /*
-                 * Ignore.
-                 */
-
-            }
-
-        }
-
-    } catch (_) {
-
-        autoplayAllowed =
-            false;
-
-
-        try {
-
-            autoplayAudio.pause();
-
-            autoplayAudio.currentTime =
-                0;
-
-        } catch (_) {
-
-            /*
-             * Ignore.
-             */
-
-        }
-
-    }
-
-
-    updatePermissionMessage();
-
-
-    return autoplayAllowed;
-
-}
-
-
-/* ============================================================
-   DYNAMIC PERMISSION MESSAGE
+   PERMISSION MESSAGE
    ============================================================ */
 
 function getPermissionMessage() {
@@ -925,7 +1103,7 @@ function updatePermissionMessage() {
 
 
     /*
-     * Both permissions are available.
+     * Both permissions succeeded.
      */
 
     if (
@@ -948,15 +1126,12 @@ function updatePermissionMessage() {
             false;
 
 
+        maybeOpenQuestionPopup();
+
         return;
 
     }
 
-
-    /*
-     * Update the currently visible
-     * permission dialog dynamically.
-     */
 
     if (
         !permissionMessageVisible
@@ -983,6 +1158,17 @@ async function showPermissionMessage() {
         !message
     ) {
 
+        maybeOpenQuestionPopup();
+
+        return;
+
+    }
+
+
+    if (
+        permissionMessageVisible
+    ) {
+
         return;
 
     }
@@ -1001,6 +1187,40 @@ async function showPermissionMessage() {
 
     permissionMessageVisible =
         false;
+
+
+    /*
+     * The OK interaction itself gives the browser
+     * another user interaction opportunity.
+     */
+
+    tryUnlockAutoplay();
+
+
+    /*
+     * Retry popup permission as well.
+     */
+
+    if (
+        !popupAllowed
+    ) {
+
+        popupTestStarted =
+            false;
+
+        popupResults.clear();
+
+        testPopupPermission();
+
+    }
+
+
+    /*
+     * If both permissions have already become
+     * available, open popup.html immediately.
+     */
+
+    maybeOpenQuestionPopup();
 
 }
 
@@ -1039,8 +1259,8 @@ window.addEventListener(
 
 
         /*
-         * Only the real popup.html may request
-         * the Discord-sized window.
+         * Only the actual popup.html window
+         * can request the resize.
          */
 
         if (
@@ -1139,6 +1359,10 @@ function getPopupFeatures() {
 
     /*
      * Fake question-window aspect ratio.
+     *
+     * popup.html starts at this size.
+     *
+     * It can later request the Discord size.
      */
 
     const aspectRatio =
@@ -1271,8 +1495,8 @@ function handleTargetPopupClosed() {
 
 
     /*
-     * Redirect only after the actual
-     * popup window has closed.
+     * Redirect ONLY after the real popup
+     * has actually been closed.
      */
 
     window.location.href =
@@ -1345,6 +1569,16 @@ function openQuestionPopup() {
     }
 
 
+    if (
+        !popupAllowed ||
+        !autoplayAllowed
+    ) {
+
+        return;
+
+    }
+
+
     openingTarget =
         true;
 
@@ -1379,7 +1613,7 @@ function openQuestionPopup() {
 
 
     /*
-     * Blocked real popup.
+     * Browser blocked the actual popup.
      */
 
     if (
@@ -1389,14 +1623,11 @@ function openQuestionPopup() {
         openingTarget =
             false;
 
-
         popupAllowed =
             false;
 
-
         popupTestStarted =
             false;
-
 
         popupResults.clear();
 
@@ -1408,6 +1639,10 @@ function openQuestionPopup() {
     }
 
 
+    /*
+     * Save the actual WindowProxy immediately.
+     */
+
     targetPopup =
         popup;
 
@@ -1415,6 +1650,10 @@ function openQuestionPopup() {
     openingTarget =
         false;
 
+
+    /*
+     * Start monitoring immediately.
+     */
 
     monitorTargetPopup(
         popup
@@ -1431,7 +1670,66 @@ function openQuestionPopup() {
 
 
 /* ============================================================
-   STARTUP FEATURE DETECTION
+   OPEN ONLY WHEN BOTH CHECKS SUCCEEDED
+   ============================================================ */
+
+function maybeOpenQuestionPopup() {
+
+    if (
+        !permissionStartupComplete
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !popupAllowed ||
+        !autoplayAllowed
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        targetPopup ||
+        openingTarget
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Close the permission message if it is
+     * still visible.
+     */
+
+    if (
+        permissionMessageVisible
+    ) {
+
+        closePopup(
+            "Permissions complete"
+        );
+
+        permissionMessageVisible =
+            false;
+
+    }
+
+
+    openQuestionPopup();
+
+}
+
+
+/* ============================================================
+   STARTUP
    ============================================================ */
 
 window.addEventListener(
@@ -1439,12 +1737,11 @@ window.addEventListener(
     async () => {
 
         /*
-         * Exactly like question.html:
+         * Same order as question.html:
          *
-         * 1. Start popup detection.
-         * 2. Test autoplay.
-         * 3. Show ONE combined permission dialog
-         *    if something is still unavailable.
+         * 1. popup test
+         * 2. autoplay test
+         * 3. permission message
          */
 
         testPopupPermission();
@@ -1453,67 +1750,31 @@ window.addEventListener(
         await testAutoplayPermission();
 
 
-        await showPermissionMessage();
-
-    },
-    {
-        once: true
-    }
-);
+        permissionStartupComplete =
+            true;
 
 
-/* ============================================================
-   NORMAL AUDIO PLAYBACK
-   ============================================================ */
+        /*
+         * If both succeeded while startup was
+         * running, open popup.html.
+         */
 
-function playAudio() {
-
-    const playPromise =
-        autoplayAudio.play();
+        maybeOpenQuestionPopup();
 
 
-    if (
-        playPromise &&
-        typeof playPromise.catch ===
-        "function"
-    ) {
+        /*
+         * Otherwise show the appropriate
+         * combined permission message.
+         */
 
-        playPromise.catch(
-            () => {
+        if (
+            !popupAllowed ||
+            !autoplayAllowed
+        ) {
 
-                /*
-                 * Autoplay may still be blocked.
-                 */
+            await showPermissionMessage();
 
-            }
-        );
-
-    }
-
-}
-
-
-playAudio();
-
-
-document.addEventListener(
-    "pointerdown",
-    () => {
-
-        playAudio();
-
-    },
-    {
-        once: true
-    }
-);
-
-
-document.addEventListener(
-    "keydown",
-    () => {
-
-        playAudio();
+        }
 
     },
     {
@@ -1531,25 +1792,53 @@ window.addEventListener(
     () => {
 
         /*
-         * Match question.html behavior:
-         *
-         * Do not repeatedly start the popup test
-         * once it has already been started.
+         * Don't restart permission testing after
+         * the actual popup has opened.
          */
 
         if (
-            !popupAllowed &&
-            !targetPopup
+            !targetPopup &&
+            !permissionMessageVisible
         ) {
 
-            popupTestStarted =
-                false;
+            if (
+                !popupAllowed
+            ) {
 
-            popupResults.clear();
+                popupTestStarted =
+                    false;
 
-            testPopupPermission();
+                popupResults.clear();
+
+                testPopupPermission();
+
+            }
+
+
+            if (
+                !autoplayAllowed
+            ) {
+
+                autoplayTestComplete =
+                    false;
+
+                testAutoplayPermission();
+
+            }
 
         }
+
+
+        if (
+            !autoplayAllowed
+        ) {
+
+            tryUnlockAutoplay();
+
+        }
+
+
+        maybeOpenQuestionPopup();
 
     }
 );
@@ -1590,4 +1879,8 @@ document.addEventListener(
     }
 );
 
-</script></body></html>
+</script>
+
+</body>
+
+</html>
