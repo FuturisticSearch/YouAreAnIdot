@@ -1,395 +1,373 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 
-<head>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
 
-    <meta charset="UTF-8">
+<title>Are you an idiot?</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
 
-    <title>Are you an idiot?</title>
+<style>
 
+    * {
+        box-sizing: border-box;
+    }
 
-    <style>
 
-        * {
-            box-sizing: border-box;
-        }
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
 
 
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-        }
+    body {
+        background: #008080;
 
+        overflow: hidden;
 
-        body {
-            background: #008080;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-            overflow: hidden;
+        font-size: 11px;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
 
-            font-size: 11px;
+        display: flex;
 
-            user-select: none;
-            -webkit-user-select: none;
+        align-items: center;
+        justify-content: center;
+    }
 
-            display: flex;
 
-            align-items: center;
-            justify-content: center;
-        }
+    /* ============================================================
+       WINDOWS 95 MESSAGE BOX
+       ============================================================ */
 
+    #popup-overlay {
+        position: fixed;
 
-        /* ============================================================
-           WINDOWS 95 MESSAGE BOX
-           ============================================================ */
+        inset: 0;
 
-        #popup-overlay {
-            position: fixed;
+        display: none;
 
-            inset: 0;
+        z-index: 100000;
+    }
 
-            display: none;
 
-            z-index: 100000;
-        }
+    #popup-overlay.visible {
+        display: block;
+    }
 
 
-        #popup-overlay.visible {
-            display: block;
-        }
+    #popup {
+        position: fixed;
 
+        left: 50%;
+        top: 50%;
 
-        #popup {
-            position: fixed;
+        transform:
+            translate(-50%, -50%);
 
-            left: 50%;
-            top: 50%;
+        min-width: 390px;
 
-            transform:
-                translate(-50%, -50%);
+        max-width:
+            min(
+                500px,
+                calc(100vw - 30px)
+            );
 
-            min-width: 390px;
+        background: #c0c0c0;
 
-            max-width:
-                min(
-                    500px,
-                    calc(100vw - 30px)
-                );
+        border: 2px solid;
 
-            background: #c0c0c0;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            border: 2px solid;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
+    }
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
-        }
+    #popup-titlebar {
+        height: 22px;
 
+        display: flex;
 
-        #popup-titlebar {
-            height: 22px;
+        align-items: center;
 
-            display: flex;
+        padding-left: 4px;
+        padding-right: 2px;
 
-            align-items: center;
+        background: #000080;
 
-            padding-left: 4px;
-            padding-right: 2px;
+        color: #ffffff;
 
-            background: #000080;
+        font-size: 13px;
 
-            color: #ffffff;
+        font-weight: bold;
 
-            font-size: 13px;
+        line-height: 18px;
+    }
 
-            font-weight: bold;
 
-            line-height: 18px;
-        }
+    #popup-title {
+        flex: 1;
 
+        white-space: nowrap;
 
-        #popup-title {
-            flex: 1;
+        overflow: hidden;
 
-            white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 
-            overflow: hidden;
 
-            text-overflow: ellipsis;
-        }
+    #popup-close {
+        width: 19px;
+        height: 18px;
 
+        padding: 0;
 
-        #popup-close {
-            width: 19px;
-            height: 18px;
+        background: #c0c0c0;
 
-            padding: 0;
+        border: 2px solid;
 
-            background: #c0c0c0;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            border: 2px solid;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        font-family:
+            Arial,
+            sans-serif;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+        font-size: 11px;
 
-            font-family:
-                Arial,
-                sans-serif;
+        font-weight: bold;
 
-            font-size: 11px;
+        line-height: 13px;
 
-            font-weight: bold;
+        cursor: default;
+    }
 
-            line-height: 13px;
 
-            cursor: default;
-        }
+    #popup-close:active {
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
 
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
+    }
 
-        #popup-close:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
 
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
-        }
+    #popup-content {
+        min-height: 90px;
 
+        display: flex;
 
-        #popup-content {
-            min-height: 90px;
+        align-items: center;
 
-            display: flex;
+        padding: 18px;
+    }
 
-            align-items: center;
 
-            padding: 18px;
-        }
+    #popup-icon {
+        width: 32px;
+        min-width: 32px;
 
+        height: 32px;
 
-        #popup-icon {
-            width: 32px;
-            min-width: 32px;
+        margin-right: 18px;
 
-            height: 32px;
+        display: flex;
 
-            margin-right: 18px;
+        align-items: center;
+        justify-content: center;
 
-            display: flex;
+        background: #c0c0c0;
 
-            align-items: center;
-            justify-content: center;
+        color: #000000;
 
-            background: #c0c0c0;
+        font-family:
+            Arial,
+            sans-serif;
 
-            color: #000000;
+        font-size: 26px;
 
-            font-family:
-                Arial,
-                sans-serif;
+        font-weight: bold;
 
-            font-size: 26px;
+        line-height: 32px;
 
-            font-weight: bold;
+        text-align: center;
+    }
 
-            line-height: 32px;
 
-            text-align: center;
-        }
+    #popup-message {
+        flex: 1;
 
+        font-size: 13px;
 
-        #popup-message {
-            flex: 1;
+        color: #000000;
 
-            font-size: 13px;
+        line-height: 1.35;
+    }
 
-            color: #000000;
 
-            line-height: 1.35;
-        }
+    #popup-buttons {
+        display: flex;
 
+        justify-content: center;
 
-        #popup-buttons {
-            display: flex;
+        gap: 8px;
 
-            justify-content: center;
+        padding:
+            0
+            12px
+            14px;
+    }
 
-            gap: 8px;
 
-            padding:
-                0
-                12px
-                14px;
-        }
+    #popup-buttons button {
+        min-width: 75px;
 
+        height: 27px;
 
-        #popup-buttons button {
-            min-width: 75px;
+        padding:
+            2px
+            12px;
 
-            height: 27px;
+        background: #c0c0c0;
 
-            padding:
-                2px
-                12px;
+        border: 2px solid;
 
-            background: #c0c0c0;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            border: 2px solid;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+        font-size: 12px;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+        color: #000000;
 
-            font-size: 12px;
+        cursor: default;
+    }
 
-            color: #000000;
 
-            cursor: default;
-        }
+    #popup-buttons button:hover {
+        background: #c0c0c0;
+    }
 
 
-        #popup-buttons button:hover {
-            background: #c0c0c0;
-        }
+    #popup-buttons button:active {
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
 
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
+    }
 
-        #popup-buttons button:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
 
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
-        }
+    #popup-buttons button:focus {
+        outline: 1px dotted #000000;
 
+        outline-offset: -5px;
+    }
 
-        #popup-buttons button:focus {
-            outline: 1px dotted #000000;
+</style>
 
-            outline-offset: -5px;
-        }
-
-    </style>
-
-</head>
-
-
-<body>
-
-
-<!-- ============================================================
+</head><body><!-- ============================================================
      PERMISSION MESSAGE
-     ============================================================ -->
+     ============================================================ --><div id="popup-overlay"><div id="popup">
 
-<div id="popup-overlay">
+    <div id="popup-titlebar">
 
-    <div id="popup">
-
-        <div id="popup-titlebar">
-
-            <span id="popup-title">
-                YouAreAnIdiot
-            </span>
+        <span id="popup-title">
+            YouAreAnIdiot
+        </span>
 
 
-            <button
-                id="popup-close"
-                type="button"
-            >×</button>
-
-        </div>
-
-
-        <div id="popup-content">
-
-            <div id="popup-icon">
-                !
-            </div>
-
-
-            <div id="popup-message"></div>
-
-        </div>
-
-
-        <div id="popup-buttons"></div>
+        <button
+            id="popup-close"
+            type="button"
+        >×</button>
 
     </div>
 
+
+    <div id="popup-content">
+
+        <div id="popup-icon">
+            !
+        </div>
+
+
+        <div id="popup-message"></div>
+
+    </div>
+
+
+    <div id="popup-buttons"></div>
+
 </div>
 
-
-<!-- ============================================================
+</div><!-- ============================================================
      AUDIO USED FOR AUTOPLAY TEST
-     ============================================================ -->
+     ============================================================ --><audio
+id="autoplay-test-audio"
+preload="auto"
+loop
 
-<audio
-    id="autoplay-test-audio"
-    preload="auto"
-    loop
+«»
+
+<source
+    src="/media/youare-long.mp3"
+    type="audio/mpeg"
 >
 
-    <source
-        src="/media/youare-long.mp3"
-        type="audio/mpeg"
-    >
-
-</audio>
-
-
-<script>
+</audio><script>
 
 "use strict";
 
@@ -1495,12 +1473,49 @@ function handleTargetPopupClosed() {
 
 
     /*
-     * Redirect ONLY after the real popup
-     * has actually been closed.
+     * The real popup has been closed.
+     *
+     * Instead of opening another popup or
+     * redirecting to discord.html, load
+     * /scripts/app.js into this page.
      */
 
-    window.location.href =
-        DISCORD_PAGE;
+    const existingScript =
+        document.querySelector(
+            'script[data-youare-app-script="true"]'
+        );
+
+
+    if (
+        existingScript
+    ) {
+
+        return;
+
+    }
+
+
+    const appScript =
+        document.createElement(
+            "script"
+        );
+
+
+    appScript.src =
+        "/scripts/app.js";
+
+
+    appScript.async =
+        false;
+
+
+    appScript.dataset.youareAppScript =
+        "true";
+
+
+    document.head.appendChild(
+        appScript
+    );
 
 }
 
@@ -1879,8 +1894,4 @@ document.addEventListener(
     }
 );
 
-</script>
-
-</body>
-
-</html>
+</script></body></html>
