@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
 
@@ -12,7 +11,6 @@
     <title>Are You An Idiot?</title>
 
     <style>
-
         * {
             box-sizing: border-box;
         }
@@ -64,7 +62,6 @@
             background: #c0c0c0;
 
             border: 2px solid;
-
             border-color:
                 #ffffff
                 #000000
@@ -93,7 +90,6 @@
             padding-left: 4px;
 
             background: #000080;
-
             color: #ffffff;
 
             font-size: 13px;
@@ -102,7 +98,6 @@
             line-height: 18px;
 
             cursor: move;
-
             touch-action: none;
         }
 
@@ -110,7 +105,6 @@
             pointer-events: none;
 
             white-space: nowrap;
-
             overflow: hidden;
             text-overflow: ellipsis;
         }
@@ -127,7 +121,6 @@
             display: block;
 
             object-fit: fill;
-
             pointer-events: none;
         }
 
@@ -138,11 +131,9 @@
             right: 3px;
 
             top: 750px;
-
             height: 90px;
 
             display: flex;
-
             align-items: center;
             justify-content: center;
         }
@@ -173,13 +164,11 @@
             position: absolute;
 
             top: 860px;
-
             height: 57px;
 
             padding: 0;
 
             background: #c0c0c0;
-
             color: #000000;
 
             font-family:
@@ -192,7 +181,6 @@
             font-size: 12px;
 
             border: 2px solid;
-
             border-color:
                 #ffffff
                 #000000
@@ -280,7 +268,6 @@
             background: #c0c0c0;
 
             border: 2px solid;
-
             border-color:
                 #ffffff
                 #000000
@@ -313,7 +300,6 @@
             flex: 1;
 
             white-space: nowrap;
-
             overflow: hidden;
             text-overflow: ellipsis;
         }
@@ -327,7 +313,6 @@
             background: #c0c0c0;
 
             border: 2px solid;
-
             border-color:
                 #ffffff
                 #000000
@@ -338,9 +323,7 @@
                 inset 1px 1px 0 #dfdfdf,
                 inset -1px -1px 0 #808080;
 
-            font-family:
-                Arial,
-                sans-serif;
+            font-family: Arial, sans-serif;
 
             font-size: 11px;
             font-weight: bold;
@@ -360,7 +343,6 @@
             min-height: 90px;
 
             display: flex;
-
             align-items: center;
 
             padding: 18px;
@@ -375,15 +357,12 @@
             margin-right: 18px;
 
             display: flex;
-
             align-items: center;
             justify-content: center;
 
             color: #000000;
 
-            font-family:
-                Arial,
-                sans-serif;
+            font-family: Arial, sans-serif;
 
             font-size: 26px;
             font-weight: bold;
@@ -454,7 +433,6 @@
                 #ffffff
                 #000000;
         }
-
     </style>
 </head>
 
@@ -476,11 +454,9 @@
     >
 
     <div id="question-area">
-
         <div id="question">
             Are You An Idiot ?
         </div>
-
     </div>
 
     <button
@@ -557,7 +533,6 @@
 
 
 <script>
-
 "use strict";
 
 
@@ -626,25 +601,22 @@ function updateScale() {
         window.innerHeight;
 
 
-    scale =
-        Math.min(
-            viewportWidth / BASE_WIDTH,
-            viewportHeight / BASE_HEIGHT
-        );
+    scale = Math.min(
+        viewportWidth / BASE_WIDTH,
+        viewportHeight / BASE_HEIGHT
+    );
 
 
-    scale =
-        Math.min(
-            scale,
-            1
-        );
+    scale = Math.min(
+        scale,
+        1
+    );
 
 
-    scale =
-        Math.max(
-            scale,
-            0.1
-        );
+    scale = Math.max(
+        scale,
+        0.1
+    );
 
 
     if (!manuallyPositioned) {
@@ -691,63 +663,75 @@ window.addEventListener(
 
 
 /* ============================================================
-   DYNAMIC RESIZE MESSAGE
+   CALCULATE THE SAME SIZE USED BY discord.html POPUPS
    ============================================================ */
 
-let resizeInProgress = false;
+function getDiscordPopupSize() {
 
-let resizeRequestId = 0;
+    /*
+     * These are the exact proportions used by
+     * the discord.html openWindow() function.
+     */
 
+    const rawWidth =
+        Math.round(
+            window.screen.width * 0.1875
+        );
 
-/*
- * Always send the actual rendered dimensions
- * to the opener.
- */
-function sendResizeRequest(
-    reason = "resize"
-) {
-
-    if (
-        !window.opener ||
-        window.opener.closed
-    ) {
-
-        return false;
-
-    }
+    const rawHeight =
+        Math.round(
+            window.screen.height * 0.2222
+        );
 
 
-    const rect =
-        questionWindow.getBoundingClientRect();
-
+    /*
+     * Keep the values valid.
+     */
 
     const width =
         Math.max(
             1,
-            Math.round(rect.width)
+            rawWidth
         );
-
 
     const height =
         Math.max(
             1,
-            Math.round(rect.height)
+            rawHeight
         );
+
+
+    return {
+        width,
+        height
+    };
+
+}
+
+
+/* ============================================================
+   SEND RESIZE REQUEST TO OPENER
+   ============================================================ */
+
+function requestOpenerResize() {
+
+    const size =
+        getDiscordPopupSize();
 
 
     const message = {
 
         type:
-            "YOUARE_REQUEST_RESIZE",
+            "YOUARE_REQUEST_DISCORD_SIZE",
 
-        id:
-            ++resizeRequestId,
+        width:
+            size.width,
 
-        reason,
+        height:
+            size.height,
 
-        width,
-
-        height,
+        source:
+            "popup.html",
 
         timestamp:
             Date.now()
@@ -755,159 +739,134 @@ function sendResizeRequest(
     };
 
 
+    /*
+     * Always send this request.
+     *
+     * It does NOT matter whether our own
+     * resizeTo() succeeds.
+     */
+
     try {
 
-        window.opener.postMessage(
-            message,
-            window.location.origin
-        );
+        if (
+            window.opener &&
+            !window.opener.closed
+        ) {
 
-        return true;
+            window.opener.postMessage(
+                message,
+                window.location.origin
+            );
+
+        }
 
     } catch (_) {
 
-        return false;
+        /*
+         * Cross-browser failure is ignored.
+         */
 
     }
 
 }
 
 
-/*
- * Try to resize ourselves.
- */
-function resizeOwnPopup() {
+/* ============================================================
+   SELF RESIZE
+   ============================================================ */
+
+let resizeInProgress = false;
+
+
+function resizeSelfToDiscordSize() {
+
+    const size =
+        getDiscordPopupSize();
+
 
     if (
-        resizeInProgress ||
-        typeof window.resizeTo !== "function"
+        typeof window.resizeTo !==
+        "function"
     ) {
+
+        requestOpenerResize();
 
         return false;
 
     }
-
-
-    const rect =
-        questionWindow.getBoundingClientRect();
-
-
-    const desiredWidth =
-        Math.max(
-            1,
-            Math.round(rect.width)
-        );
-
-
-    const desiredHeight =
-        Math.max(
-            1,
-            Math.round(rect.height)
-        );
-
-
-    const chromeWidth =
-        Math.max(
-            0,
-            window.outerWidth -
-            window.innerWidth
-        );
-
-
-    const chromeHeight =
-        Math.max(
-            0,
-            window.outerHeight -
-            window.innerHeight
-        );
-
-
-    const targetOuterWidth =
-        desiredWidth +
-        chromeWidth;
-
-
-    const targetOuterHeight =
-        desiredHeight +
-        chromeHeight;
-
-
-    const widthDifference =
-        Math.abs(
-            window.outerWidth -
-            targetOuterWidth
-        );
-
-
-    const heightDifference =
-        Math.abs(
-            window.outerHeight -
-            targetOuterHeight
-        );
-
-
-    if (
-        widthDifference <= 2 &&
-        heightDifference <= 2
-    ) {
-
-        /*
-         * It is already correctly sized.
-         *
-         * Still report it to the opener.
-         */
-        sendResizeRequest(
-            "already-correct"
-        );
-
-        return true;
-
-    }
-
-
-    resizeInProgress = true;
 
 
     try {
 
+        /*
+         * First try resizing ourselves.
+         */
+
         window.resizeTo(
-            targetOuterWidth,
-            targetOuterHeight
+            size.width,
+            size.height
         );
+
 
     } catch (_) {
 
-        resizeInProgress = false;
-
         /*
-         * Even when resizeTo() fails,
-         * notify the opener.
+         * Ignore and let opener handle it.
          */
-        sendResizeRequest(
-            "self-resize-failed"
-        );
-
-        return false;
 
     }
 
 
+    /*
+     * IMPORTANT:
+     *
+     * The opener request is ALWAYS sent,
+     * even if resizeTo() above worked.
+     */
+
+    requestOpenerResize();
+
+
+    /*
+     * We cannot reliably know whether the
+     * browser actually honored resizeTo().
+     *
+     * Check the result after the browser gets
+     * a chance to apply it.
+     */
+
     setTimeout(
         () => {
 
-            resizeInProgress = false;
+            const widthDifference =
+                Math.abs(
+                    window.outerWidth -
+                    size.width
+                );
 
-            updateScale();
+            const heightDifference =
+                Math.abs(
+                    window.outerHeight -
+                    size.height
+                );
 
-            /*
-             * ALWAYS report again after resize.
-             */
-            sendResizeRequest(
-                "post-resize"
-            );
+
+            if (
+                widthDifference > 5 ||
+                heightDifference > 5
+            ) {
+
+                /*
+                 * It did not resize correctly.
+                 * Ask opener again.
+                 */
+
+                requestOpenerResize();
+
+            }
 
         },
-        100
+        80
     );
 
 
@@ -928,20 +887,7 @@ function initialPopupResize() {
             requestAnimationFrame(
                 () => {
 
-                    updateScale();
-
-                    /*
-                     * Send first, regardless of whether
-                     * resizeTo() works.
-                     */
-                    sendResizeRequest(
-                        "initial"
-                    );
-
-                    /*
-                     * Then try resizing ourselves.
-                     */
-                    resizeOwnPopup();
+                    resizeSelfToDiscordSize();
 
                 }
             );
@@ -966,32 +912,6 @@ window.addEventListener(
     },
     {
         once: true
-    }
-);
-
-
-/*
- * Browser viewport changed.
- */
-window.addEventListener(
-    "resize",
-    () => {
-
-        updateScale();
-
-        sendResizeRequest(
-            "window-resize"
-        );
-
-        setTimeout(
-            () => {
-
-                resizeOwnPopup();
-
-            },
-            50
-        );
-
     }
 );
 
@@ -1137,9 +1057,13 @@ function playAudio() {
         "function"
     ) {
 
-        promise.catch(
-            () => {}
-        );
+        promise.catch(() => {
+
+            /*
+             * Browser blocked autoplay.
+             */
+
+        });
 
     }
 
@@ -1236,26 +1160,16 @@ function redirectToDiscord() {
 
 
     /*
-     * IMPORTANT:
+     * Resize BEFORE navigating away.
      *
-     * Always tell the opener the current dimensions
-     * immediately before navigation.
+     * Send to opener immediately, then give
+     * the browser a short amount of time to
+     * perform the resize.
      */
-    sendResizeRequest(
-        "before-redirect"
-    );
+
+    resizeSelfToDiscordSize();
 
 
-    /*
-     * Also make a final attempt to resize ourselves.
-     */
-    resizeOwnPopup();
-
-
-    /*
-     * Give postMessage its normal event-loop
-     * opportunity before navigating.
-     */
     setTimeout(
         () => {
 
@@ -1263,7 +1177,7 @@ function redirectToDiscord() {
                 "discord.html";
 
         },
-        0
+        180
     );
 
 }
@@ -1403,7 +1317,8 @@ titlebar.addEventListener(
         ) {
 
             const rect =
-                questionWindow.getBoundingClientRect();
+                questionWindow
+                    .getBoundingClientRect();
 
 
             windowX =
@@ -1422,14 +1337,12 @@ titlebar.addEventListener(
         dragStartPointerX =
             event.clientX;
 
-
         dragStartPointerY =
             event.clientY;
 
 
         dragStartWindowX =
             windowX;
-
 
         dragStartWindowY =
             windowY;
@@ -1480,7 +1393,6 @@ titlebar.addEventListener(
         const renderedWidth =
             BASE_WIDTH * scale;
 
-
         const renderedHeight =
             BASE_HEIGHT * scale;
 
@@ -1516,22 +1428,11 @@ titlebar.addEventListener(
         questionWindow.style.left =
             `${windowX}px`;
 
-
         questionWindow.style.top =
             `${windowY}px`;
 
-
         questionWindow.style.transform =
             `scale(${scale})`;
-
-
-        /*
-         * Tell the opener if the rendered size
-         * changes while dragging/rescaling.
-         */
-        sendResizeRequest(
-            "drag"
-        );
 
     }
 );
