@@ -25,21 +25,26 @@
 
     #fallback {
         position: fixed;
+
         left: 50%;
         top: 50%;
-        transform: translate(-50%, -50%);
+
+        transform:
+            translate(-50%, -50%);
 
         padding: 8px 20px;
 
         background: #c0c0c0;
-        color: #000;
+
+        color: #000000;
 
         border: 2px solid;
+
         border-color:
-            #fff
-            #000
-            #000
-            #fff;
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
         box-shadow:
             inset 1px 1px 0 #dfdfdf,
@@ -53,59 +58,98 @@
 
     #fallback:active {
         border-color:
-            #000
-            #fff
-            #fff
-            #000;
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
     }
 </style>
 
-</head><body><button id="fallback" type="button">
-    Open Are You An Idiot?
+</head><body><button
+id="fallback"
+type="button"
+
+«»
+
+Open Are You An Idiot?
+
 </button><script>
 "use strict";
 
-/*
- * ============================================================
- * POPUP TEST
- * ============================================================
- */
+
+/* ============================================================
+   POPUP PERMISSION TEST
+   ============================================================ */
 
 const POPUP_TEST_COUNT = 3;
 
-const popupResults = new Set();
+const popupResults =
+    new Set();
 
 let popupTestStarted = false;
+
 let popupAllowed = false;
 
-window.addEventListener("message", event => {
 
-    if (event.origin !== window.location.origin) {
-        return;
+window.addEventListener(
+    "message",
+    event => {
+
+        if (
+            event.origin !==
+            window.location.origin
+        ) {
+            return;
+        }
+
+
+        const data =
+            event.data;
+
+
+        if (
+            !data ||
+            data.type !==
+            "YOUARE_POPUP_TEST_SUCCESS"
+        ) {
+            return;
+        }
+
+
+        const id =
+            String(data.id);
+
+
+        if (
+            ![
+                "0",
+                "1",
+                "2"
+            ].includes(id)
+        ) {
+            return;
+        }
+
+
+        popupResults.add(id);
+
+
+        if (
+            popupResults.size >=
+            POPUP_TEST_COUNT
+        ) {
+
+            popupAllowed = true;
+
+        }
+
     }
+);
 
-    const data = event.data;
 
-    if (
-        !data ||
-        data.type !== "YOUARE_POPUP_TEST_SUCCESS"
-    ) {
-        return;
-    }
-
-    const id = String(data.id);
-
-    if (!["0", "1", "2"].includes(id)) {
-        return;
-    }
-
-    popupResults.add(id);
-
-    if (popupResults.size >= POPUP_TEST_COUNT) {
-        popupAllowed = true;
-    }
-});
-
+/* ============================================================
+   TEST POPUPS
+   ============================================================ */
 
 function testPopupPermission() {
 
@@ -113,9 +157,11 @@ function testPopupPermission() {
         return popupAllowed;
     }
 
+
     popupTestStarted = true;
 
     popupResults.clear();
+
 
     for (
         let i = 0;
@@ -125,53 +171,59 @@ function testPopupPermission() {
 
         try {
 
-            const popup = window.open(
-                `test.html?id=${i}`,
-                `youare_popup_test_${i}`,
-                [
-                    "width=1",
-                    "height=1",
-                    "left=-10000",
-                    "top=-10000"
-                ].join(",")
-            );
+            const popup =
+                window.open(
+                    `test.html?id=${i}`,
+                    `youare_popup_test_${i}`,
+                    [
+                        "width=1",
+                        "height=1",
+                        "left=-10000",
+                        "top=-10000"
+                    ].join(",")
+                );
 
-            /*
-             * test.html is responsible for sending
-             * YOUARE_POPUP_TEST_SUCCESS and closing itself.
-             */
 
             void popup;
 
         } catch (_) {
-            /* Popup blocked. */
+
+            /*
+             * Browser blocked the popup.
+             */
+
         }
+
     }
 
+
     return popupAllowed;
+
 }
 
 
-/*
- * ============================================================
- * CALCULATE POPUP SIZE
- * ============================================================
- *
- * The original artwork is 928x929.
- *
- * We leave a little room for browser chrome and prevent
- * the popup from becoming ridiculously large on desktops.
- */
+/* ============================================================
+   POPUP SIZE
+   ============================================================ */
 
 function getPopupFeatures() {
 
     const screenWidth =
-        window.screen.availWidth || window.innerWidth;
+        window.screen.availWidth ||
+        window.innerWidth;
 
     const screenHeight =
-        window.screen.availHeight || window.innerHeight;
+        window.screen.availHeight ||
+        window.innerHeight;
+
+
+    /*
+     * Keep a small margin so the popup isn't positioned
+     * directly against the edges of the usable screen.
+     */
 
     const margin = 24;
+
 
     const maxWidth =
         Math.max(
@@ -179,14 +231,23 @@ function getPopupFeatures() {
             screenWidth - margin
         );
 
+
     const maxHeight =
         Math.max(
             320,
             screenHeight - margin
         );
 
+
+    /*
+     * Original question window:
+     *
+     * 928 × 929
+     */
+
     const aspectRatio =
         928 / 929;
+
 
     let width =
         Math.min(
@@ -194,41 +255,63 @@ function getPopupFeatures() {
             maxWidth
         );
 
+
     let height =
         width / aspectRatio;
 
-    if (height > maxHeight) {
 
-        height = maxHeight;
-        width = height * aspectRatio;
+    if (
+        height >
+        maxHeight
+    ) {
+
+        height =
+            maxHeight;
+
+        width =
+            height *
+            aspectRatio;
 
     }
 
-    width = Math.max(
-        320,
-        Math.floor(width)
-    );
 
-    height = Math.max(
-        320,
-        Math.floor(height)
-    );
+    width =
+        Math.max(
+            320,
+            Math.floor(width)
+        );
+
+
+    height =
+        Math.max(
+            320,
+            Math.floor(height)
+        );
+
 
     const left =
         Math.max(
             0,
             Math.floor(
-                (screenWidth - width) / 2
+                (
+                    screenWidth -
+                    width
+                ) / 2
             )
         );
+
 
     const top =
         Math.max(
             0,
             Math.floor(
-                (screenHeight - height) / 2
+                (
+                    screenHeight -
+                    height
+                ) / 2
             )
         );
+
 
     return [
         `width=${width}`,
@@ -242,25 +325,149 @@ function getPopupFeatures() {
         "location=no",
         "status=no"
     ].join(",");
+
 }
 
 
-/*
- * ============================================================
- * OPEN QUESTION POPUP
- * ============================================================
- */
+/* ============================================================
+   QUESTION POPUP
+   ============================================================ */
 
 let questionPopup = null;
 
+let popupOpened = false;
+
+let redirecting = false;
+
+
+/* ============================================================
+   REDIRECT
+   ============================================================ */
+
+function redirectToDiscord() {
+
+    if (redirecting) {
+        return;
+    }
+
+
+    redirecting = true;
+
+
+    window.location.href =
+        "discord.html";
+
+}
+
+
+/* ============================================================
+   MONITOR POPUP
+   ============================================================
+   
+   This is what makes closing the external window behave
+   like the original:
+   
+       close question window
+              ↓
+       Discord page
+   
+   The interval is intentionally short so the redirect
+   happens almost immediately.
+   ============================================================ */
+
+let popupMonitor = null;
+
+
+function startPopupMonitor() {
+
+    if (popupMonitor) {
+        return;
+    }
+
+
+    popupMonitor =
+        setInterval(
+            () => {
+
+                if (
+                    redirecting
+                ) {
+                    clearInterval(
+                        popupMonitor
+                    );
+
+                    popupMonitor =
+                        null;
+
+                    return;
+                }
+
+
+                /*
+                 * The popup was successfully opened and
+                 * subsequently closed.
+                 */
+
+                if (
+                    popupOpened &&
+                    (
+                        !questionPopup ||
+                        questionPopup.closed
+                    )
+                ) {
+
+                    clearInterval(
+                        popupMonitor
+                    );
+
+                    popupMonitor =
+                        null;
+
+                    redirectToDiscord();
+
+                }
+
+            },
+            100
+        );
+
+}
+
+
+/* ============================================================
+   OPEN QUESTION POPUP
+   ============================================================ */
+
 function openQuestionPopup() {
+
+    /*
+     * Don't create multiple copies.
+     */
+
+    if (
+        questionPopup &&
+        !questionPopup.closed
+    ) {
+
+        try {
+            questionPopup.focus();
+        } catch (_) {}
+
+        return true;
+
+    }
+
 
     const features =
         getPopupFeatures();
 
+
+    let popup = null;
+
+
     try {
 
-        questionPopup =
+        popup =
             window.open(
                 "popup.html",
                 "youare_question_popup",
@@ -269,78 +476,121 @@ function openQuestionPopup() {
 
     } catch (_) {
 
-        questionPopup = null;
+        popup = null;
 
     }
 
+
+    /*
+     * Popup blocked.
+     */
+
     if (
-        !questionPopup ||
-        questionPopup.closed
+        !popup ||
+        popup.closed
     ) {
 
         document.getElementById(
             "fallback"
-        ).style.display = "block";
+        ).style.display =
+            "block";
 
         return false;
 
     }
 
+
+    questionPopup =
+        popup;
+
+    popupOpened =
+        true;
+
+
     /*
-     * Some browsers ignore the initial centering
-     * parameters. Try to center it again after creation.
+     * Hide fallback once we have a working popup.
      */
 
-    setTimeout(() => {
+    document.getElementById(
+        "fallback"
+    ).style.display =
+        "none";
 
-        try {
 
-            const screenWidth =
-                window.screen.availWidth ||
-                window.innerWidth;
+    startPopupMonitor();
 
-            const screenHeight =
-                window.screen.availHeight ||
-                window.innerHeight;
 
-            const width =
-                questionPopup.outerWidth;
+    /*
+     * Some browsers ignore left/top in window.open().
+     * Try to center it again once it exists.
+     */
 
-            const height =
-                questionPopup.outerHeight;
+    setTimeout(
+        () => {
 
-            questionPopup.moveTo(
-                Math.max(
-                    0,
-                    Math.floor(
-                        (screenWidth - width) / 2
+            try {
+
+                const screenWidth =
+                    window.screen.availWidth ||
+                    window.innerWidth;
+
+                const screenHeight =
+                    window.screen.availHeight ||
+                    window.innerHeight;
+
+
+                const width =
+                    questionPopup.outerWidth;
+
+                const height =
+                    questionPopup.outerHeight;
+
+
+                questionPopup.moveTo(
+                    Math.max(
+                        0,
+                        Math.floor(
+                            (
+                                screenWidth -
+                                width
+                            ) / 2
+                        )
+                    ),
+                    Math.max(
+                        0,
+                        Math.floor(
+                            (
+                                screenHeight -
+                                height
+                            ) / 2
+                        )
                     )
-                ),
-                Math.max(
-                    0,
-                    Math.floor(
-                        (screenHeight - height) / 2
-                    )
-                )
-            );
+                );
 
-            questionPopup.focus();
 
-        } catch (_) {
-            /* Browser may forbid moveTo(). */
-        }
+                questionPopup.focus();
 
-    }, 100);
+            } catch (_) {
+
+                /*
+                 * Browsers can forbid moveTo/focus.
+                 */
+
+            }
+
+        },
+        100
+    );
+
 
     return true;
+
 }
 
 
-/*
- * ============================================================
- * START
- * ============================================================
- */
+/* ============================================================
+   STARTUP
+   ============================================================ */
 
 window.addEventListener(
     "load",
@@ -348,22 +598,30 @@ window.addEventListener(
 
         testPopupPermission();
 
+
         /*
-         * Give test.html a short amount of time to report.
-         * The actual question popup is still attempted once.
+         * Wait briefly for test.html responses.
+         * The test itself doesn't determine whether we
+         * attempt the real popup — it only detects support.
          */
 
-        setTimeout(() => {
+        setTimeout(
+            () => {
 
-            if (!openQuestionPopup()) {
+                if (
+                    !openQuestionPopup()
+                ) {
 
-                document.getElementById(
-                    "fallback"
-                ).style.display = "block";
+                    document.getElementById(
+                        "fallback"
+                    ).style.display =
+                        "block";
 
-            }
+                }
 
-        }, 150);
+            },
+            150
+        );
 
     },
     {
@@ -372,11 +630,9 @@ window.addEventListener(
 );
 
 
-/*
- * ============================================================
- * FALLBACK BUTTON
- * ============================================================
- */
+/* ============================================================
+   FALLBACK
+   ============================================================ */
 
 document
     .getElementById("fallback")
@@ -384,10 +640,38 @@ document
         "click",
         () => {
 
+            /*
+             * A click gives the browser a user gesture,
+             * making popup opening much more likely to work.
+             */
+
             openQuestionPopup();
 
         }
     );
+
+
+/* ============================================================
+   CLEANUP
+   ============================================================ */
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+
+        if (popupMonitor) {
+
+            clearInterval(
+                popupMonitor
+            );
+
+            popupMonitor =
+                null;
+
+        }
+
+    }
+);
 
 </script></body>
 </html>
