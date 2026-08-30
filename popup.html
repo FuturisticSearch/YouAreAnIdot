@@ -1,540 +1,523 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"><meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
+<title>Are You An Idiot?</title>
 
-    <title>Are You An Idiot?</title>
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
 
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+    body {
+        background: transparent;
+        overflow: hidden;
 
-        body {
-            background: transparent;
-            overflow: hidden;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+        font-size: 11px;
 
-            font-size: 11px;
+        user-select: none;
+        -webkit-user-select: none;
 
-            user-select: none;
-            -webkit-user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    #question-window {
+        position: absolute;
 
-        #question-window {
-            position: absolute;
+        width: 928px;
+        height: 929px;
 
-            width: 928px;
-            height: 929px;
+        left: 50%;
+        top: 50%;
 
-            left: 50%;
-            top: 50%;
+        transform:
+            translate(-50%, -50%)
+            scale(1);
 
-            transform:
-                translate(-50%, -50%)
-                scale(1);
+        transform-origin: center center;
 
-            transform-origin: center center;
+        background: #c0c0c0;
 
-            background: #c0c0c0;
+        border: 2px solid;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            border: 2px solid;
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+        overflow: hidden;
+    }
 
-            overflow: hidden;
-        }
+    #titlebar {
+        position: absolute;
 
-        #titlebar {
-            position: absolute;
+        left: 3px;
+        right: 3px;
+        top: 3px;
 
-            left: 3px;
-            right: 3px;
-            top: 3px;
+        height: 22px;
 
-            height: 22px;
+        display: flex;
+        align-items: center;
 
-            display: flex;
-            align-items: center;
+        padding-left: 4px;
 
-            padding-left: 4px;
+        background: #000080;
+        color: #ffffff;
 
-            background: #000080;
-            color: #ffffff;
+        font-size: 13px;
+        font-weight: bold;
 
-            font-size: 13px;
-            font-weight: bold;
+        line-height: 18px;
 
-            line-height: 18px;
+        cursor: move;
+        touch-action: none;
+    }
 
-            cursor: move;
-            touch-action: none;
-        }
+    #title {
+        pointer-events: none;
 
-        #title {
-            pointer-events: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    #pictureBox1 {
+        position: absolute;
 
-        #pictureBox1 {
-            position: absolute;
+        left: 3px;
+        top: 28px;
 
-            left: 3px;
-            top: 28px;
+        width: 918px;
+        height: 714px;
 
-            width: 918px;
-            height: 714px;
+        display: block;
 
-            display: block;
+        object-fit: fill;
+        pointer-events: none;
+    }
 
-            object-fit: fill;
-            pointer-events: none;
-        }
+    #question-area {
+        position: absolute;
 
-        #question-area {
-            position: absolute;
+        left: 3px;
+        right: 3px;
 
-            left: 3px;
-            right: 3px;
+        top: 750px;
+        height: 90px;
 
-            top: 750px;
-            height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    #question {
+        margin: 0;
 
-        #question {
-            margin: 0;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+        font-size: 20px;
+        font-weight: normal;
 
-            font-size: 20px;
-            font-weight: normal;
+        line-height: 1.2;
 
-            line-height: 1.2;
+        white-space: nowrap;
 
-            white-space: nowrap;
+        color: Indigo;
 
-            color: Indigo;
+        text-align: center;
+    }
 
-            text-align: center;
-        }
+    .answer {
+        position: absolute;
 
-        .answer {
-            position: absolute;
+        top: 860px;
+        height: 57px;
 
-            top: 860px;
-            height: 57px;
+        padding: 0;
 
-            padding: 0;
+        background: #c0c0c0;
+        color: #000000;
 
-            background: #c0c0c0;
-            color: #000000;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+        font-size: 12px;
 
-            font-size: 12px;
+        border: 2px solid;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            border: 2px solid;
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        border-radius: 0;
 
-            border-radius: 0;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+        cursor: default;
 
-            cursor: default;
+        appearance: none;
+        -webkit-appearance: none;
+    }
 
-            appearance: none;
-            -webkit-appearance: none;
-        }
+    .answer:active {
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
 
-        .answer:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
 
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
+        padding-left: 2px;
+        padding-top: 2px;
+    }
 
-            padding-left: 2px;
-            padding-top: 2px;
-        }
+    .answer:focus {
+        outline: 1px dotted #000000;
+        outline-offset: -5px;
+    }
 
-        .answer:focus {
-            outline: 1px dotted #000000;
-            outline-offset: -5px;
-        }
+    #no {
+        left: 28px;
+        width: 262px;
+    }
 
-        #no {
-            left: 28px;
-            width: 262px;
-        }
+    #none {
+        left: 298px;
+        width: 354px;
+    }
 
-        #none {
-            left: 298px;
-            width: 354px;
-        }
+    #yes {
+        left: 660px;
+        width: 244px;
+    }
 
-        #yes {
-            left: 660px;
-            width: 244px;
-        }
+    #popup-overlay {
+        position: fixed;
 
-        #popup-overlay {
-            position: fixed;
+        inset: 0;
 
-            inset: 0;
+        display: none;
 
-            display: none;
+        z-index: 100000;
+    }
 
-            z-index: 100000;
-        }
+    #popup-overlay.visible {
+        display: block;
+    }
 
-        #popup-overlay.visible {
-            display: block;
-        }
+    #popup {
+        position: fixed;
 
-        #popup {
-            position: fixed;
+        left: 50%;
+        top: 50%;
 
-            left: 50%;
-            top: 50%;
+        transform:
+            translate(-50%, -50%);
 
-            transform:
-                translate(-50%, -50%);
+        min-width: 390px;
 
-            min-width: 390px;
+        max-width:
+            min(
+                500px,
+                calc(100vw - 30px)
+            );
 
-            max-width:
-                min(
-                    500px,
-                    calc(100vw - 30px)
-                );
+        background: #c0c0c0;
 
-            background: #c0c0c0;
+        border: 2px solid;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            border: 2px solid;
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
+    }
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
-        }
+    #popup-titlebar {
+        height: 22px;
 
-        #popup-titlebar {
-            height: 22px;
+        display: flex;
+        align-items: center;
 
-            display: flex;
-            align-items: center;
+        padding-left: 4px;
+        padding-right: 2px;
 
-            padding-left: 4px;
-            padding-right: 2px;
+        background: #000080;
 
-            background: #000080;
+        color: #ffffff;
 
-            color: #ffffff;
+        font-size: 13px;
+        font-weight: bold;
+    }
 
-            font-size: 13px;
-            font-weight: bold;
-        }
+    #popup-title {
+        flex: 1;
 
-        #popup-title {
-            flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    #popup-close {
+        width: 19px;
+        height: 18px;
 
-        #popup-close {
-            width: 19px;
-            height: 18px;
+        padding: 0;
 
-            padding: 0;
+        background: #c0c0c0;
 
-            background: #c0c0c0;
+        border: 2px solid;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            border: 2px solid;
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+        font-family: Arial, sans-serif;
 
-            font-family: Arial, sans-serif;
+        font-size: 11px;
+        font-weight: bold;
 
-            font-size: 11px;
-            font-weight: bold;
+        line-height: 13px;
+    }
 
-            line-height: 13px;
-        }
+    #popup-close:active {
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
+    }
 
-        #popup-close:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
-        }
+    #popup-content {
+        min-height: 90px;
 
-        #popup-content {
-            min-height: 90px;
+        display: flex;
+        align-items: center;
 
-            display: flex;
-            align-items: center;
+        padding: 18px;
+    }
 
-            padding: 18px;
-        }
+    #popup-icon {
+        width: 32px;
+        min-width: 32px;
 
-        #popup-icon {
-            width: 32px;
-            min-width: 32px;
+        height: 32px;
 
-            height: 32px;
+        margin-right: 18px;
 
-            margin-right: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        color: #000000;
 
-            color: #000000;
+        font-family: Arial, sans-serif;
 
-            font-family: Arial, sans-serif;
+        font-size: 26px;
+        font-weight: bold;
+    }
 
-            font-size: 26px;
-            font-weight: bold;
-        }
+    #popup-message {
+        flex: 1;
 
-        #popup-message {
-            flex: 1;
+        font-size: 13px;
 
-            font-size: 13px;
+        color: #000000;
 
-            color: #000000;
+        line-height: 1.35;
+    }
 
-            line-height: 1.35;
-        }
+    #popup-buttons {
+        display: flex;
 
-        #popup-buttons {
-            display: flex;
+        justify-content: center;
 
-            justify-content: center;
+        gap: 8px;
 
-            gap: 8px;
+        padding:
+            0
+            12px
+            14px;
+    }
 
-            padding:
-                0
-                12px
-                14px;
-        }
+    #popup-buttons button {
+        min-width: 75px;
 
-        #popup-buttons button {
-            min-width: 75px;
+        height: 27px;
 
-            height: 27px;
+        padding:
+            2px
+            12px;
 
-            padding:
-                2px
-                12px;
+        background: #c0c0c0;
 
-            background: #c0c0c0;
+        border: 2px solid;
 
-            border: 2px solid;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+        font-size: 12px;
 
-            font-size: 12px;
+        color: #000000;
+    }
 
-            color: #000000;
-        }
+    #popup-buttons button:active {
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
+    }
+</style>
 
-        #popup-buttons button:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
-        }
-    </style>
-</head>
+</head><body><main id="question-window"><div id="titlebar">
+    <span id="title">
+        Are You An Idiot?
+    </span>
+</div>
 
-<body>
+<img
+    id="pictureBox1"
+    src="media/idiot.gif"
+    alt=""
+    draggable="false"
+>
 
-<main id="question-window">
+<div id="question-area">
+    <div id="question">
+        Are You An Idiot ?
+    </div>
+</div>
 
-    <div id="titlebar">
-        <span id="title">
-            Are You An Idiot?
+<button
+    class="answer"
+    id="no"
+    type="button"
+>
+    No, I'm not.
+</button>
+
+<button
+    class="answer"
+    id="none"
+    type="button"
+>
+    I don't know =[
+</button>
+
+<button
+    class="answer"
+    id="yes"
+    type="button"
+>
+    Yes, I am.
+</button>
+
+</main><div id="popup-overlay"><div id="popup">
+
+    <div id="popup-titlebar">
+
+        <span id="popup-title">
+            YouAreAnIdiot
         </span>
-    </div>
 
-    <img
-        id="pictureBox1"
-        src="media/idiot.gif"
-        alt=""
-        draggable="false"
-    >
-
-    <div id="question-area">
-        <div id="question">
-            Are You An Idiot ?
-        </div>
-    </div>
-
-    <button
-        class="answer"
-        id="no"
-        type="button"
-    >
-        No, I'm not.
-    </button>
-
-    <button
-        class="answer"
-        id="none"
-        type="button"
-    >
-        I don't know =[
-    </button>
-
-    <button
-        class="answer"
-        id="yes"
-        type="button"
-    >
-        Yes, I am.
-    </button>
-
-</main>
-
-
-<div id="popup-overlay">
-
-    <div id="popup">
-
-        <div id="popup-titlebar">
-
-            <span id="popup-title">
-                YouAreAnIdiot
-            </span>
-
-            <button
-                id="popup-close"
-                type="button"
-            >×</button>
-
-        </div>
-
-        <div id="popup-content">
-
-            <div id="popup-icon">
-                !
-            </div>
-
-            <div id="popup-message"></div>
-
-        </div>
-
-        <div id="popup-buttons"></div>
+        <button
+            id="popup-close"
+            type="button"
+        >×</button>
 
     </div>
+
+    <div id="popup-content">
+
+        <div id="popup-icon">
+            !
+        </div>
+
+        <div id="popup-message"></div>
+
+    </div>
+
+    <div id="popup-buttons"></div>
 
 </div>
 
+</div><audio
+id="idiot-audio"
+preload="auto"
+loop
 
-<audio
-    id="idiot-audio"
-    preload="auto"
-    loop
+«»
+
+<source
+    src="/media/youare-long.mp3"
+    type="audio/mpeg"
 >
-    <source
-        src="/media/youare-long.mp3"
-        type="audio/mpeg"
-    >
-</audio>
 
-
-<script>
+</audio><script>
 "use strict";
-
 
 /* ============================================================
    ELEMENTS
@@ -642,12 +625,10 @@ function updateScale() {
 
 updateScale();
 
-
 window.addEventListener(
     "resize",
     updateScale
 );
-
 
 window.addEventListener(
     "orientationchange",
@@ -663,41 +644,62 @@ window.addEventListener(
 
 
 /* ============================================================
-   CALCULATE THE SAME SIZE USED BY discord.html POPUPS
+   DISCORD SIZE CALCULATION
    ============================================================ */
+
+/*
+ * IMPORTANT:
+ *
+ * Do not use innerWidth/innerHeight here.
+ *
+ * screen.width / screen.height describe the actual
+ * display and therefore remain stable while popup.html
+ * is being resized or navigated.
+ */
 
 function getDiscordPopupSize() {
 
+    const screenWidth =
+        Number(window.screen.width);
+
+    const screenHeight =
+        Number(window.screen.height);
+
+
+    if (
+        !Number.isFinite(screenWidth) ||
+        !Number.isFinite(screenHeight) ||
+        screenWidth <= 0 ||
+        screenHeight <= 0
+    ) {
+
+        return {
+            width: 320,
+            height: 320
+        };
+
+    }
+
+
     /*
-     * These are the exact proportions used by
-     * the discord.html openWindow() function.
-     */
-
-    const rawWidth =
-        Math.round(
-            window.screen.width * 0.1875
-        );
-
-    const rawHeight =
-        Math.round(
-            window.screen.height * 0.2222
-        );
-
-
-    /*
-     * Keep the values valid.
+     * Same proportions as discord.html.
      */
 
     const width =
         Math.max(
             1,
-            rawWidth
+            Math.round(
+                screenWidth * 0.1875
+            )
         );
+
 
     const height =
         Math.max(
             1,
-            rawHeight
+            Math.round(
+                screenHeight * 0.2222
+            )
         );
 
 
@@ -710,10 +712,24 @@ function getDiscordPopupSize() {
 
 
 /* ============================================================
-   SEND RESIZE REQUEST TO OPENER
+   SEND SIZE MESSAGE TO OPENER
    ============================================================ */
 
 function requestOpenerResize() {
+
+    const opener =
+        window.opener;
+
+
+    if (
+        !opener ||
+        opener.closed
+    ) {
+
+        return false;
+
+    }
+
 
     const size =
         getDiscordPopupSize();
@@ -739,32 +755,29 @@ function requestOpenerResize() {
     };
 
 
-    /*
-     * Always send this request.
-     *
-     * It does NOT matter whether our own
-     * resizeTo() succeeds.
-     */
-
     try {
 
-        if (
-            window.opener &&
-            !window.opener.closed
-        ) {
+        /*
+         * Use "*" here rather than window.location.origin.
+         *
+         * The browser already guarantees that window.opener
+         * is the window which opened this popup.
+         *
+         * This also avoids failures caused by origin changes
+         * during navigation.
+         */
 
-            window.opener.postMessage(
-                message,
-                window.location.origin
-            );
+        opener.postMessage(
+            message,
+            "*"
+        );
 
-        }
+
+        return true;
 
     } catch (_) {
 
-        /*
-         * Cross-browser failure is ignored.
-         */
+        return false;
 
     }
 
@@ -772,11 +785,8 @@ function requestOpenerResize() {
 
 
 /* ============================================================
-   SELF RESIZE
+   RESIZE OUR OWN WINDOW
    ============================================================ */
-
-let resizeInProgress = false;
-
 
 function resizeSelfToDiscordSize() {
 
@@ -784,115 +794,101 @@ function resizeSelfToDiscordSize() {
         getDiscordPopupSize();
 
 
-    if (
-        typeof window.resizeTo !==
-        "function"
-    ) {
-
-        requestOpenerResize();
-
-        return false;
-
-    }
-
-
-    try {
-
-        /*
-         * First try resizing ourselves.
-         */
-
-        window.resizeTo(
-            size.width,
-            size.height
-        );
-
-
-    } catch (_) {
-
-        /*
-         * Ignore and let opener handle it.
-         */
-
-    }
-
-
     /*
-     * IMPORTANT:
+     * Always notify opener FIRST.
      *
-     * The opener request is ALWAYS sent,
-     * even if resizeTo() above worked.
+     * This is important because the opener may be the only
+     * window that is allowed to resize this popup.
      */
 
     requestOpenerResize();
 
 
+    try {
+
+        if (
+            typeof window.resizeTo ===
+            "function"
+        ) {
+
+            window.resizeTo(
+                size.width,
+                size.height
+            );
+
+        }
+
+    } catch (_) {}
+
+
     /*
-     * We cannot reliably know whether the
-     * browser actually honored resizeTo().
+     * Send another request immediately after resizeTo().
      *
-     * Check the result after the browser gets
-     * a chance to apply it.
+     * This is intentional: the first request handles browsers
+     * that block resizeTo(), while the second handles browsers
+     * where resizeTo() changes the popup state first.
      */
+
+    requestOpenerResize();
+
+
+    return size;
+
+}
+
+
+/* ============================================================
+   INITIAL RESIZE HANDSHAKE
+   ============================================================ */
+
+function initialPopupResize() {
+
+    /*
+     * Do not wait for load.
+     *
+     * popup.html must request the Discord size as early as
+     * possible, before the user can interact with it.
+     */
+
+    resizeSelfToDiscordSize();
+
+
+    requestAnimationFrame(
+        () => {
+
+            resizeSelfToDiscordSize();
+
+        }
+    );
+
 
     setTimeout(
         () => {
 
-            const widthDifference =
-                Math.abs(
-                    window.outerWidth -
-                    size.width
-                );
+            resizeSelfToDiscordSize();
 
-            const heightDifference =
-                Math.abs(
-                    window.outerHeight -
-                    size.height
-                );
+        },
+        30
+    );
 
 
-            if (
-                widthDifference > 5 ||
-                heightDifference > 5
-            ) {
+    setTimeout(
+        () => {
 
-                /*
-                 * It did not resize correctly.
-                 * Ask opener again.
-                 */
-
-                requestOpenerResize();
-
-            }
+            resizeSelfToDiscordSize();
 
         },
         80
     );
 
 
-    return true;
-
-}
-
-
-/* ============================================================
-   INITIAL RESIZE
-   ============================================================ */
-
-function initialPopupResize() {
-
-    requestAnimationFrame(
+    setTimeout(
         () => {
 
-            requestAnimationFrame(
-                () => {
+            resizeSelfToDiscordSize();
 
-                    resizeSelfToDiscordSize();
-
-                }
-            );
-
-        }
+        },
+        150
     );
 
 }
@@ -907,7 +903,7 @@ window.addEventListener(
 
         updateScale();
 
-        initialPopupResize();
+        resizeSelfToDiscordSize();
 
     },
     {
@@ -917,7 +913,7 @@ window.addEventListener(
 
 
 /* ============================================================
-   CUSTOM MESSAGE BOX
+   MESSAGE BOX
    ============================================================ */
 
 let popupResolver = null;
@@ -1047,25 +1043,23 @@ popupClose.addEventListener(
 
 function playAudio() {
 
-    const promise =
-        idiotAudio.play();
+    try {
+
+        const promise =
+            idiotAudio.play();
 
 
-    if (
-        promise &&
-        typeof promise.catch ===
-        "function"
-    ) {
+        if (
+            promise &&
+            typeof promise.catch ===
+            "function"
+        ) {
 
-        promise.catch(() => {
+            promise.catch(() => {});
 
-            /*
-             * Browser blocked autoplay.
-             */
+        }
 
-        });
-
-    }
+    } catch (_) {}
 
 }
 
@@ -1075,11 +1069,7 @@ playAudio();
 
 document.addEventListener(
     "pointerdown",
-    () => {
-
-        playAudio();
-
-    },
+    playAudio,
     {
         once: true
     }
@@ -1152,7 +1142,9 @@ let redirecting = false;
 function redirectToDiscord() {
 
     if (redirecting) {
+
         return;
+
     }
 
 
@@ -1160,18 +1152,47 @@ function redirectToDiscord() {
 
 
     /*
-     * Resize BEFORE navigating away.
-     *
-     * Send to opener immediately, then give
-     * the browser a short amount of time to
-     * perform the resize.
+     * Perform the resize handshake repeatedly while this
+     * document still exists.
      */
 
     resizeSelfToDiscordSize();
 
 
+    /*
+     * One more message shortly before navigation.
+     */
+
+    const resizeTimer =
+        setTimeout(
+            () => {
+
+                requestOpenerResize();
+
+            },
+            60
+        );
+
+
+    /*
+     * Give the browser enough time to process the resize
+     * messages before replacing the document.
+     */
+
     setTimeout(
         () => {
+
+            clearTimeout(
+                resizeTimer
+            );
+
+
+            /*
+             * Final request immediately before navigation.
+             */
+
+            requestOpenerResize();
+
 
             window.location.href =
                 "discord.html";
@@ -1190,7 +1211,9 @@ function redirectToDiscord() {
 async function handleNo() {
 
     if (redirecting) {
+
         return;
+
     }
 
 
@@ -1227,7 +1250,9 @@ yesButton.addEventListener(
     async () => {
 
         if (redirecting) {
+
             return;
+
         }
 
 
@@ -1494,7 +1519,5 @@ document
         }
     );
 
-</script>
-
-</body>
+</script></body>
 </html>
