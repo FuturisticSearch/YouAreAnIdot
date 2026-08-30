@@ -1,644 +1,559 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8"><meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
 
-<head>
-    <meta charset="UTF-8">
+<title>Are You An Idiot?</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
+<style>
 
-    <title>Are You An Idiot?</title>
+    * {
+        box-sizing: border-box;
+    }
 
-    <style>
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
 
-        * {
-            box-sizing: border-box;
-        }
+    body {
+        background: transparent;
+        overflow: hidden;
 
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-        body {
-            background: transparent;
-            overflow: hidden;
+        font-size: 11px;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
 
-            font-size: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-            user-select: none;
-            -webkit-user-select: none;
+    #question-window {
+        position: absolute;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        width: 928px;
+        height: 929px;
 
-        #question-window {
-            position: absolute;
+        left: 50%;
+        top: 50%;
 
-            width: 928px;
-            height: 929px;
+        transform:
+            translate(-50%, -50%)
+            scale(1);
 
-            left: 50%;
-            top: 50%;
+        transform-origin: center center;
 
-            transform:
-                translate(-50%, -50%)
-                scale(1);
+        background: #c0c0c0;
 
-            transform-origin: center center;
+        border: 2px solid;
 
-            background: #c0c0c0;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            border: 2px solid;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        overflow: hidden;
+    }
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+    #titlebar {
+        position: absolute;
 
-            overflow: hidden;
-        }
+        left: 3px;
+        right: 3px;
+        top: 3px;
 
-        #titlebar {
-            position: absolute;
+        height: 22px;
 
-            left: 3px;
-            right: 3px;
-            top: 3px;
+        display: flex;
+        align-items: center;
 
-            height: 22px;
+        padding-left: 4px;
+        padding-right: 2px;
 
-            display: flex;
-            align-items: center;
+        background: #000080;
+        color: #ffffff;
 
-            padding-left: 4px;
-            padding-right: 2px;
+        font-size: 13px;
+        font-weight: bold;
 
-            background: #000080;
-            color: #ffffff;
+        line-height: 18px;
 
-            font-size: 13px;
-            font-weight: bold;
+        cursor: move;
+        touch-action: none;
+    }
 
-            line-height: 18px;
+    #title {
+        flex: 1;
 
-            cursor: move;
-            touch-action: none;
-        }
+        pointer-events: none;
 
-        #title {
-            flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-            pointer-events: none;
+    #pictureBox1 {
+        position: absolute;
 
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        left: 3px;
+        top: 28px;
 
-        .window-button {
-            width: 19px;
-            height: 18px;
+        width: 918px;
+        height: 714px;
 
-            padding: 0;
-            margin-left: 2px;
+        display: block;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        object-fit: fill;
+        pointer-events: none;
+    }
 
-            background: #c0c0c0;
-            color: #000000;
+    #question-area {
+        position: absolute;
 
-            border: 2px solid;
+        left: 3px;
+        right: 3px;
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        top: 750px;
+        height: 90px;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-            font-family: Arial, sans-serif;
-            font-size: 11px;
-            font-weight: bold;
-            line-height: 13px;
+    #question {
+        margin: 0;
 
-            appearance: none;
-            -webkit-appearance: none;
-        }
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-        .window-button:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
+        font-size: 20px;
+        font-weight: normal;
 
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
-        }
+        line-height: 1.2;
 
-        #pictureBox1 {
-            position: absolute;
+        white-space: nowrap;
 
-            left: 3px;
-            top: 28px;
+        color: Indigo;
+        text-align: center;
+    }
 
-            width: 918px;
-            height: 714px;
+    .answer {
+        position: absolute;
 
-            display: block;
+        top: 860px;
+        height: 57px;
 
-            object-fit: fill;
-            pointer-events: none;
-        }
+        padding: 0;
 
-        #question-area {
-            position: absolute;
+        background: #c0c0c0;
+        color: #000000;
 
-            left: 3px;
-            right: 3px;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-            top: 750px;
-            height: 90px;
+        font-size: 12px;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        border: 2px solid;
 
-        #question {
-            margin: 0;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+        border-radius: 0;
 
-            font-size: 20px;
-            font-weight: normal;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            line-height: 1.2;
+        cursor: default;
 
-            white-space: nowrap;
+        appearance: none;
+        -webkit-appearance: none;
+    }
 
-            color: Indigo;
-            text-align: center;
-        }
+    .answer:hover {
+        background: #c0c0c0;
+    }
 
-        .answer {
-            position: absolute;
+    .answer:active {
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
 
-            top: 860px;
-            height: 57px;
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
 
-            padding: 0;
+        padding-left: 2px;
+        padding-top: 2px;
+    }
 
-            background: #c0c0c0;
-            color: #000000;
+    .answer:focus {
+        outline: 1px dotted #000000;
+        outline-offset: -5px;
+    }
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+    #no {
+        left: 28px;
+        width: 262px;
+    }
 
-            font-size: 12px;
+    #none {
+        left: 298px;
+        width: 354px;
+    }
 
-            border: 2px solid;
+    #yes {
+        left: 660px;
+        width: 244px;
+    }
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+    #popup-overlay {
+        position: fixed;
 
-            border-radius: 0;
+        inset: 0;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+        display: none;
 
-            cursor: default;
+        z-index: 100000;
+    }
 
-            appearance: none;
-            -webkit-appearance: none;
-        }
+    #popup-overlay.visible {
+        display: block;
+    }
 
-        .answer:hover {
-            background: #c0c0c0;
-        }
+    #popup {
+        position: fixed;
 
-        .answer:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
+        left: 50%;
+        top: 50%;
 
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
+        transform:
+            translate(-50%, -50%);
 
-            padding-left: 2px;
-            padding-top: 2px;
-        }
+        width: min(
+            500px,
+            calc(100vw - 30px),
+            calc(100vh - 30px)
+        );
 
-        .answer:focus {
-            outline: 1px dotted #000000;
-            outline-offset: -5px;
-        }
+        min-width: min(
+            390px,
+            calc(100vw - 30px),
+            calc(100vh - 30px)
+        );
 
-        #no {
-            left: 28px;
-            width: 262px;
-        }
+        background: #c0c0c0;
 
-        #none {
-            left: 298px;
-            width: 354px;
-        }
+        border: 2px solid;
 
-        #yes {
-            left: 660px;
-            width: 244px;
-        }
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-        #popup-overlay {
-            position: fixed;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
+    }
 
-            inset: 0;
+    #popup-titlebar {
+        height: 22px;
 
-            display: none;
+        display: flex;
+        align-items: center;
 
-            z-index: 100000;
-        }
+        padding-left: 4px;
+        padding-right: 2px;
 
-        #popup-overlay.visible {
-            display: block;
-        }
+        background: #000080;
+        color: #ffffff;
 
-        #popup {
-            position: fixed;
+        font-size: 13px;
+        font-weight: bold;
+    }
 
-            left: 50%;
-            top: 50%;
+    #popup-title {
+        flex: 1;
 
-            transform:
-                translate(-50%, -50%);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-            width: min(
-                500px,
-                calc(100vw - 30px),
-                calc(100vh - 30px)
-            );
+    #popup-close {
+        width: 19px;
+        height: 18px;
 
-            min-width: min(
-                390px,
-                calc(100vw - 30px),
-                calc(100vh - 30px)
-            );
+        padding: 0;
 
-            background: #c0c0c0;
+        background: #c0c0c0;
 
-            border: 2px solid;
+        border: 2px solid;
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
-        }
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-        #popup-titlebar {
-            height: 22px;
+        font-family: Arial, sans-serif;
 
-            display: flex;
-            align-items: center;
+        font-size: 11px;
+        font-weight: bold;
+        line-height: 13px;
+    }
 
-            padding-left: 4px;
-            padding-right: 2px;
+    #popup-close:active {
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
 
-            background: #000080;
-            color: #ffffff;
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
+    }
 
-            font-size: 13px;
-            font-weight: bold;
-        }
+    #popup-content {
+        min-height: 90px;
 
-        #popup-title {
-            flex: 1;
+        display: flex;
+        align-items: center;
 
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        padding: 18px;
+    }
 
-        #popup-close {
-            width: 19px;
-            height: 18px;
+    #popup-icon {
+        width: 32px;
+        min-width: 32px;
 
-            padding: 0;
+        height: 32px;
 
-            background: #c0c0c0;
+        margin-right: 18px;
 
-            border: 2px solid;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        color: #000000;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+        font-family: Arial, sans-serif;
 
-            font-family: Arial, sans-serif;
+        font-size: 26px;
+        font-weight: bold;
+        line-height: 32px;
 
-            font-size: 11px;
-            font-weight: bold;
-            line-height: 13px;
-        }
+        text-align: center;
+    }
 
-        #popup-close:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
+    #popup-message {
+        flex: 1;
 
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
-        }
+        font-size: 13px;
 
-        #popup-content {
-            min-height: 90px;
+        color: #000000;
 
-            display: flex;
-            align-items: center;
+        line-height: 1.35;
+    }
 
-            padding: 18px;
-        }
+    #popup-buttons {
+        display: flex;
 
-        #popup-icon {
-            width: 32px;
-            min-width: 32px;
+        justify-content: center;
 
-            height: 32px;
+        gap: 8px;
 
-            margin-right: 18px;
+        padding:
+            0
+            12px
+            14px;
+    }
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+    #popup-buttons button {
+        min-width: 75px;
 
-            color: #000000;
+        height: 27px;
 
-            font-family: Arial, sans-serif;
+        padding:
+            2px
+            12px;
 
-            font-size: 26px;
-            font-weight: bold;
-            line-height: 32px;
+        background: #c0c0c0;
 
-            text-align: center;
-        }
+        border: 2px solid;
 
-        #popup-message {
-            flex: 1;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            font-size: 13px;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            color: #000000;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-            line-height: 1.35;
-        }
+        font-size: 12px;
 
-        #popup-buttons {
-            display: flex;
+        color: #000000;
+    }
 
-            justify-content: center;
+    #popup-buttons button:hover {
+        background: #c0c0c0;
+    }
 
-            gap: 8px;
+    #popup-buttons button:active {
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
 
-            padding:
-                0
-                12px
-                14px;
-        }
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
+    }
 
-        #popup-buttons button {
-            min-width: 75px;
+    #popup-buttons button:focus {
+        outline: 1px dotted #000000;
+        outline-offset: -5px;
+    }
 
-            height: 27px;
+</style>
 
-            padding:
-                2px
-                12px;
+</head><body><main id="question-window"><div id="titlebar">
 
-            background: #c0c0c0;
+    <span id="title">
+        Are You An Idiot?
+    </span>
 
-            border: 2px solid;
+</div>
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+<img
+    id="pictureBox1"
+    src="media/idiot.gif"
+    alt=""
+    draggable="false"
+>
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+<div id="question-area">
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+    <div id="question">
+        Are You An Idiot ?
+    </div>
 
-            font-size: 12px;
+</div>
 
-            color: #000000;
-        }
+<button
+    class="answer"
+    id="no"
+    type="button"
+>
+    No, I'm not.
+</button>
 
-        #popup-buttons button:hover {
-            background: #c0c0c0;
-        }
+<button
+    class="answer"
+    id="none"
+    type="button"
+>
+    I don't know =[
+</button>
 
-        #popup-buttons button:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
+<button
+    class="answer"
+    id="yes"
+    type="button"
+>
+    Yes, I am.
+</button>
 
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
-        }
+</main><div id="popup-overlay"><div id="popup">
 
-        #popup-buttons button:focus {
-            outline: 1px dotted #000000;
-            outline-offset: -5px;
-        }
+    <div id="popup-titlebar">
 
-    </style>
-</head>
-
-<body>
-
-<main id="question-window">
-
-    <div id="titlebar">
-
-        <span id="title">
-            Are You An Idiot?
+        <span id="popup-title">
+            YouAreAnIdiot
         </span>
 
         <button
-            class="window-button"
-            id="minimize"
-            type="button"
-            disabled
-        >_</button>
-
-        <button
-            class="window-button"
-            id="maximize"
-            type="button"
-            disabled
-        >□</button>
-
-        <button
-            class="window-button"
-            id="close"
+            id="popup-close"
             type="button"
         >×</button>
 
     </div>
 
-    <img
-        id="pictureBox1"
-        src="media/idiot.gif"
-        alt=""
-        draggable="false"
-    >
+    <div id="popup-content">
 
-    <div id="question-area">
-
-        <div id="question">
-            Are You An Idiot ?
+        <div id="popup-icon">
+            !
         </div>
+
+        <div id="popup-message"></div>
 
     </div>
 
-    <button
-        class="answer"
-        id="no"
-        type="button"
-    >
-        No, I'm not.
-    </button>
-
-    <button
-        class="answer"
-        id="none"
-        type="button"
-    >
-        I don't know =[
-    </button>
-
-    <button
-        class="answer"
-        id="yes"
-        type="button"
-    >
-        Yes, I am.
-    </button>
-
-</main>
-
-
-<div id="popup-overlay">
-
-    <div id="popup">
-
-        <div id="popup-titlebar">
-
-            <span id="popup-title">
-                YouAreAnIdiot
-            </span>
-
-            <button
-                id="popup-close"
-                type="button"
-            >×</button>
-
-        </div>
-
-        <div id="popup-content">
-
-            <div id="popup-icon">
-                !
-            </div>
-
-            <div id="popup-message"></div>
-
-        </div>
-
-        <div id="popup-buttons"></div>
-
-    </div>
+    <div id="popup-buttons"></div>
 
 </div>
 
+</div><audio
+id="idiot-audio"
+preload="auto"
+loop
 
-<audio
-    id="idiot-audio"
-    preload="auto"
-    loop
+«»
+
+<source
+    src="/media/youare-long.mp3"
+    type="audio/mpeg"
 >
-    <source
-        src="/media/youare-long.mp3"
-        type="audio/mpeg"
-    >
-</audio>
 
-
-<script>
+</audio><script>
 
 "use strict";
 
@@ -658,9 +573,6 @@ const noneButton =
 
 const yesButton =
     document.getElementById("yes");
-
-const closeButton =
-    document.getElementById("close");
 
 const idiotAudio =
     document.getElementById("idiot-audio");
@@ -1264,16 +1176,6 @@ yesButton.addEventListener(
 
 
 /* ============================================================
-   CLOSE BUTTON
-   ============================================================ */
-
-closeButton.addEventListener(
-    "click",
-    redirectToDiscord
-);
-
-
-/* ============================================================
    ESCAPE
    ============================================================ */
 
@@ -1325,16 +1227,6 @@ let dragStartWindowY = 0;
 titlebar.addEventListener(
     "pointerdown",
     event => {
-
-        if (
-            event.target.closest(
-                ".window-button"
-            )
-        ) {
-
-            return;
-
-        }
 
         dragging = true;
 
@@ -1538,7 +1430,5 @@ document
     );
 
 
-</script>
-
-</body>
+</script></body>
 </html>
