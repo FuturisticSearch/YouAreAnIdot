@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>YouAreAnIdiot</title>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: "Microsoft Sans Serif", Tahoma, Arial, sans-serif;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            user-select: none;
+        }
+
+        #form {
+            position: relative;
+
+            width: 500px;
+            min-height: 360px;
+
+            background: #c0c0c0;
+
+            border: 2px solid;
+            border-top-color: #ffffff;
+            border-left-color: #ffffff;
+            border-right-color: #404040;
+            border-bottom-color: #404040;
+
+            box-shadow:
+                1px 1px 0 #000,
+                inset 1px 1px 0 #dfdfdf;
+
+            padding: 24px;
+        }
+
+        #picture {
+            display: block;
+
+            width: 180px;
+            height: 180px;
+
+            object-fit: contain;
+
+            margin: 0 auto 15px auto;
+        }
+
+        #question {
+            margin: 10px 0 25px 0;
+
+            text-align: center;
+
+            font-family: "Microsoft Sans Serif", Tahoma, Arial, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+
+            color: indigo;
+        }
+
+        #buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        button {
+            min-width: 90px;
+            height: 30px;
+
+            padding: 3px 12px;
+
+            background: #c0c0c0;
+
+            border: 2px solid;
+            border-top-color: #ffffff;
+            border-left-color: #ffffff;
+            border-right-color: #404040;
+            border-bottom-color: #404040;
+
+            font-family: "Microsoft Sans Serif", Tahoma, Arial, sans-serif;
+            font-size: 13px;
+
+            cursor: pointer;
+        }
+
+        button:active {
+            border-top-color: #404040;
+            border-left-color: #404040;
+            border-right-color: #ffffff;
+            border-bottom-color: #ffffff;
+
+            padding-left: 13px;
+            padding-top: 4px;
+        }
+
+        button:focus {
+            outline: 1px dotted #000;
+            outline-offset: -4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main id="form">
+
+        <img
+            id="picture"
+            src="/media/idiot.gif"
+            alt="You Are An Idiot"
+            draggable="false"
+        >
+
+        <div id="question">
+            Are you an idiot?
+        </div>
+
+        <div id="buttons">
+            <button id="yesButton" type="button">
+                Yes
+            </button>
+
+            <button id="noButton" type="button">
+                No
+            </button>
+        </div>
+
+    </main>
+
+    <audio
+        id="startAudio"
+        src="/media/you_are_an_idiot.mp3"
+        preload="auto"
+    ></audio>
+
+    <script>
+        /*
+         * ============================================================
+         * Question.cs → HTML
+         * ============================================================
+         *
+         * Constructor:
+         *
+         *     InitializeComponent();
+         *     this.ActiveControl = Label_Question;
+         *     FontColour.Start();
+         *
+         *     play(Properties.Resources.you_are_an_idiot);
+         *
+         *
+         * The .resx contains the pictureBox image resource.
+         * Its binary data was omitted from the supplied file, so
+         * the web version uses:
+         *
+         *     /media/idiot.gif
+         *
+         * ============================================================
+         */
+
+
+        const question = document.getElementById("question");
+        const yesButton = document.getElementById("yesButton");
+        const noButton = document.getElementById("noButton");
+        const startAudio = document.getElementById("startAudio");
+
+
+        /*
+         * ============================================================
+         * FontColour timer
+         * ============================================================
+         *
+         * Original C#:
+         *
+         * 0  -> Indigo
+         * 1  -> Ivory
+         * 2  -> LightPink
+         * 3  -> LightSkyBlue
+         * 4  -> Lime
+         * 5  -> MediumPurple
+         * 6  -> MediumSpringGreen
+         * 7  -> Pink
+         * 8  -> Red
+         * 9  -> Snow
+         *
+         * Then Timer_FT is reset to 0.
+         */
+
+        const colors = [
+            "indigo",
+            "ivory",
+            "lightpink",
+            "lightskyblue",
+            "lime",
+            "mediumpurple",
+            "mediumspringgreen",
+            "pink",
+            "red",
+            "snow"
+        ];
+
+        let timerFT = 0;
+
+
+        /*
+         * Equivalent to FontColour_Tick().
+         *
+         * The WinForms timer controls the color of Label_Question.
+         */
+        setInterval(() => {
+            timerFT += 1;
+
+            if (timerFT === 10) {
+                timerFT = 0;
+            }
+
+            question.style.color = colors[timerFT];
+        }, 100);
+
+
+        /*
+         * ============================================================
+         * Initial audio
+         * ============================================================
+         *
+         * The original uses:
+         *
+         * Properties.Resources.you_are_an_idiot
+         *
+         * and NAudio/WaveOut.
+         *
+         * Browsers can block autoplay, so we attempt autoplay and
+         * retry after the first interaction if necessary.
+         */
+
+        function playStartAudio() {
+            if (!startAudio) {
+                return;
+            }
+
+            startAudio.play().catch(() => {
+                // Browser autoplay policy prevented playback.
+            });
+        }
+
+        playStartAudio();
+
+        document.addEventListener(
+            "pointerdown",
+            playStartAudio,
+            { once: true }
+        );
+
+
+        /*
+         * ============================================================
+         * Question_Closing replacement
+         * ============================================================
+         *
+         * Original C# creates five HAHA windows here.
+         *
+         * For this web version we deliberately DON'T execute that
+         * behavior.
+         *
+         * Instead:
+         *
+         *     Question -> discord.html
+         */
+
+        function redirectToDiscord() {
+            window.location.href = "discord.html";
+        }
+
+
+        /*
+         * ============================================================
+         * No_Click
+         * ============================================================
+         *
+         * Original:
+         *
+         * MessageBox.Show(
+         *     "Oh... I think you are an idiot. XD",
+         *     "YouAreAnIdiot"
+         * );
+         *
+         * this.Close();
+         *
+         * Closing ultimately enters Question_Closing().
+         */
+
+        noButton.addEventListener("click", () => {
+            window.alert(
+                "Oh... I think you are an idiot. XD"
+            );
+
+            redirectToDiscord();
+        });
+
+
+        /*
+         * ============================================================
+         * Yes_Click
+         * ============================================================
+         *
+         * Original:
+         *
+         * MessageBox.Show(
+         *     "Are you sure?",
+         *     "YouAreAnIdiot",
+         *     MessageBoxButtons.YesNo
+         * );
+         *
+         * this.Close();
+         *
+         * The original closes regardless of which MessageBox choice
+         * is selected.
+         */
+
+        yesButton.addEventListener("click", () => {
+            window.confirm("Are you sure?");
+
+            redirectToDiscord();
+        });
+
+
+        /*
+         * ============================================================
+         * ESC
+         * ============================================================
+         *
+         * Treat Escape as closing the form.
+         */
+
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape") {
+                redirectToDiscord();
+            }
+        });
+
+
+        /*
+         * Prevent dragging the resource image around the page.
+         */
+
+        document.getElementById("picture")
+            .addEventListener("dragstart", event => {
+                event.preventDefault();
+            });
+    </script>
+
+</body>
+</html>
