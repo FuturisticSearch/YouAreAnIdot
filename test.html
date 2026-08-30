@@ -1,68 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Popup Test</title>
 </head>
-
-<body>
-<script>
+<body><script>
 "use strict";
 
-(function () {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+/*
+ * Read the ID assigned by the parent page.
+ */
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+/*
+ * Only report valid test IDs.
+ */
+if (["0", "1", "2"].includes(id)) {
 
     /*
-     * Only send a result for one of the expected test IDs.
+     * Tell the opener that this popup actually loaded.
+     *
+     * opener.postMessage() is used instead of relying on
+     * window.open() returning a usable Window object.
      */
-    if (!["0", "1", "2"].includes(String(id))) {
-        return;
-    }
+    if (window.opener && !window.opener.closed) {
 
-    function reportSuccess() {
-        if (!window.opener || window.opener.closed) {
-            return;
-        }
-
-        try {
-            window.opener.postMessage(
-                {
-                    type: "YOUARE_POPUP_TEST_SUCCESS",
-                    id: String(id)
-                },
-                window.location.origin
-            );
-        } catch (_) {
-            return;
-        }
-
-        /*
-         * This window has completed its job.
-         * Close it so the user doesn't get three tiny windows.
-         */
-        setTimeout(() => {
-            try {
-                window.close();
-            } catch (_) {
-                /* Ignore close failures. */
-            }
-        }, 50);
-    }
-
-    /*
-     * Wait until this popup has actually loaded.
-     */
-    if (document.readyState === "loading") {
-        window.addEventListener(
-            "DOMContentLoaded",
-            reportSuccess,
-            { once: true }
+        window.opener.postMessage(
+            {
+                type: "YOUARE_POPUP_TEST_SUCCESS",
+                id: id
+            },
+            window.location.origin
         );
-    } else {
-        reportSuccess();
     }
-})();
-</script>
-</body>
+
+    /*
+     * Do NOT immediately close this window.
+     *
+     * Some browsers, especially Firefox-based browsers,
+     * may delay/reopen popup windows after the permission
+     * is changed. Keeping this page alive allows the
+     * communication above to complete reliably.
+     */
+}
+</script></body>
 </html>
