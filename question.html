@@ -26,20 +26,22 @@
             align-items: center;
             justify-content: center;
 
-            font-family: "MS Sans Serif", Tahoma, Arial, sans-serif;
+            font-family:
+                "MS Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
             user-select: none;
         }
 
 
-        /*
-         * ============================================================
-         * WINDOWS 95/98 STYLE MAIN WINDOW
-         * ============================================================
-         */
+        /* ============================================================
+           MAIN WINDOW
+           ============================================================ */
 
         #question-window {
-            position: relative;
+            position: absolute;
 
             width: 928px;
             height: 929px;
@@ -57,11 +59,9 @@
         }
 
 
-        /*
-         * ============================================================
-         * TITLE BAR
-         * ============================================================
-         */
+        /* ============================================================
+           TITLE BAR
+           ============================================================ */
 
         #titlebar {
             position: absolute;
@@ -90,15 +90,18 @@
 
             font-size: 13px;
             font-weight: bold;
+
+            cursor: move;
         }
 
         #title {
             flex: 1;
+
+            pointer-events: none;
         }
 
-        /*
-         * Windows 95/98 title-bar buttons
-         */
+
+        /* Windows 95/98 title buttons */
 
         .window-button {
             width: 21px;
@@ -116,35 +119,29 @@
             color: #000000;
 
             border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
             font-family: Arial, sans-serif;
             font-size: 12px;
             font-weight: bold;
 
             line-height: 15px;
+
+            cursor: default;
         }
 
-        .window-button:active {
-            border-color: #000000 #ffffff #ffffff #000000;
+        .window-button:disabled {
+            opacity: 1;
         }
 
 
-        /*
-         * ============================================================
-         * CONTENT AREA
-         * ============================================================
-         *
-         * Original PictureBox:
-         *
-         * x = 0
-         * y = 0
-         * width = 928
-         * height = 711
-         *
-         * Since we now have a title bar, the image starts below it
-         * while retaining its original aspect/layout.
-         */
+        /* ============================================================
+           GIF / PICTURE BOX
+           ============================================================ */
 
         #pictureBox1 {
             position: absolute;
@@ -163,20 +160,9 @@
         }
 
 
-        /*
-         * ============================================================
-         * QUESTION AREA
-         * ============================================================
-         *
-         * The original label was at:
-         *
-         * x = 266
-         * y = 786
-         *
-         * But that leaves it slightly off-center.
-         *
-         * Here the question is centered horizontally.
-         */
+        /* ============================================================
+           QUESTION
+           ============================================================ */
 
         #question-area {
             position: absolute;
@@ -210,34 +196,9 @@
         }
 
 
-        /*
-         * ============================================================
-         * ANSWER BUTTONS
-         * ============================================================
-         *
-         * Original:
-         *
-         * No:
-         *   x=28
-         *   y=860
-         *   w=262
-         *   h=57
-         *
-         * None:
-         *   x=298
-         *   y=860
-         *   w=354
-         *   h=57
-         *
-         * Yes:
-         *   x=660
-         *   y=860
-         *   w=244
-         *   h=57
-         *
-         * The buttons are retained at essentially the same
-         * horizontal arrangement.
-         */
+        /* ============================================================
+           WIN95/98 ANSWER BUTTONS
+           ============================================================ */
 
         .answer {
             position: absolute;
@@ -247,25 +208,74 @@
 
             padding: 0;
 
-            font-family: Verdana, sans-serif;
-            font-size: 12px;
-            font-weight: normal;
-
             background: #c0c0c0;
 
             color: #000000;
 
+            font-family: Verdana, sans-serif;
+            font-size: 12px;
+            font-weight: normal;
+
             border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
+
+            /*
+             * Classic raised Win95/98 button.
+             */
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
             border-radius: 0;
 
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
+
             cursor: default;
+
+            appearance: none;
+            -webkit-appearance: none;
         }
 
+        /*
+         * Win95/98 pressed-button appearance.
+         */
+
         .answer:active {
-            border-color: #000000 #ffffff #ffffff #000000;
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
+
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+
+            padding-left: 2px;
+            padding-top: 2px;
         }
+
+        /*
+         * Keep the classic gray appearance instead of modern
+         * browser hover effects.
+         */
+
+        .answer:hover {
+            background: #c0c0c0;
+        }
+
+        /*
+         * Dotted focus rectangle characteristic of old Windows UI.
+         */
+
+        .answer:focus {
+            outline: 1px dotted #000000;
+            outline-offset: -5px;
+        }
+
 
         #no {
             left: 28px;
@@ -283,11 +293,9 @@
         }
 
 
-        /*
-         * ============================================================
-         * WINDOWS 95/98 MESSAGE BOX
-         * ============================================================
-         */
+        /* ============================================================
+           CUSTOM WINDOWS 95/98 MESSAGE BOX
+           ============================================================ */
 
         #popup-overlay {
             position: fixed;
@@ -316,7 +324,11 @@
             background: #c0c0c0;
 
             border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
             box-shadow:
                 1px 1px 0 #dfdfdf,
@@ -340,7 +352,7 @@
 
             background: #000080;
 
-            color: white;
+            color: #ffffff;
 
             font-size: 13px;
             font-weight: bold;
@@ -359,15 +371,25 @@
             background: #c0c0c0;
 
             border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
             font-family: Arial, sans-serif;
             font-size: 12px;
             font-weight: bold;
+
+            cursor: default;
         }
 
         #popup-close:active {
-            border-color: #000000 #ffffff #ffffff #000000;
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
         }
 
         #popup-content {
@@ -427,7 +449,15 @@
             background: #c0c0c0;
 
             border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
+
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
             font-family:
                 "MS Sans Serif",
@@ -438,10 +468,20 @@
             font-size: 12px;
 
             color: #000000;
+
+            cursor: default;
         }
 
         #popup-buttons button:active {
-            border-color: #000000 #ffffff #ffffff #000000;
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
+
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
         }
 
         #popup-buttons button:focus {
@@ -450,11 +490,9 @@
         }
 
 
-        /*
-         * ============================================================
-         * SMALL SCREEN SCALING
-         * ============================================================
-         */
+        /* ============================================================
+           SMALL SCREENS
+           ============================================================ */
 
         @media (max-width: 928px), (max-height: 929px) {
 
@@ -476,12 +514,11 @@
 <body>
 
     <!-- ============================================================
-         MAIN QUESTION WINDOW
+         MAIN WINDOW
          ============================================================ -->
 
     <main id="question-window">
 
-        <!-- Windows 95/98 title bar -->
         <div id="titlebar">
 
             <span id="title">
@@ -492,33 +529,25 @@
                 class="window-button"
                 id="minimize"
                 type="button"
-                aria-label="Minimize"
-            >
-                _
-            </button>
+                disabled
+            >_</button>
 
             <button
                 class="window-button"
                 id="maximize"
                 type="button"
-                aria-label="Maximize"
-            >
-                □
-            </button>
+                disabled
+            >□</button>
 
             <button
                 class="window-button"
                 id="close"
                 type="button"
-                aria-label="Close"
-            >
-                ×
-            </button>
+            >×</button>
 
         </div>
 
 
-        <!-- Original PictureBox -->
         <img
             id="pictureBox1"
             src="media/idiot.gif"
@@ -527,17 +556,12 @@
         >
 
 
-        <!-- Centered question -->
         <div id="question-area">
-
             <div id="question">
                 Are You An Idiot ?
             </div>
-
         </div>
 
-
-        <!-- Original buttons -->
 
         <button
             class="answer"
@@ -583,18 +607,13 @@
                 <button
                     id="popup-close"
                     type="button"
-                    aria-label="Close"
-                >
-                    ×
-                </button>
+                >×</button>
 
             </div>
 
             <div id="popup-content">
 
-                <div id="popup-icon">
-                    !
-                </div>
+                <div id="popup-icon">!</div>
 
                 <div id="popup-message"></div>
 
@@ -609,12 +628,7 @@
 
     <!-- ============================================================
          AUDIO
-         ============================================================
-
-         Using the requested path:
-
-         /media/youare-long.mp3
-         -->
+         ============================================================ -->
 
     <audio
         id="idiot-audio"
@@ -632,11 +646,9 @@
         "use strict";
 
 
-        /*
-         * ============================================================
-         * ELEMENTS
-         * ============================================================
-         */
+        /* ============================================================
+           ELEMENTS
+           ============================================================ */
 
         const question =
             document.getElementById("question");
@@ -668,29 +680,16 @@
         const popupClose =
             document.getElementById("popup-close");
 
+        const questionWindow =
+            document.getElementById("question-window");
 
-        /*
-         * ============================================================
-         * FONT COLOUR TIMER
-         * ============================================================
-         *
-         * Original Designer:
-         *
-         * FontColour.Interval = 55;
-         *
-         * Original sequence:
-         *
-         * Indigo
-         * Ivory
-         * LightPink
-         * LightSkyBlue
-         * Lime
-         * MediumPurple
-         * MediumSpringGreen
-         * Pink
-         * Red
-         * Snow
-         */
+        const titlebar =
+            document.getElementById("titlebar");
+
+
+        /* ============================================================
+           RAINBOW TEXT
+           ============================================================ */
 
         const fontColors = [
             "Indigo",
@@ -707,7 +706,6 @@
 
         let timerFT = 0;
 
-
         setInterval(() => {
 
             timerFT++;
@@ -719,7 +717,8 @@
 
             if (timerFT >= 9) {
 
-                question.style.color = "Snow";
+                question.style.color =
+                    "Snow";
 
                 timerFT = 0;
             }
@@ -727,33 +726,20 @@
         }, 55);
 
 
-        /*
-         * ============================================================
-         * AUDIO
-         * ============================================================
-         *
-         * Requested:
-         *
-         * /media/youare-long.mp3
-         */
+        /* ============================================================
+           AUDIO
+           ============================================================ */
 
         function playAudio() {
 
             idiotAudio
                 .play()
                 .catch(() => {
-                    /*
-                     * Autoplay may be blocked by the browser.
-                     */
+                    // Browser blocked autoplay.
                 });
         }
 
         playAudio();
-
-
-        /*
-         * Retry after first user interaction if autoplay was blocked.
-         */
 
         document.addEventListener(
             "pointerdown",
@@ -764,18 +750,16 @@
         );
 
 
-        /*
-         * ============================================================
-         * CUSTOM MESSAGE BOX
-         * ============================================================
-         */
+        /* ============================================================
+           CUSTOM MESSAGE BOX
+           ============================================================ */
 
         let popupResolver = null;
 
-
         function showPopup(message, buttons, icon = "!") {
 
-            popupMessage.textContent = message;
+            popupMessage.textContent =
+                message;
 
             document.getElementById(
                 "popup-icon"
@@ -783,13 +767,13 @@
 
             popupButtons.innerHTML = "";
 
-            popupOverlay.classList.add("visible");
-
+            popupOverlay.classList.add(
+                "visible"
+            );
 
             return new Promise(resolve => {
 
                 popupResolver = resolve;
-
 
                 for (const text of buttons) {
 
@@ -798,7 +782,8 @@
 
                     button.type = "button";
 
-                    button.textContent = text;
+                    button.textContent =
+                        text;
 
                     button.addEventListener(
                         "click",
@@ -807,12 +792,15 @@
                         }
                     );
 
-                    popupButtons.appendChild(button);
+                    popupButtons.appendChild(
+                        button
+                    );
                 }
 
-
                 const firstButton =
-                    popupButtons.querySelector("button");
+                    popupButtons.querySelector(
+                        "button"
+                    );
 
                 if (firstButton) {
                     firstButton.focus();
@@ -823,11 +811,14 @@
 
         function closePopup(result = "Close") {
 
-            popupOverlay.classList.remove("visible");
+            popupOverlay.classList.remove(
+                "visible"
+            );
 
             if (popupResolver) {
 
-                const resolve = popupResolver;
+                const resolve =
+                    popupResolver;
 
                 popupResolver = null;
 
@@ -844,16 +835,11 @@
         );
 
 
-        /*
-         * ============================================================
-         * REDIRECT
-         * ============================================================
-         *
-         * Requested replacement for the original HAHA spawning.
-         */
+        /* ============================================================
+           REDIRECT
+           ============================================================ */
 
         let redirecting = false;
-
 
         function redirectToDiscord() {
 
@@ -863,24 +849,14 @@
 
             redirecting = true;
 
-            window.location.href = "discord.html";
+            window.location.href =
+                "discord.html";
         }
 
 
-        /*
-         * ============================================================
-         * NO
-         * ============================================================
-         *
-         * Original:
-         *
-         * MessageBox.Show(
-         *     "Oh... I think you are an idiot. XD",
-         *     "YouAreAnIdiot"
-         * );
-         *
-         * this.Close();
-         */
+        /* ============================================================
+           NO / I DON'T KNOW
+           ============================================================ */
 
         async function handleNo() {
 
@@ -898,11 +874,6 @@
         }
 
 
-        /*
-         * Both No and None are connected to No_Click in the
-         * original Designer.cs.
-         */
-
         noButton.addEventListener(
             "click",
             handleNo
@@ -914,21 +885,9 @@
         );
 
 
-        /*
-         * ============================================================
-         * YES
-         * ============================================================
-         *
-         * Original:
-         *
-         * MessageBox.Show(
-         *     "Are you sure?",
-         *     "YouAreAnIdiot",
-         *     MessageBoxButtons.YesNo
-         * );
-         *
-         * this.Close();
-         */
+        /* ============================================================
+           YES
+           ============================================================ */
 
         yesButton.addEventListener(
             "click",
@@ -949,13 +908,9 @@
         );
 
 
-        /*
-         * ============================================================
-         * CLOSE BUTTON
-         * ============================================================
-         *
-         * Equivalent to closing the original Question form.
-         */
+        /* ============================================================
+           CLOSE
+           ============================================================ */
 
         closeButton.addEventListener(
             "click",
@@ -963,23 +918,22 @@
         );
 
 
-        /*
-         * The minimize/maximize buttons don't exist on the original
-         * WinForms window because:
-         *
-         * MaximizeBox = false
-         * MinimizeBox = false
-         *
-         * They are therefore disabled visually/functionally.
-         */
+        /* ============================================================
+           DISABLE MINIMIZE / MAXIMIZE
+           ============================================================ */
 
-        document.getElementById("minimize").disabled = true;
-        document.getElementById("maximize").disabled = true;
+        document.getElementById(
+            "minimize"
+        ).disabled = true;
+
+        document.getElementById(
+            "maximize"
+        ).disabled = true;
 
 
-        /*
-         * ESC = close
-         */
+        /* ============================================================
+           ESCAPE
+           ============================================================ */
 
         document.addEventListener(
             "keydown",
@@ -993,9 +947,9 @@
         );
 
 
-        /*
-         * Prevent context menu, matching the fixed-app behavior.
-         */
+        /* ============================================================
+           RIGHT CLICK
+           ============================================================ */
 
         document.addEventListener(
             "contextmenu",
@@ -1005,8 +959,135 @@
         );
 
 
+        /* ============================================================
+           DRAGGABLE WINDOW
+           ============================================================
+           
+           Only the blue title bar is draggable.
+           
+           The window itself uses absolute positioning, so moving it
+           doesn't cause the page to scroll or move.
+           ============================================================ */
+
+        let dragging = false;
+
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+
+        titlebar.addEventListener(
+            "pointerdown",
+            event => {
+
+                /*
+                 * Don't start dragging when clicking a title-bar button.
+                 */
+
+                if (
+                    event.target.closest(
+                        ".window-button"
+                    )
+                ) {
+                    return;
+                }
+
+                dragging = true;
+
+                const rect =
+                    questionWindow.getBoundingClientRect();
+
+                dragOffsetX =
+                    event.clientX - rect.left;
+
+                dragOffsetY =
+                    event.clientY - rect.top;
+
+                titlebar.setPointerCapture(
+                    event.pointerId
+                );
+
+                event.preventDefault();
+            }
+        );
+
+
+        titlebar.addEventListener(
+            "pointermove",
+            event => {
+
+                if (!dragging) {
+                    return;
+                }
+
+                /*
+                 * Account for the current visual scale on small
+                 * screens.
+                 */
+
+                const scale =
+                    questionWindow.getBoundingClientRect().width /
+                    questionWindow.offsetWidth;
+
+                const newLeft =
+                    event.clientX -
+                    (dragOffsetX * scale);
+
+                const newTop =
+                    event.clientY -
+                    (dragOffsetY * scale);
+
+
+                questionWindow.style.left =
+                    `${newLeft}px`;
+
+                questionWindow.style.top =
+                    `${newTop}px`;
+
+                /*
+                 * Once manually dragged, stop using the body's
+                 * flex centering.
+                 */
+
+                questionWindow.style.margin =
+                    "0";
+
+                questionWindow.style.transform =
+                    `scale(${scale})`;
+            }
+        );
+
+
+        function stopDragging(event) {
+
+            if (!dragging) {
+                return;
+            }
+
+            dragging = false;
+
+            try {
+                titlebar.releasePointerCapture(
+                    event.pointerId
+                );
+            } catch (_) {
+                // Pointer capture may already have been released.
+            }
+        }
+
+
+        titlebar.addEventListener(
+            "pointerup",
+            stopDragging
+        );
+
+        titlebar.addEventListener(
+            "pointercancel",
+            stopDragging
+        );
+
+
         /*
-         * Don't let the GIF be dragged.
+         * Prevent dragging the GIF itself.
          */
 
         document
