@@ -1,86 +1,50 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8"><meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta charset="UTF-8">
+    <title>Popup Test</title>
+</head>
 
-<title>Popup Test</title>
-
-</head><body><script>
+<body>
+<script>
 "use strict";
 
-/*
- * Read our assigned popup ID.
- */
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
-
-const id =
-    params.get("id");
-
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
 
 /*
- * Only valid popup-test windows
- * are allowed to report success.
+ * Only accept the IDs created by question.html.
  */
-if (
-    ["0", "1", "2"].includes(id) &&
-    window.opener &&
-    !window.opener.closed
-) {
+if (["0", "1", "2"].includes(String(id))) {
 
     /*
-     * Tell the original page that this
-     * particular popup successfully loaded.
+     * Tell the opener that this popup actually loaded.
      */
-    window.opener.postMessage(
-        {
-            type:
-                "YOUARE_POPUP_TEST_SUCCESS",
+    if (window.opener && !window.opener.closed) {
 
-            id:
-                id
-        },
-
-        window.location.origin
-    );
-
+        window.opener.postMessage(
+            {
+                type: "YOUARE_POPUP_TEST_SUCCESS",
+                id: String(id)
+            },
+            window.location.origin
+        );
+    }
 
     /*
-     * First let the message get queued.
-     *
-     * Then try to close ourselves.
-     *
-     * The parent page also attempts to close
-     * this exact window when it receives the
-     * success message, so there are two chances
-     * to close it.
+     * Give postMessage a moment to leave this document,
+     * then try to close ourselves.
      */
-    setTimeout(
-        () => {
+    setTimeout(() => {
 
-            try {
+        try {
+            window.close();
+        } catch (_) {
+            /* Parent page will try to close us as fallback. */
+        }
 
-                window.close();
-
-            } catch (_) {
-
-                /*
-                 * Ignore close failures.
-                 *
-                 * The parent page will also try
-                 * to close this exact window.
-                 */
-
-            }
-
-        },
-        0
-    );
-
+    }, 50);
 }
-</script></body>
+</script>
+</body>
 </html>
