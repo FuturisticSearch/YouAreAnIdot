@@ -1,48 +1,53 @@
 <!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
     <title>Popup Test</title>
-</head>
-<body><script>
+</head><body><script>
 "use strict";
 
-/*
- * Read the ID assigned by the parent page.
- */
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(
+    window.location.search
+);
+
 const id = params.get("id");
 
-/*
- * Only report valid test IDs.
- */
-if (["0", "1", "2"].includes(id)) {
+if (
+    ["0", "1", "2"].includes(id) &&
+    window.opener &&
+    !window.opener.closed
+) {
 
     /*
-     * Tell the opener that this popup actually loaded.
-     *
-     * opener.postMessage() is used instead of relying on
-     * window.open() returning a usable Window object.
+     * First report successful loading to the
+     * original window.
      */
-    if (window.opener && !window.opener.closed) {
-
-        window.opener.postMessage(
-            {
-                type: "YOUARE_POPUP_TEST_SUCCESS",
-                id: id
-            },
-            window.location.origin
-        );
-    }
+    window.opener.postMessage(
+        {
+            type: "YOUARE_POPUP_TEST_SUCCESS",
+            id: id
+        },
+        window.location.origin
+    );
 
     /*
-     * Do NOT immediately close this window.
+     * Close on the next event-loop turn.
      *
-     * Some browsers, especially Firefox-based browsers,
-     * may delay/reopen popup windows after the permission
-     * is changed. Keeping this page alive allows the
-     * communication above to complete reliably.
+     * This lets the postMessage event get queued
+     * before this popup disappears.
      */
+    setTimeout(() => {
+
+        try {
+            window.close();
+        } catch (_) {
+            /* Ignore browsers that refuse the close. */
+        }
+
+    }, 0);
 }
 </script></body>
 </html>
