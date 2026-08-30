@@ -1,535 +1,562 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="UTF-8"><meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
->
+<!DOCTYPE html>
+<html lang="en">
 
-<title>Are You An Idiot?</title>
+<head>
+    <meta charset="UTF-8">
 
-<style>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
 
-    * {
-        box-sizing: border-box;
-    }
+    <title>Are You An Idiot?</title>
 
-    html,
-    body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
+    <style>
 
-    body {
-        background: transparent;
-        overflow: hidden;
+        * {
+            box-sizing: border-box;
+        }
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
-        font-size: 11px;
+        body {
+            background: transparent;
+            overflow: hidden;
 
-        user-select: none;
-        -webkit-user-select: none;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+            font-size: 11px;
 
-    #question-window {
-        position: absolute;
+            user-select: none;
+            -webkit-user-select: none;
 
-        width: 928px;
-        height: 929px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        left: 50%;
-        top: 50%;
+        #question-window {
+            position: absolute;
 
-        transform:
-            translate(-50%, -50%)
-            scale(1);
+            width: 928px;
+            height: 929px;
 
-        transform-origin: center center;
+            left: 50%;
+            top: 50%;
 
-        background: #c0c0c0;
+            transform:
+                translate(-50%, -50%)
+                scale(1);
 
-        border: 2px solid;
+            transform-origin: center center;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            background: #c0c0c0;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            border: 2px solid;
 
-        overflow: hidden;
-    }
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-    #titlebar {
-        position: absolute;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-        left: 3px;
-        right: 3px;
-        top: 3px;
+            overflow: hidden;
+        }
 
-        height: 22px;
+        #titlebar {
+            position: absolute;
 
-        display: flex;
-        align-items: center;
+            left: 3px;
+            right: 3px;
+            top: 3px;
 
-        padding-left: 4px;
+            height: 22px;
 
-        background: #000080;
+            display: flex;
+            align-items: center;
 
-        color: #ffffff;
+            padding-left: 4px;
 
-        font-size: 13px;
-        font-weight: bold;
+            background: #000080;
 
-        line-height: 18px;
+            color: #ffffff;
 
-        cursor: move;
-        touch-action: none;
-    }
+            font-size: 13px;
+            font-weight: bold;
 
-    #title {
-        pointer-events: none;
+            line-height: 18px;
 
-        white-space: nowrap;
+            cursor: move;
 
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+            touch-action: none;
+        }
 
-    #pictureBox1 {
-        position: absolute;
+        #title {
+            pointer-events: none;
 
-        left: 3px;
-        top: 28px;
+            white-space: nowrap;
 
-        width: 918px;
-        height: 714px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        display: block;
+        #pictureBox1 {
+            position: absolute;
 
-        object-fit: fill;
+            left: 3px;
+            top: 28px;
 
-        pointer-events: none;
-    }
+            width: 918px;
+            height: 714px;
 
-    #question-area {
-        position: absolute;
+            display: block;
 
-        left: 3px;
-        right: 3px;
+            object-fit: fill;
 
-        top: 750px;
-        height: 90px;
+            pointer-events: none;
+        }
 
-        display: flex;
+        #question-area {
+            position: absolute;
 
-        align-items: center;
-        justify-content: center;
-    }
+            left: 3px;
+            right: 3px;
 
-    #question {
-        margin: 0;
+            top: 750px;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+            height: 90px;
 
-        font-size: 20px;
-        font-weight: normal;
+            display: flex;
 
-        line-height: 1.2;
+            align-items: center;
+            justify-content: center;
+        }
 
-        white-space: nowrap;
+        #question {
+            margin: 0;
 
-        color: Indigo;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-        text-align: center;
-    }
+            font-size: 20px;
+            font-weight: normal;
 
-    .answer {
-        position: absolute;
+            line-height: 1.2;
 
-        top: 860px;
-        height: 57px;
+            white-space: nowrap;
 
-        padding: 0;
+            color: Indigo;
 
-        background: #c0c0c0;
+            text-align: center;
+        }
 
-        color: #000000;
+        .answer {
+            position: absolute;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+            top: 860px;
 
-        font-size: 12px;
+            height: 57px;
 
-        border: 2px solid;
+            padding: 0;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            background: #c0c0c0;
 
-        border-radius: 0;
+            color: #000000;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-        cursor: default;
+            font-size: 12px;
 
-        appearance: none;
-        -webkit-appearance: none;
-    }
+            border: 2px solid;
 
-    .answer:active {
-        border-color:
-            #000000
-            #ffffff
-            #ffffff
-            #000000;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-        box-shadow:
-            inset 1px 1px 0 #808080,
-            inset -1px -1px 0 #dfdfdf;
+            border-radius: 0;
 
-        padding-left: 2px;
-        padding-top: 2px;
-    }
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-    .answer:focus {
-        outline: 1px dotted #000000;
-        outline-offset: -5px;
-    }
+            cursor: default;
 
-    #no {
-        left: 28px;
-        width: 262px;
-    }
+            appearance: none;
+            -webkit-appearance: none;
+        }
 
-    #none {
-        left: 298px;
-        width: 354px;
-    }
+        .answer:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
 
-    #yes {
-        left: 660px;
-        width: 244px;
-    }
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
 
-    #popup-overlay {
-        position: fixed;
+            padding-left: 2px;
+            padding-top: 2px;
+        }
 
-        inset: 0;
+        .answer:focus {
+            outline: 1px dotted #000000;
+            outline-offset: -5px;
+        }
 
-        display: none;
+        #no {
+            left: 28px;
+            width: 262px;
+        }
 
-        z-index: 100000;
-    }
+        #none {
+            left: 298px;
+            width: 354px;
+        }
 
-    #popup-overlay.visible {
-        display: block;
-    }
+        #yes {
+            left: 660px;
+            width: 244px;
+        }
 
-    #popup {
-        position: fixed;
+        #popup-overlay {
+            position: fixed;
 
-        left: 50%;
-        top: 50%;
+            inset: 0;
 
-        transform:
-            translate(-50%, -50%);
+            display: none;
 
-        min-width: 390px;
+            z-index: 100000;
+        }
 
-        max-width:
-            min(
-                500px,
-                calc(100vw - 30px)
-            );
+        #popup-overlay.visible {
+            display: block;
+        }
 
-        background: #c0c0c0;
+        #popup {
+            position: fixed;
 
-        border: 2px solid;
+            left: 50%;
+            top: 50%;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            transform:
+                translate(-50%, -50%);
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
-    }
+            min-width: 390px;
 
-    #popup-titlebar {
-        height: 22px;
+            max-width:
+                min(
+                    500px,
+                    calc(100vw - 30px)
+                );
 
-        display: flex;
-        align-items: center;
+            background: #c0c0c0;
 
-        padding-left: 4px;
-        padding-right: 2px;
+            border: 2px solid;
 
-        background: #000080;
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-        color: #ffffff;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
+        }
 
-        font-size: 13px;
-        font-weight: bold;
-    }
+        #popup-titlebar {
+            height: 22px;
 
-    #popup-title {
-        flex: 1;
+            display: flex;
+            align-items: center;
 
-        white-space: nowrap;
+            padding-left: 4px;
+            padding-right: 2px;
 
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+            background: #000080;
 
-    #popup-close {
-        width: 19px;
-        height: 18px;
+            color: #ffffff;
 
-        padding: 0;
+            font-size: 13px;
+            font-weight: bold;
+        }
 
-        background: #c0c0c0;
+        #popup-title {
+            flex: 1;
 
-        border: 2px solid;
+            white-space: nowrap;
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+        #popup-close {
+            width: 19px;
+            height: 18px;
 
-        font-family: Arial, sans-serif;
+            padding: 0;
 
-        font-size: 11px;
-        font-weight: bold;
+            background: #c0c0c0;
 
-        line-height: 13px;
-    }
+            border: 2px solid;
 
-    #popup-close:active {
-        border-color:
-            #000000
-            #ffffff
-            #ffffff
-            #000000;
-    }
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-    #popup-content {
-        min-height: 90px;
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-        display: flex;
+            font-family:
+                Arial,
+                sans-serif;
 
-        align-items: center;
+            font-size: 11px;
+            font-weight: bold;
 
-        padding: 18px;
-    }
+            line-height: 13px;
+        }
 
-    #popup-icon {
-        width: 32px;
-        min-width: 32px;
+        #popup-close:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
+        }
 
-        height: 32px;
+        #popup-content {
+            min-height: 90px;
 
-        margin-right: 18px;
+            display: flex;
 
-        display: flex;
+            align-items: center;
 
-        align-items: center;
-        justify-content: center;
+            padding: 18px;
+        }
 
-        color: #000000;
+        #popup-icon {
+            width: 32px;
+            min-width: 32px;
 
-        font-family: Arial, sans-serif;
+            height: 32px;
 
-        font-size: 26px;
-        font-weight: bold;
-    }
+            margin-right: 18px;
 
-    #popup-message {
-        flex: 1;
+            display: flex;
 
-        font-size: 13px;
+            align-items: center;
+            justify-content: center;
 
-        color: #000000;
+            color: #000000;
 
-        line-height: 1.35;
-    }
+            font-family:
+                Arial,
+                sans-serif;
 
-    #popup-buttons {
-        display: flex;
+            font-size: 26px;
+            font-weight: bold;
+        }
 
-        justify-content: center;
+        #popup-message {
+            flex: 1;
 
-        gap: 8px;
+            font-size: 13px;
 
-        padding:
-            0
-            12px
-            14px;
-    }
+            color: #000000;
 
-    #popup-buttons button {
-        min-width: 75px;
+            line-height: 1.35;
+        }
 
-        height: 27px;
+        #popup-buttons {
+            display: flex;
 
-        padding:
-            2px
-            12px;
+            justify-content: center;
 
-        background: #c0c0c0;
+            gap: 8px;
 
-        border: 2px solid;
+            padding:
+                0
+                12px
+                14px;
+        }
 
-        border-color:
-            #ffffff
-            #000000
-            #000000
-            #ffffff;
+        #popup-buttons button {
+            min-width: 75px;
 
-        box-shadow:
-            inset 1px 1px 0 #dfdfdf,
-            inset -1px -1px 0 #808080;
+            height: 27px;
 
-        font-family:
-            "MS Sans Serif",
-            "Microsoft Sans Serif",
-            Tahoma,
-            Arial,
-            sans-serif;
+            padding:
+                2px
+                12px;
 
-        font-size: 12px;
+            background: #c0c0c0;
 
-        color: #000000;
-    }
+            border: 2px solid;
 
-    #popup-buttons button:active {
-        border-color:
-            #000000
-            #ffffff
-            #ffffff
-            #000000;
-    }
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
 
-</style>
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
 
-</head><body><main id="question-window"><div id="titlebar">
-    <span id="title">
-        Are You An Idiot?
-    </span>
-</div>
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-<img
-    id="pictureBox1"
-    src="media/idiot.gif"
-    alt=""
-    draggable="false"
->
+            font-size: 12px;
 
-<div id="question-area">
-    <div id="question">
-        Are You An Idiot ?
-    </div>
-</div>
+            color: #000000;
+        }
 
-<button
-    class="answer"
-    id="no"
-    type="button"
->
-    No, I'm not.
-</button>
+        #popup-buttons button:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
+        }
 
-<button
-    class="answer"
-    id="none"
-    type="button"
->
-    I don't know =[
-</button>
+    </style>
+</head>
 
-<button
-    class="answer"
-    id="yes"
-    type="button"
->
-    Yes, I am.
-</button>
+<body>
 
-</main><div id="popup-overlay"><div id="popup">
+<main id="question-window">
 
-    <div id="popup-titlebar">
-
-        <span id="popup-title">
-            YouAreAnIdiot
+    <div id="titlebar">
+        <span id="title">
+            Are You An Idiot?
         </span>
-
-        <button
-            id="popup-close"
-            type="button"
-        >×</button>
-
     </div>
 
-    <div id="popup-content">
+    <img
+        id="pictureBox1"
+        src="media/idiot.gif"
+        alt=""
+        draggable="false"
+    >
 
-        <div id="popup-icon">
-            !
+    <div id="question-area">
+
+        <div id="question">
+            Are You An Idiot ?
         </div>
 
-        <div id="popup-message"></div>
+    </div>
+
+    <button
+        class="answer"
+        id="no"
+        type="button"
+    >
+        No, I'm not.
+    </button>
+
+    <button
+        class="answer"
+        id="none"
+        type="button"
+    >
+        I don't know =[
+    </button>
+
+    <button
+        class="answer"
+        id="yes"
+        type="button"
+    >
+        Yes, I am.
+    </button>
+
+</main>
+
+
+<div id="popup-overlay">
+
+    <div id="popup">
+
+        <div id="popup-titlebar">
+
+            <span id="popup-title">
+                YouAreAnIdiot
+            </span>
+
+            <button
+                id="popup-close"
+                type="button"
+            >×</button>
+
+        </div>
+
+        <div id="popup-content">
+
+            <div id="popup-icon">
+                !
+            </div>
+
+            <div id="popup-message"></div>
+
+        </div>
+
+        <div id="popup-buttons"></div>
 
     </div>
 
-    <div id="popup-buttons"></div>
-
 </div>
 
-</div><audio
-id="idiot-audio"
-preload="auto"
-loop
 
-«»
-
-<source
-    src="/media/youare-long.mp3"
-    type="audio/mpeg"
+<audio
+    id="idiot-audio"
+    preload="auto"
+    loop
 >
+    <source
+        src="/media/youare-long.mp3"
+        type="audio/mpeg"
+    >
+</audio>
 
-</audio><script>
+
+<script>
 
 "use strict";
 
@@ -599,22 +626,25 @@ function updateScale() {
         window.innerHeight;
 
 
-    scale = Math.min(
-        viewportWidth / BASE_WIDTH,
-        viewportHeight / BASE_HEIGHT
-    );
+    scale =
+        Math.min(
+            viewportWidth / BASE_WIDTH,
+            viewportHeight / BASE_HEIGHT
+        );
 
 
-    scale = Math.min(
-        scale,
-        1
-    );
+    scale =
+        Math.min(
+            scale,
+            1
+        );
 
 
-    scale = Math.max(
-        scale,
-        0.1
-    );
+    scale =
+        Math.max(
+            scale,
+            0.1
+        );
 
 
     if (!manuallyPositioned) {
@@ -661,18 +691,102 @@ window.addEventListener(
 
 
 /* ============================================================
-   POPUP SELF-RESIZE
+   DYNAMIC RESIZE MESSAGE
    ============================================================ */
 
-/*
- * This calculates the browser outer size required for the
- * actual rendered fake Windows window.
- *
- * If the popup is currently scaled, the rendered dimensions
- * are used rather than blindly requesting 928x929.
- */
+let resizeInProgress = false;
 
-function getDesiredPopupSize() {
+let resizeRequestId = 0;
+
+
+/*
+ * Always send the actual rendered dimensions
+ * to the opener.
+ */
+function sendResizeRequest(
+    reason = "resize"
+) {
+
+    if (
+        !window.opener ||
+        window.opener.closed
+    ) {
+
+        return false;
+
+    }
+
+
+    const rect =
+        questionWindow.getBoundingClientRect();
+
+
+    const width =
+        Math.max(
+            1,
+            Math.round(rect.width)
+        );
+
+
+    const height =
+        Math.max(
+            1,
+            Math.round(rect.height)
+        );
+
+
+    const message = {
+
+        type:
+            "YOUARE_REQUEST_RESIZE",
+
+        id:
+            ++resizeRequestId,
+
+        reason,
+
+        width,
+
+        height,
+
+        timestamp:
+            Date.now()
+
+    };
+
+
+    try {
+
+        window.opener.postMessage(
+            message,
+            window.location.origin
+        );
+
+        return true;
+
+    } catch (_) {
+
+        return false;
+
+    }
+
+}
+
+
+/*
+ * Try to resize ourselves.
+ */
+function resizeOwnPopup() {
+
+    if (
+        resizeInProgress ||
+        typeof window.resizeTo !== "function"
+    ) {
+
+        return false;
+
+    }
+
 
     const rect =
         questionWindow.getBoundingClientRect();
@@ -708,210 +822,178 @@ function getDesiredPopupSize() {
         );
 
 
-    return {
-        viewportWidth: desiredWidth,
-        viewportHeight: desiredHeight,
-
-        outerWidth:
-            desiredWidth +
-            chromeWidth,
-
-        outerHeight:
-            desiredHeight +
-            chromeHeight
-    };
-
-}
+    const targetOuterWidth =
+        desiredWidth +
+        chromeWidth;
 
 
-/*
- * Actually attempt to resize this popup.
- *
- * Returns a Promise<boolean> indicating whether the browser
- * appears to have accepted the resize.
- */
-
-function resizePopupToActualSize() {
-
-    return new Promise(resolve => {
-
-        const target =
-            getDesiredPopupSize();
+    const targetOuterHeight =
+        desiredHeight +
+        chromeHeight;
 
 
-        if (
-            typeof window.resizeTo !==
-            "function"
-        ) {
-
-            resolve(false);
-
-            return;
-
-        }
-
-
-        try {
-
-            window.resizeTo(
-                target.outerWidth,
-                target.outerHeight
-            );
-
-        } catch (_) {
-
-            resolve(false);
-
-            return;
-
-        }
-
-
-        /*
-         * resizeTo() does not necessarily throw when a browser
-         * ignores it, so verify the result afterwards.
-         */
-
-        setTimeout(
-            () => {
-
-                const widthDifference =
-                    Math.abs(
-                        window.innerWidth -
-                        target.viewportWidth
-                    );
-
-
-                const heightDifference =
-                    Math.abs(
-                        window.innerHeight -
-                        target.viewportHeight
-                    );
-
-
-                const success =
-                    widthDifference <= 3 &&
-                    heightDifference <= 3;
-
-
-                resolve(success);
-
-            },
-            120
+    const widthDifference =
+        Math.abs(
+            window.outerWidth -
+            targetOuterWidth
         );
 
-    });
 
-}
+    const heightDifference =
+        Math.abs(
+            window.outerHeight -
+            targetOuterHeight
+        );
 
 
-/*
- * Ask the opener to perform the resize when this window
- * cannot resize itself.
- */
+    if (
+        widthDifference <= 2 &&
+        heightDifference <= 2
+    ) {
 
-function requestOpenerResize() {
+        /*
+         * It is already correctly sized.
+         *
+         * Still report it to the opener.
+         */
+        sendResizeRequest(
+            "already-correct"
+        );
 
-    const target =
-        getDesiredPopupSize();
+        return true;
+
+    }
+
+
+    resizeInProgress = true;
 
 
     try {
 
-        if (
-            window.opener &&
-            !window.opener.closed
-        ) {
-
-            window.opener.postMessage(
-                {
-                    type:
-                        "YOUARE_RESIZE_REQUEST",
-
-                    outerWidth:
-                        target.outerWidth,
-
-                    outerHeight:
-                        target.outerHeight,
-
-                    viewportWidth:
-                        target.viewportWidth,
-
-                    viewportHeight:
-                        target.viewportHeight
-                },
-                window.location.origin
-            );
-
-            return true;
-
-        }
+        window.resizeTo(
+            targetOuterWidth,
+            targetOuterHeight
+        );
 
     } catch (_) {
 
-        /* Ignore inaccessible/closed opener. */
+        resizeInProgress = false;
+
+        /*
+         * Even when resizeTo() fails,
+         * notify the opener.
+         */
+        sendResizeRequest(
+            "self-resize-failed"
+        );
+
+        return false;
 
     }
 
 
-    return false;
+    setTimeout(
+        () => {
+
+            resizeInProgress = false;
+
+            updateScale();
+
+            /*
+             * ALWAYS report again after resize.
+             */
+            sendResizeRequest(
+                "post-resize"
+            );
+
+        },
+        100
+    );
+
+
+    return true;
 
 }
 
 
-/*
- * Final resize operation used immediately before navigation.
- *
- * First try the popup itself.
- *
- * If that fails, ask index.html to resize this window.
- *
- * We wait briefly for the opener to perform the request before
- * navigating away.
- */
+/* ============================================================
+   INITIAL RESIZE
+   ============================================================ */
 
-async function prepareWindowForRedirect() {
+function initialPopupResize() {
 
-    const selfResizeWorked =
-        await resizePopupToActualSize();
+    requestAnimationFrame(
+        () => {
 
+            requestAnimationFrame(
+                () => {
 
-    if (selfResizeWorked) {
+                    updateScale();
 
-        return;
+                    /*
+                     * Send first, regardless of whether
+                     * resizeTo() works.
+                     */
+                    sendResizeRequest(
+                        "initial"
+                    );
 
-    }
+                    /*
+                     * Then try resizing ourselves.
+                     */
+                    resizeOwnPopup();
 
-
-    const requested =
-        requestOpenerResize();
-
-
-    if (!requested) {
-
-        return;
-
-    }
-
-
-    /*
-     * Give index.html enough time to execute resizeTo().
-     *
-     * Navigation follows immediately afterwards.
-     */
-
-    await new Promise(
-        resolve => {
-
-            setTimeout(
-                resolve,
-                120
+                }
             );
 
         }
     );
 
 }
+
+
+initialPopupResize();
+
+
+window.addEventListener(
+    "load",
+    () => {
+
+        updateScale();
+
+        initialPopupResize();
+
+    },
+    {
+        once: true
+    }
+);
+
+
+/*
+ * Browser viewport changed.
+ */
+window.addEventListener(
+    "resize",
+    () => {
+
+        updateScale();
+
+        sendResizeRequest(
+            "window-resize"
+        );
+
+        setTimeout(
+            () => {
+
+                resizeOwnPopup();
+
+            },
+            50
+        );
+
+    }
+);
 
 
 /* ============================================================
@@ -930,14 +1012,11 @@ function showPopup(
     popupMessage.textContent =
         message;
 
-
     popupIcon.textContent =
         icon;
 
-
     popupButtons.innerHTML =
         "";
-
 
     popupOverlay.classList.add(
         "visible"
@@ -1058,7 +1137,9 @@ function playAudio() {
         "function"
     ) {
 
-        promise.catch(() => {});
+        promise.catch(
+            () => {}
+        );
 
     }
 
@@ -1144,12 +1225,10 @@ setInterval(
 let redirecting = false;
 
 
-async function redirectToDiscord() {
+function redirectToDiscord() {
 
     if (redirecting) {
-
         return;
-
     }
 
 
@@ -1157,19 +1236,35 @@ async function redirectToDiscord() {
 
 
     /*
-     * Resize immediately before the navigation.
+     * IMPORTANT:
+     *
+     * Always tell the opener the current dimensions
+     * immediately before navigation.
      */
-
-    await prepareWindowForRedirect();
+    sendResizeRequest(
+        "before-redirect"
+    );
 
 
     /*
-     * Navigate only after the resize/fallback request
-     * has been given a chance to execute.
+     * Also make a final attempt to resize ourselves.
      */
+    resizeOwnPopup();
 
-    window.location.href =
-        "discord.html";
+
+    /*
+     * Give postMessage its normal event-loop
+     * opportunity before navigating.
+     */
+    setTimeout(
+        () => {
+
+            window.location.href =
+                "discord.html";
+
+        },
+        0
+    );
 
 }
 
@@ -1181,9 +1276,7 @@ async function redirectToDiscord() {
 async function handleNo() {
 
     if (redirecting) {
-
         return;
-
     }
 
 
@@ -1220,9 +1313,7 @@ yesButton.addEventListener(
     async () => {
 
         if (redirecting) {
-
             return;
-
         }
 
 
@@ -1331,12 +1422,14 @@ titlebar.addEventListener(
         dragStartPointerX =
             event.clientX;
 
+
         dragStartPointerY =
             event.clientY;
 
 
         dragStartWindowX =
             windowX;
+
 
         dragStartWindowY =
             windowY;
@@ -1385,13 +1478,11 @@ titlebar.addEventListener(
 
 
         const renderedWidth =
-            BASE_WIDTH *
-            scale;
+            BASE_WIDTH * scale;
 
 
         const renderedHeight =
-            BASE_HEIGHT *
-            scale;
+            BASE_HEIGHT * scale;
 
 
         const minVisible =
@@ -1432,6 +1523,15 @@ titlebar.addEventListener(
 
         questionWindow.style.transform =
             `scale(${scale})`;
+
+
+        /*
+         * Tell the opener if the rendered size
+         * changes while dragging/rescaling.
+         */
+        sendResizeRequest(
+            "drag"
+        );
 
     }
 );
@@ -1493,5 +1593,7 @@ document
         }
     );
 
-</script></body>
+</script>
+
+</body>
 </html>
