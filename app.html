@@ -1,377 +1,349 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 
-<head>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
 
-    <meta charset="UTF-8">
+<title>Are you an idiot?</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
 
-    <title>Are you an idiot?</title>
+<style>
 
+    * {
+        box-sizing: border-box;
+    }
 
-    <style>
 
-        * {
-            box-sizing: border-box;
-        }
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
 
 
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-        }
+    body {
+        background: #008080;
 
+        overflow: hidden;
 
-        body {
-            background: #008080;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-            overflow: hidden;
+        font-size: 11px;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
 
-            font-size: 11px;
+        display: flex;
 
-            user-select: none;
-            -webkit-user-select: none;
+        align-items: center;
+        justify-content: center;
+    }
 
-            display: flex;
 
-            align-items: center;
-            justify-content: center;
-        }
+    #popup-overlay {
+        position: fixed;
 
+        inset: 0;
 
-        /* ============================================================
-           WINDOWS 95 MESSAGE BOX
-           ============================================================ */
+        display: none;
 
-        #popup-overlay {
-            position: fixed;
+        z-index: 100000;
+    }
 
-            inset: 0;
 
-            display: none;
+    #popup-overlay.visible {
+        display: block;
+    }
 
-            z-index: 100000;
-        }
 
+    #popup {
+        position: fixed;
 
-        #popup-overlay.visible {
-            display: block;
-        }
+        left: 50%;
+        top: 50%;
 
+        transform:
+            translate(-50%, -50%);
 
-        #popup {
-            position: fixed;
+        width:
+            min(
+                500px,
+                calc(100vw - 30px)
+            );
 
-            left: 50%;
-            top: 50%;
+        background: #c0c0c0;
 
-            transform:
-                translate(-50%, -50%);
+        border: 2px solid;
 
-            width:
-                min(
-                    500px,
-                    calc(100vw - 30px)
-                );
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            background: #c0c0c0;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
+    }
 
-            border: 2px solid;
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+    #popup-titlebar {
+        height: 22px;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
-        }
+        display: flex;
 
+        align-items: center;
 
-        #popup-titlebar {
-            height: 22px;
+        padding-left: 4px;
+        padding-right: 2px;
 
-            display: flex;
+        background: #000080;
 
-            align-items: center;
+        color: #ffffff;
 
-            padding-left: 4px;
-            padding-right: 2px;
+        font-size: 13px;
 
-            background: #000080;
+        font-weight: bold;
 
-            color: #ffffff;
+        line-height: 18px;
+    }
 
-            font-size: 13px;
 
-            font-weight: bold;
+    #popup-title {
+        flex: 1;
 
-            line-height: 18px;
-        }
+        white-space: nowrap;
 
+        overflow: hidden;
 
-        #popup-title {
-            flex: 1;
+        text-overflow: ellipsis;
+    }
 
-            white-space: nowrap;
 
-            overflow: hidden;
+    #popup-close {
+        width: 19px;
+        height: 18px;
 
-            text-overflow: ellipsis;
-        }
+        padding: 0;
 
+        background: #c0c0c0;
 
-        #popup-close {
-            width: 19px;
-            height: 18px;
+        border: 2px solid;
 
-            padding: 0;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            background: #c0c0c0;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            border: 2px solid;
+        font-family:
+            Arial,
+            sans-serif;
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        font-size: 11px;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+        font-weight: bold;
 
-            font-family:
-                Arial,
-                sans-serif;
+        line-height: 13px;
 
-            font-size: 11px;
+        cursor: default;
+    }
 
-            font-weight: bold;
 
-            line-height: 13px;
+    #popup-close:active {
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
 
-            cursor: default;
-        }
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
+    }
 
 
-        #popup-close:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
+    #popup-content {
+        min-height: 90px;
 
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
-        }
+        display: flex;
 
+        align-items: center;
 
-        #popup-content {
-            min-height: 90px;
+        padding: 18px;
+    }
 
-            display: flex;
 
-            align-items: center;
+    #popup-icon {
+        width: 32px;
+        min-width: 32px;
 
-            padding: 18px;
-        }
+        height: 32px;
 
+        margin-right: 18px;
 
-        #popup-icon {
-            width: 32px;
-            min-width: 32px;
+        display: flex;
 
-            height: 32px;
+        align-items: center;
+        justify-content: center;
 
-            margin-right: 18px;
+        color: #000000;
 
-            display: flex;
+        font-family:
+            Arial,
+            sans-serif;
 
-            align-items: center;
-            justify-content: center;
+        font-size: 26px;
 
-            color: #000000;
+        font-weight: bold;
 
-            font-family:
-                Arial,
-                sans-serif;
+        line-height: 32px;
 
-            font-size: 26px;
+        text-align: center;
+    }
 
-            font-weight: bold;
 
-            line-height: 32px;
+    #popup-message {
+        flex: 1;
 
-            text-align: center;
-        }
+        font-size: 13px;
 
+        color: #000000;
 
-        #popup-message {
-            flex: 1;
+        line-height: 1.35;
+    }
 
-            font-size: 13px;
 
-            color: #000000;
+    #popup-buttons {
+        display: flex;
 
-            line-height: 1.35;
-        }
+        justify-content: center;
 
+        gap: 8px;
 
-        #popup-buttons {
-            display: flex;
+        padding:
+            0
+            12px
+            14px;
+    }
 
-            justify-content: center;
 
-            gap: 8px;
+    #popup-buttons button {
+        min-width: 75px;
 
-            padding:
-                0
-                12px
-                14px;
-        }
+        height: 27px;
 
+        padding:
+            2px
+            12px;
 
-        #popup-buttons button {
-            min-width: 75px;
+        background: #c0c0c0;
 
-            height: 27px;
+        border: 2px solid;
 
-            padding:
-                2px
-                12px;
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
 
-            background: #c0c0c0;
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
 
-            border: 2px solid;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
+        font-size: 12px;
 
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+        color: #000000;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
+        cursor: default;
+    }
 
-            font-size: 12px;
 
-            color: #000000;
+    #popup-buttons button:active {
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
 
-            cursor: default;
-        }
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
+    }
 
 
-        #popup-buttons button:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
+    #popup-buttons button:focus {
+        outline: 1px dotted #000000;
 
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
-        }
+        outline-offset: -5px;
+    }
 
+</style>
 
-        #popup-buttons button:focus {
-            outline: 1px dotted #000000;
+</head><body><div id="popup-overlay"><div id="popup">
 
-            outline-offset: -5px;
-        }
+    <div id="popup-titlebar">
 
-    </style>
+        <span id="popup-title">
+            YouAreAnIdiot
+        </span>
 
-</head>
 
-
-<body>
-
-
-<!-- ============================================================
-     PERMISSION MESSAGE
-     ============================================================ -->
-
-<div id="popup-overlay">
-
-    <div id="popup">
-
-        <div id="popup-titlebar">
-
-            <span id="popup-title">
-                YouAreAnIdiot
-            </span>
-
-
-            <button
-                id="popup-close"
-                type="button"
-            >×</button>
-
-        </div>
-
-
-        <div id="popup-content">
-
-            <div id="popup-icon">
-                !
-            </div>
-
-
-            <div id="popup-message"></div>
-
-        </div>
-
-
-        <div id="popup-buttons"></div>
+        <button
+            id="popup-close"
+            type="button"
+        >×</button>
 
     </div>
 
+
+    <div id="popup-content">
+
+        <div id="popup-icon">
+            !
+        </div>
+
+
+        <div id="popup-message"></div>
+
+    </div>
+
+
+    <div id="popup-buttons"></div>
+
 </div>
 
+</div><audio
+id="autoplay-test-audio"
+preload="auto"
+loop
 
-<!-- ============================================================
-     AUDIO USED FOR AUTOPLAY TEST
-     ============================================================ -->
+«»
 
-<audio
-    id="autoplay-test-audio"
-    preload="auto"
-    loop
+<source
+    src="/media/youare-long.mp3"
+    type="audio/mpeg"
 >
-    <source
-        src="/media/youare-long.mp3"
-        type="audio/mpeg"
-    >
-</audio>
 
-
-<script>
+</audio><script>
 
 "use strict";
 
@@ -385,17 +357,23 @@ const POPUP_TEST_COUNT = 3;
 const TEST_PAGE =
     "test.html";
 
-/*
- * This is the actual question window.
- *
- * IMPORTANT:
- *
- * getPopupFeatures() controls its INITIAL size.
- *
- * It is NOT resized to the Discord size here.
- */
 const TARGET_PAGE =
     "popup.html";
+
+const DISCORD_PAGE =
+    "discord.html";
+
+
+/*
+ * How often the real popup is checked.
+ *
+ * window.closed is cheap to poll and works even when
+ * the child window is on another page, as long as the
+ * WindowProxy remains available.
+ */
+
+const TARGET_CHECK_INTERVAL =
+    250;
 
 
 /* ============================================================
@@ -465,6 +443,27 @@ let permissionMessageVisible =
 
 
 let popupResolver =
+    null;
+
+
+/*
+ * Reference to the ACTUAL popup.html window.
+ */
+
+let targetPopup =
+    null;
+
+
+/*
+ * Prevent the closed-popup redirect from
+ * happening more than once.
+ */
+
+let targetPopupFinished =
+    false;
+
+
+let targetPopupMonitor =
     null;
 
 
@@ -654,7 +653,8 @@ async function checkAutoplay() {
 async function showAutoplayMessage() {
 
     if (
-        autoplayAllowed
+        autoplayAllowed ||
+        permissionMessageVisible
     ) {
 
         return;
@@ -668,13 +668,6 @@ async function showAutoplayMessage() {
         ["OK"]
     );
 
-
-    /*
-     * The OK click itself is a user gesture.
-     *
-     * Try playback immediately while that
-     * gesture is still active.
-     */
 
     try {
 
@@ -777,10 +770,6 @@ function tryUnlockAutoplay() {
 }
 
 
-/*
- * pointerdown works for mouse, touch and pen.
- */
-
 document.addEventListener(
     "pointerdown",
     tryUnlockAutoplay,
@@ -789,11 +778,6 @@ document.addEventListener(
     }
 );
 
-
-/*
- * Keyboard interaction can also unlock
- * media autoplay in browsers that permit it.
- */
 
 document.addEventListener(
     "keydown",
@@ -811,10 +795,6 @@ document.addEventListener(
 window.addEventListener(
     "message",
     event => {
-
-        /*
-         * Only accept same-origin messages.
-         */
 
         if (
             event.origin !==
@@ -842,26 +822,19 @@ window.addEventListener(
 
 
         /*
-         * event.source is the actual popup.html
-         * WindowProxy that requested the resize.
+         * Only allow the REAL target popup to
+         * request the resize.
          */
 
-        const childWindow =
-            event.source;
-
-
         if (
-            !childWindow
+            !targetPopup ||
+            event.source !== targetPopup
         ) {
 
             return;
 
         }
 
-
-        /*
-         * Validate the requested dimensions.
-         */
 
         const width =
             Number(data.width);
@@ -882,10 +855,6 @@ window.addEventListener(
 
         }
 
-
-        /*
-         * Prevent absurd dimensions.
-         */
 
         const safeWidth =
             Math.round(
@@ -911,33 +880,19 @@ window.addEventListener(
             );
 
 
-        /*
-         * This resize happens ONLY when
-         * popup.html explicitly sends the
-         * YOUARE_REQUEST_DISCORD_SIZE message.
-         *
-         * Nothing here runs during startup.
-         */
-
         try {
 
-            childWindow.resizeTo(
+            targetPopup.resizeTo(
                 safeWidth,
                 safeHeight
             );
 
-        } catch (_) {
-
-            /*
-             * Some browsers refuse resizeTo().
-             */
-
-        }
+        } catch (_) {}
 
 
         try {
 
-            childWindow.focus();
+            targetPopup.focus();
 
         } catch (_) {}
 
@@ -1097,15 +1052,6 @@ function getPopupFeatures() {
         );
 
 
-    /*
-     * Fake question-window aspect ratio.
-     *
-     * This determines the size when popup.html
-     * is FIRST opened.
-     *
-     * It is intentionally NOT the Discord size.
-     */
-
     const aspectRatio =
         928 / 929;
 
@@ -1199,13 +1145,121 @@ function getPopupFeatures() {
 
 
 /* ============================================================
+   REAL POPUP CLOSED HANDLER
+   ============================================================ */
+
+function handleTargetPopupClosed() {
+
+    if (
+        targetPopupFinished
+    ) {
+
+        return;
+
+    }
+
+
+    targetPopupFinished =
+        true;
+
+
+    if (
+        targetPopupMonitor
+    ) {
+
+        clearInterval(
+            targetPopupMonitor
+        );
+
+        targetPopupMonitor =
+            null;
+
+    }
+
+
+    targetPopup =
+        null;
+
+
+    /*
+     * Redirect ONLY after the actual popup
+     * window has really been closed.
+     */
+
+    window.location.href =
+        DISCORD_PAGE;
+
+}
+
+
+/* ============================================================
+   MONITOR REAL POPUP
+   ============================================================ */
+
+function monitorTargetPopup(
+    popup
+) {
+
+    if (
+        targetPopupMonitor
+    ) {
+
+        clearInterval(
+            targetPopupMonitor
+        );
+
+    }
+
+
+    targetPopupMonitor =
+        setInterval(
+            () => {
+
+                /*
+                 * The popup may become inaccessible
+                 * in unusual browser situations.
+                 *
+                 * window.closed is the important check.
+                 */
+
+                try {
+
+                    if (
+                        popup.closed
+                    ) {
+
+                        handleTargetPopupClosed();
+
+                    }
+
+                } catch (_) {
+
+                    /*
+                     * If reading .closed itself throws,
+                     * do not immediately redirect.
+                     *
+                     * Keep monitoring because the
+                     * popup may still exist.
+                     */
+
+                }
+
+            },
+            TARGET_CHECK_INTERVAL
+        );
+
+}
+
+
+/* ============================================================
    OPEN QUESTION POPUP
    ============================================================ */
 
 function openQuestionPopup() {
 
     if (
-        openingTarget
+        openingTarget ||
+        targetPopup
     ) {
 
         return;
@@ -1217,14 +1271,9 @@ function openQuestionPopup() {
         true;
 
 
-    /*
-     * IMPORTANT:
-     *
-     * These features define the INITIAL
-     * fake-window size.
-     *
-     * There is NO Discord-size resize here.
-     */
+    targetPopupFinished =
+        false;
+
 
     const features =
         getPopupFeatures();
@@ -1251,6 +1300,10 @@ function openQuestionPopup() {
     }
 
 
+    /*
+     * A blocked popup normally returns null.
+     */
+
     if (
         !popup
     ) {
@@ -1275,11 +1328,28 @@ function openQuestionPopup() {
 
 
     /*
-     * The popup stays at the fake-window size.
+     * Save the WindowProxy immediately.
      *
-     * popup.html itself will later request the
-     * Discord size only when it redirects.
+     * This is what lets index.html detect when
+     * the actual popup is closed.
      */
+
+    targetPopup =
+        popup;
+
+
+    openingTarget =
+        false;
+
+
+    /*
+     * Start monitoring immediately.
+     */
+
+    monitorTargetPopup(
+        popup
+    );
+
 
     try {
 
@@ -1334,7 +1404,24 @@ function testPopupPermission() {
                 );
 
 
-            void testPopup;
+            /*
+             * Do not keep these windows around.
+             *
+             * test.html is responsible for sending
+             * its success message.
+             */
+
+            if (
+                testPopup
+            ) {
+
+                try {
+
+                    testPopup.blur();
+
+                } catch (_) {}
+
+            }
 
         } catch (_) {}
 
@@ -1373,29 +1460,19 @@ window.addEventListener(
     async () => {
 
         /*
-         * Check autoplay independently.
-         *
-         * This does NOT resize or open the
-         * question popup.
+         * Run both checks independently.
          */
 
         const autoplay =
             await checkAutoplay();
 
 
-        /*
-         * Popup permission testing is independent
-         * of autoplay.
-         */
-
         testPopupPermission();
 
 
         /*
-         * If autoplay is blocked, tell the user.
-         *
-         * This does not prevent popup.html
-         * from opening.
+         * Autoplay warning is independent from
+         * popup permission.
          */
 
         if (
@@ -1407,7 +1484,6 @@ window.addEventListener(
 
                     if (
                         !permissionMessageVisible &&
-                        !popupAllowed &&
                         !autoplayAllowed
                     ) {
 
@@ -1436,9 +1512,15 @@ window.addEventListener(
     "focus",
     () => {
 
+        /*
+         * Do not retest popup permission after
+         * the real question popup has already opened.
+         */
+
         if (
             !popupAllowed &&
-            !permissionMessageVisible
+            !permissionMessageVisible &&
+            !targetPopup
         ) {
 
             popupTestStarted =
@@ -1498,7 +1580,5 @@ document.addEventListener(
     }
 );
 
-</script>
-
-</body>
+</script></body>
 </html>
