@@ -39,7 +39,6 @@
             justify-content: center;
         }
 
-
         /* ============================================================
            MAIN WINDOW
            ============================================================ */
@@ -47,10 +46,6 @@
         #question-window {
             position: absolute;
 
-            /*
-             * Everything inside this window uses the original
-             * 928 × 929 coordinate system.
-             */
             width: 928px;
             height: 929px;
 
@@ -78,7 +73,6 @@
 
             overflow: hidden;
         }
-
 
         /* ============================================================
            TITLE BAR
@@ -119,10 +113,8 @@
 
         #title {
             flex: 1;
-
             pointer-events: none;
         }
-
 
         /* ============================================================
            TITLE BAR BUTTONS
@@ -140,7 +132,6 @@
             justify-content: center;
 
             background: #c0c0c0;
-
             color: #000000;
 
             border: 2px solid;
@@ -174,7 +165,6 @@
             opacity: 1;
         }
 
-
         /* ============================================================
            GIF
            ============================================================ */
@@ -194,7 +184,6 @@
 
             pointer-events: none;
         }
-
 
         /* ============================================================
            QUESTION
@@ -231,7 +220,6 @@
             text-align: center;
         }
 
-
         /* ============================================================
            ANSWER BUTTONS
            ============================================================ */
@@ -245,7 +233,6 @@
             padding: 0;
 
             background: #c0c0c0;
-
             color: #000000;
 
             font-family: Verdana, sans-serif;
@@ -311,7 +298,6 @@
             width: 244px;
         }
 
-
         /* ============================================================
            CUSTOM MESSAGE BOX
            ============================================================ */
@@ -339,6 +325,7 @@
             transform: translate(-50%, -50%);
 
             min-width: 390px;
+            max-width: min(500px, calc(100vw - 30px));
 
             background: #c0c0c0;
 
@@ -448,6 +435,8 @@
             font-size: 13px;
 
             color: #000000;
+
+            line-height: 1.35;
         }
 
         #popup-buttons {
@@ -544,7 +533,6 @@
 
         </div>
 
-
         <img
             id="pictureBox1"
             src="media/idiot.gif"
@@ -552,13 +540,11 @@
             draggable="false"
         >
 
-
         <div id="question-area">
             <div id="question">
                 Are You An Idiot ?
             </div>
         </div>
-
 
         <button
             class="answer"
@@ -686,23 +672,7 @@
 
         /* ============================================================
            RESPONSIVE WINDOW SCALING
-           ============================================================
-           
-           The internal coordinate system remains exactly:
-
-               928 × 929
-
-           The whole window is then uniformly scaled so that BOTH
-           dimensions fit inside the current viewport.
-
-           This works for:
-             - desktop
-             - laptops
-             - tablets
-             - portrait phones
-             - landscape phones
-             - very small browser windows
-         ============================================================ */
+           ============================================================ */
 
         const BASE_WIDTH = 928;
         const BASE_HEIGHT = 929;
@@ -723,28 +693,16 @@
             const viewportHeight =
                 window.innerHeight;
 
-
-            /*
-             * Leave a tiny amount of breathing room around the
-             * window so its outer border isn't clipped.
-             */
-
             const availableWidth =
                 Math.max(1, viewportWidth - 4);
 
             const availableHeight =
                 Math.max(1, viewportHeight - 4);
 
-
             scale = Math.min(
                 availableWidth / BASE_WIDTH,
                 availableHeight / BASE_HEIGHT
             );
-
-
-            /*
-             * Never upscale beyond the original size.
-             */
 
             scale = Math.min(scale, 1);
 
@@ -762,24 +720,23 @@
                 questionWindow.style.transform =
                     `scale(${scale})`;
 
-                /*
-                 * Keep the dragged window within the viewport
-                 * as much as possible after an orientation change.
-                 */
-
                 const renderedWidth =
                     BASE_WIDTH * scale;
 
                 const renderedHeight =
                     BASE_HEIGHT * scale;
 
-
                 const maxX =
-                    Math.max(0, viewportWidth - renderedWidth);
+                    Math.max(
+                        0,
+                        viewportWidth - renderedWidth
+                    );
 
                 const maxY =
-                    Math.max(0, viewportHeight - renderedHeight);
-
+                    Math.max(
+                        0,
+                        viewportHeight - renderedHeight
+                    );
 
                 windowX =
                     Math.min(
@@ -792,7 +749,6 @@
                         Math.max(windowY, 0),
                         maxY
                     );
-
 
                 questionWindow.style.left =
                     `${windowX}px`;
@@ -816,6 +772,90 @@
                 setTimeout(updateScale, 50);
             }
         );
+
+
+        /* ============================================================
+           POPUP BLOCKER TEST
+           ============================================================
+
+           Three popup windows are opened immediately and then closed.
+
+           IMPORTANT:
+           window.open() returns:
+             - Window object -> popup was permitted
+             - null          -> popup was blocked
+
+           We deliberately do exactly THREE attempts.
+
+           No retry loop is used.
+           ============================================================ */
+
+        let popupTestComplete = false;
+
+
+        function testPopupPermission() {
+
+            if (popupTestComplete) {
+                return true;
+            }
+
+            popupTestComplete = true;
+
+            let allAllowed = true;
+
+            const testWindows = [];
+
+
+            for (let i = 0; i < 3; i++) {
+
+                let testWindow = null;
+
+                try {
+
+                    testWindow = window.open(
+                        "about:blank",
+                        `youare_popup_test_${i}`,
+                        "width=1,height=1,left=-10000,top=-10000"
+                    );
+
+                } catch (_) {
+
+                    testWindow = null;
+                }
+
+
+                if (!testWindow) {
+
+                    allAllowed = false;
+
+                } else {
+
+                    testWindows.push(
+                        testWindow
+                    );
+                }
+            }
+
+
+            /*
+             * Close every successfully opened test window
+             * immediately.
+             */
+
+            for (const testWindow of testWindows) {
+
+                try {
+                    testWindow.close();
+                } catch (_) {
+                    /*
+                     * Ignore a browser refusing the close.
+                     */
+                }
+            }
+
+
+            return allAllowed;
+        }
 
 
         /* ============================================================
@@ -872,7 +912,6 @@
                 .catch(() => {
                     /*
                      * Mobile browsers commonly block autoplay.
-                     * The first interaction retries it.
                      */
                 });
         }
@@ -985,6 +1024,46 @@
             () => {
                 closePopup("Close");
             }
+        );
+
+
+        /* ============================================================
+           POPUP BLOCKER MESSAGE
+           ============================================================ */
+
+        async function showPopupBlockedMessage() {
+
+            await showPopup(
+                "This recreation requires pop-up windows to be enabled in your browser. Please allow pop-ups for this site and reload the page.",
+                ["OK"],
+                "!"
+            );
+        }
+
+
+        /*
+         * Run the popup test as soon as the page has loaded.
+         *
+         * If all three test windows were successfully opened,
+         * nothing else happens and the page continues normally.
+         *
+         * If even one was blocked, display the custom 95/98-style
+         * message box.
+         */
+
+        window.addEventListener(
+            "load",
+            () => {
+
+                const popupsAllowed =
+                    testPopupPermission();
+
+                if (!popupsAllowed) {
+
+                    showPopupBlockedMessage();
+                }
+            },
+            { once: true }
         );
 
 
@@ -1119,10 +1198,6 @@
             "pointerdown",
             event => {
 
-                /*
-                 * Don't drag when clicking the title-bar controls.
-                 */
-
                 if (
                     event.target.closest(
                         ".window-button"
@@ -1137,11 +1212,6 @@
                 dragPointerId =
                     event.pointerId;
 
-
-                /*
-                 * If this is the first drag, convert the centered
-                 * window position into actual viewport coordinates.
-                 */
 
                 if (!manuallyPositioned) {
 
@@ -1201,22 +1271,19 @@
                 }
 
 
-                /*
-                 * Pointer movement is in CSS pixels.
-                 * The window position is also in CSS pixels.
-                 *
-                 * Therefore no division by scale is needed here.
-                 */
-
                 windowX =
                     dragStartWindowX +
-                    (event.clientX -
-                     dragStartPointerX);
+                    (
+                        event.clientX -
+                        dragStartPointerX
+                    );
 
                 windowY =
                     dragStartWindowY +
-                    (event.clientY -
-                     dragStartPointerY);
+                    (
+                        event.clientY -
+                        dragStartPointerY
+                    );
 
 
                 const renderedWidth =
@@ -1225,12 +1292,6 @@
                 const renderedHeight =
                     BASE_HEIGHT * scale;
 
-
-                /*
-                 * Keep at least part of the window visible.
-                 * This also prevents accidentally losing the
-                 * window on a phone.
-                 */
 
                 const minVisible =
                     Math.min(
@@ -1304,9 +1365,11 @@
 
 
             try {
+
                 titlebar.releasePointerCapture(
                     event.pointerId
                 );
+
             } catch (_) {
                 /*
                  * Pointer capture may already have been released.
@@ -1338,6 +1401,7 @@
                     event.preventDefault();
                 }
             );
+
     </script>
 
 </body>
