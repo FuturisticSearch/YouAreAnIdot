@@ -46,11 +46,6 @@
             justify-content: center;
         }
 
-
-        /* =====================================================
-           MAIN WINDOW
-           ===================================================== */
-
         #question-window {
             position: absolute;
 
@@ -82,11 +77,6 @@
 
             overflow: hidden;
         }
-
-
-        /* =====================================================
-           MAIN WINDOW TITLE BAR
-           ===================================================== */
 
         #titlebar {
             position: absolute;
@@ -172,11 +162,6 @@
                 inset -1px -1px 0 #dfdfdf;
         }
 
-
-        /* =====================================================
-           GIF
-           ===================================================== */
-
         #pictureBox1 {
             position: absolute;
 
@@ -191,11 +176,6 @@
             object-fit: fill;
             pointer-events: none;
         }
-
-
-        /* =====================================================
-           QUESTION
-           ===================================================== */
 
         #question-area {
             position: absolute;
@@ -231,11 +211,6 @@
             color: Indigo;
             text-align: center;
         }
-
-
-        /* =====================================================
-           ANSWER BUTTONS
-           ===================================================== */
 
         .answer {
             position: absolute;
@@ -316,11 +291,6 @@
             width: 244px;
         }
 
-
-        /* =====================================================
-           POPUP OVERLAY
-           ===================================================== */
-
         #popup-overlay {
             position: fixed;
 
@@ -329,26 +299,11 @@
             display: none;
 
             z-index: 100000;
-
-            /*
-             * Do not create a visible background here.
-             * The page behind the popup remains untouched.
-             */
-            background: transparent;
         }
 
         #popup-overlay.visible {
             display: block;
         }
-
-
-        /* =====================================================
-           POPUP
-           
-           No custom titlebar.
-           No X button.
-           The popup itself is the window.
-           ===================================================== */
 
         #popup {
             position: fixed;
@@ -359,21 +314,62 @@
             transform:
                 translate(-50%, -50%);
 
-            /*
-             * Dynamic sizing:
-             *
-             * - Never larger than 430px.
-             * - Never wider than 86vw.
-             * - Never taller than 70vh.
-             * - On tiny screens it automatically shrinks.
-             */
             width: min(
-                430px,
-                86vw,
-                calc(100vw - 24px)
+                500px,
+                calc(100vw - 30px),
+                calc(100vh - 30px)
             );
 
-            max-height: 70vh;
+            min-width: min(
+                390px,
+                calc(100vw - 30px),
+                calc(100vh - 30px)
+            );
+
+            background: #c0c0c0;
+
+            border: 2px solid;
+
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
+
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
+        }
+
+        #popup-titlebar {
+            height: 22px;
+
+            display: flex;
+            align-items: center;
+
+            padding-left: 4px;
+            padding-right: 2px;
+
+            background: #000080;
+            color: #ffffff;
+
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        #popup-title {
+            flex: 1;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #popup-close {
+            width: 19px;
+            height: 18px;
+
+            padding: 0;
 
             background: #c0c0c0;
 
@@ -389,35 +385,33 @@
                 inset 1px 1px 0 #dfdfdf,
                 inset -1px -1px 0 #808080;
 
-            overflow: hidden;
+            font-family: Arial, sans-serif;
 
-            /*
-             * Make the popup behave like a compact
-             * classic Windows dialog rather than
-             * a huge browser-sized window.
-             */
-            display: flex;
-            flex-direction: column;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 13px;
         }
 
+        #popup-close:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
 
-        /* =====================================================
-           POPUP CONTENT
-           ===================================================== */
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+        }
 
         #popup-content {
-            min-height: 76px;
+            min-height: 90px;
 
             display: flex;
             align-items: center;
 
-            padding: 14px;
+            padding: 18px;
         }
-
-
-        /* =====================================================
-           POPUP ICON
-           ===================================================== */
 
         #popup-icon {
             width: 32px;
@@ -425,7 +419,7 @@
 
             height: 32px;
 
-            margin-right: 14px;
+            margin-right: 18px;
 
             display: flex;
             align-items: center;
@@ -442,45 +436,27 @@
             text-align: center;
         }
 
-
-        /* =====================================================
-           POPUP MESSAGE
-           ===================================================== */
-
         #popup-message {
             flex: 1;
-
-            min-width: 0;
 
             font-size: 13px;
 
             color: #000000;
 
             line-height: 1.35;
-
-            overflow-wrap: break-word;
         }
-
-
-        /* =====================================================
-           POPUP BUTTONS
-           ===================================================== */
 
         #popup-buttons {
             display: flex;
 
             justify-content: center;
 
-            align-items: center;
-
-            flex-wrap: wrap;
-
             gap: 8px;
 
             padding:
                 0
                 12px
-                12px;
+                14px;
         }
 
         #popup-buttons button {
@@ -516,9 +492,6 @@
             font-size: 12px;
 
             color: #000000;
-
-            appearance: none;
-            -webkit-appearance: none;
         }
 
         #popup-buttons button:hover {
@@ -542,84 +515,10 @@
             outline-offset: -5px;
         }
 
-
-        /* =====================================================
-           SMALL VIEWPORT ADJUSTMENTS
-           ===================================================== */
-
-        @media (max-width: 450px) {
-
-            #popup {
-                width: calc(100vw - 20px);
-                max-height: 65vh;
-            }
-
-            #popup-content {
-                min-height: 68px;
-                padding: 11px;
-            }
-
-            #popup-icon {
-                width: 28px;
-                min-width: 28px;
-
-                height: 28px;
-
-                margin-right: 10px;
-
-                font-size: 23px;
-                line-height: 28px;
-            }
-
-            #popup-message {
-                font-size: 12px;
-            }
-
-            #popup-buttons {
-                gap: 6px;
-
-                padding:
-                    0
-                    8px
-                    9px;
-            }
-
-            #popup-buttons button {
-                min-width: 68px;
-                height: 25px;
-
-                padding:
-                    2px
-                    9px;
-
-                font-size: 11px;
-            }
-
-        }
-
-
-        @media (max-height: 450px) {
-
-            #popup {
-                max-height: calc(100vh - 20px);
-            }
-
-            #popup-content {
-                padding: 10px;
-                min-height: 60px;
-            }
-
-            #popup-buttons {
-                padding-bottom: 8px;
-            }
-
-        }
-
     </style>
 </head>
 
 <body>
-
 
 <main id="question-window">
 
@@ -651,14 +550,12 @@
 
     </div>
 
-
     <img
         id="pictureBox1"
         src="media/idiot.gif"
         alt=""
         draggable="false"
     >
-
 
     <div id="question-area">
 
@@ -668,7 +565,6 @@
 
     </div>
 
-
     <button
         class="answer"
         id="no"
@@ -677,7 +573,6 @@
         No, I'm not.
     </button>
 
-
     <button
         class="answer"
         id="none"
@@ -685,7 +580,6 @@
     >
         I don't know =[
     </button>
-
 
     <button
         class="answer"
@@ -698,22 +592,22 @@
 </main>
 
 
-<!-- =========================================================
-     POPUP
-     
-     IMPORTANT:
-     There is intentionally NO popup titlebar here.
-     The popup is only the grey Windows-style dialog itself.
-     ========================================================= -->
-
 <div id="popup-overlay">
 
-    <div
-        id="popup"
-        role="dialog"
-        aria-modal="true"
-        aria-live="assertive"
-    >
+    <div id="popup">
+
+        <div id="popup-titlebar">
+
+            <span id="popup-title">
+                YouAreAnIdiot
+            </span>
+
+            <button
+                id="popup-close"
+                type="button"
+            >×</button>
+
+        </div>
 
         <div id="popup-content">
 
@@ -774,14 +668,14 @@ const idiotAudio =
 const popupOverlay =
     document.getElementById("popup-overlay");
 
-const popup =
-    document.getElementById("popup");
-
 const popupMessage =
     document.getElementById("popup-message");
 
 const popupButtons =
     document.getElementById("popup-buttons");
+
+const popupClose =
+    document.getElementById("popup-close");
 
 const popupIcon =
     document.getElementById("popup-icon");
@@ -811,32 +705,18 @@ let manuallyPositioned = false;
 function updateScale() {
 
     const viewportWidth =
-        Math.max(
-            1,
-            window.innerWidth
-        );
+        Math.max(1, window.innerWidth);
 
     const viewportHeight =
-        Math.max(
-            1,
-            window.innerHeight
-        );
+        Math.max(1, window.innerHeight);
 
     scale = Math.min(
         viewportWidth / BASE_WIDTH,
         viewportHeight / BASE_HEIGHT
     );
 
-    scale = Math.min(
-        scale,
-        1
-    );
-
-    scale = Math.max(
-        scale,
-        0.1
-    );
-
+    scale = Math.min(scale, 1);
+    scale = Math.max(scale, 0.1);
 
     if (!manuallyPositioned) {
 
@@ -876,19 +756,13 @@ function updateScale() {
 
         windowX =
             Math.min(
-                Math.max(
-                    windowX,
-                    0
-                ),
+                Math.max(windowX, 0),
                 maxX
             );
 
         windowY =
             Math.min(
-                Math.max(
-                    windowY,
-                    0
-                ),
+                Math.max(windowY, 0),
                 maxY
             );
 
@@ -897,9 +771,7 @@ function updateScale() {
 
         questionWindow.style.top =
             `${windowY}px`;
-
     }
-
 }
 
 
@@ -926,74 +798,9 @@ window.addEventListener(
 
 
 /* ============================================================
-   POPUP DYNAMIC POSITION / SIZE
-   ============================================================ */
-
-/*
- * CSS already handles the main sizing.
- *
- * This function is intentionally lightweight.
- * It only makes sure that an unusually small viewport
- * can never leave the dialog outside the visible area.
- */
-
-function updatePopupBounds() {
-
-    if (
-        !popupOverlay.classList.contains(
-            "visible"
-        )
-    ) {
-
-        return;
-
-    }
-
-    const margin = 10;
-
-    const maxWidth =
-        Math.max(
-            120,
-            window.innerWidth -
-            margin * 2
-        );
-
-    const maxHeight =
-        Math.max(
-            60,
-            window.innerHeight -
-            margin * 2
-        );
-
-    popup.style.maxWidth =
-        `${maxWidth}px`;
-
-    popup.style.maxHeight =
-        `${maxHeight}px`;
-
-}
-
-
-window.addEventListener(
-    "resize",
-    updatePopupBounds
-);
-
-window.addEventListener(
-    "orientationchange",
-    () => {
-
-        setTimeout(
-            updatePopupBounds,
-            50
-        );
-
-    }
-);
-
-
-/* ============================================================
    DISCORD SIZE CALCULATION
+   IMPORTANT:
+   This is only used after the user continues.
    ============================================================ */
 
 function getDiscordPopupSize() {
@@ -1003,7 +810,6 @@ function getDiscordPopupSize() {
 
     const screenHeight =
         Number(window.screen.height);
-
 
     if (
         !Number.isFinite(screenWidth) ||
@@ -1018,7 +824,6 @@ function getDiscordPopupSize() {
         };
 
     }
-
 
     return {
 
@@ -1050,7 +855,6 @@ function requestOpenerResize() {
     const opener =
         window.opener;
 
-
     if (
         !opener ||
         opener.closed
@@ -1060,10 +864,8 @@ function requestOpenerResize() {
 
     }
 
-
     const size =
         getDiscordPopupSize();
-
 
     try {
 
@@ -1103,9 +905,11 @@ function resizeSelfToDiscordSize() {
     const size =
         getDiscordPopupSize();
 
-
+    /*
+     * Send the resize request immediately
+     * before navigating.
+     */
     requestOpenerResize();
-
 
     try {
 
@@ -1123,9 +927,12 @@ function resizeSelfToDiscordSize() {
 
     } catch (_) {}
 
-
+    /*
+     * Send again after resizeTo().
+     * This is still part of the user's
+     * explicit continuation action.
+     */
     requestOpenerResize();
-
 
     return size;
 
@@ -1154,21 +961,15 @@ function showPopup(
     popupButtons.innerHTML =
         "";
 
-
     popupOverlay.classList.add(
         "visible"
     );
-
-
-    updatePopupBounds();
-
 
     return new Promise(
         resolve => {
 
             popupResolver =
                 resolve;
-
 
             for (
                 const text of buttons
@@ -1179,14 +980,11 @@ function showPopup(
                         "button"
                     );
 
-
                 button.type =
                     "button";
 
-
                 button.textContent =
                     text;
-
 
                 button.addEventListener(
                     "click",
@@ -1199,37 +997,20 @@ function showPopup(
                     }
                 );
 
-
                 popupButtons.appendChild(
                     button
                 );
 
             }
 
-
             const firstButton =
                 popupButtons.querySelector(
                     "button"
                 );
 
-
             if (firstButton) {
 
-                /*
-                 * Focus after the button has actually
-                 * been inserted into the visible dialog.
-                 */
-                requestAnimationFrame(
-                    () => {
-
-                        try {
-
-                            firstButton.focus();
-
-                        } catch (_) {}
-
-                    }
-                );
+                firstButton.focus();
 
             }
 
@@ -1247,7 +1028,6 @@ function closePopup(
         "visible"
     );
 
-
     if (popupResolver) {
 
         const resolve =
@@ -1263,12 +1043,16 @@ function closePopup(
 }
 
 
-/*
- * There is intentionally no popup X button anymore.
- *
- * The original behavior of closing through the
- * popup titlebar is therefore removed.
- */
+popupClose.addEventListener(
+    "click",
+    () => {
+
+        closePopup(
+            "Close"
+        );
+
+    }
+);
 
 
 /* ============================================================
@@ -1281,7 +1065,6 @@ function playAudio() {
 
         const playPromise =
             idiotAudio.play();
-
 
         if (
             playPromise &&
@@ -1340,7 +1123,6 @@ setInterval(
 
         timerFT++;
 
-
         if (
             timerFT >= 1 &&
             timerFT <= 9
@@ -1350,7 +1132,6 @@ setInterval(
                 fontColors[timerFT];
 
         }
-
 
         if (
             timerFT >= 9
@@ -1378,27 +1159,30 @@ let redirecting = false;
 function redirectToDiscord() {
 
     if (redirecting) {
-
         return;
-
     }
-
 
     redirecting = true;
 
-
     /*
-     * Resize only as part of the user's
-     * continuation action.
+     * IMPORTANT:
+     *
+     * No resize request is made when popup.html
+     * loads.
+     *
+     * No resize request is made while the
+     * question is sitting on screen.
+     *
+     * The resize happens ONLY when this function
+     * is reached by the user's continuation action.
      */
 
     resizeSelfToDiscordSize();
 
-
     /*
      * Navigate immediately.
+     * No artificial timeout.
      */
-
     window.location.href =
         "discord.html";
 
@@ -1412,11 +1196,8 @@ function redirectToDiscord() {
 async function handleNo() {
 
     if (redirecting) {
-
         return;
-
     }
-
 
     await showPopup(
         "Oh... I think you are an idiot. XD",
@@ -1424,7 +1205,10 @@ async function handleNo() {
         "!"
     );
 
-
+    /*
+     * Resize + redirect only after
+     * the user presses OK.
+     */
     redirectToDiscord();
 
 }
@@ -1451,11 +1235,8 @@ yesButton.addEventListener(
     async () => {
 
         if (redirecting) {
-
             return;
-
         }
-
 
         const result =
             await showPopup(
@@ -1464,11 +1245,10 @@ yesButton.addEventListener(
                 "?"
             );
 
-
         /*
-         * Both choices continue to Discord.
+         * Both choices continue to Discord,
+         * exactly like question.html.
          */
-
         if (
             result === "Yes" ||
             result === "No" ||
@@ -1556,12 +1336,10 @@ titlebar.addEventListener(
 
         }
 
-
         dragging = true;
 
         dragPointerId =
             event.pointerId;
-
 
         if (
             !manuallyPositioned
@@ -1570,17 +1348,14 @@ titlebar.addEventListener(
             const rect =
                 questionWindow.getBoundingClientRect();
 
-
             windowX =
                 rect.left;
 
             windowY =
                 rect.top;
 
-
             manuallyPositioned =
                 true;
-
 
             questionWindow.style.left =
                 `${windowX}px`;
@@ -1588,12 +1363,10 @@ titlebar.addEventListener(
             questionWindow.style.top =
                 `${windowY}px`;
 
-
             questionWindow.style.transform =
                 `scale(${scale})`;
 
         }
-
 
         dragStartPointerX =
             event.clientX;
@@ -1601,18 +1374,15 @@ titlebar.addEventListener(
         dragStartPointerY =
             event.clientY;
 
-
         dragStartWindowX =
             windowX;
 
         dragStartWindowY =
             windowY;
 
-
         titlebar.setPointerCapture(
             event.pointerId
         );
-
 
         event.preventDefault();
 
@@ -1634,14 +1404,12 @@ titlebar.addEventListener(
 
         }
 
-
         windowX =
             dragStartWindowX +
             (
                 event.clientX -
                 dragStartPointerX
             );
-
 
         windowY =
             dragStartWindowY +
@@ -1650,13 +1418,11 @@ titlebar.addEventListener(
                 dragStartPointerY
             );
 
-
         const renderedWidth =
             BASE_WIDTH * scale;
 
         const renderedHeight =
             BASE_HEIGHT * scale;
-
 
         const minVisible =
             Math.min(
@@ -1664,33 +1430,27 @@ titlebar.addEventListener(
                 renderedWidth
             );
 
-
         const minVisibleY =
             Math.min(
                 30,
                 renderedHeight
             );
 
-
         const minX =
             -renderedWidth +
             minVisible;
-
 
         const maxX =
             window.innerWidth -
             minVisible;
 
-
         const minY =
             -renderedHeight +
             minVisibleY;
 
-
         const maxY =
             window.innerHeight -
             minVisibleY;
-
 
         windowX =
             Math.min(
@@ -1701,7 +1461,6 @@ titlebar.addEventListener(
                 maxX
             );
 
-
         windowY =
             Math.min(
                 Math.max(
@@ -1710,7 +1469,6 @@ titlebar.addEventListener(
                 ),
                 maxY
             );
-
 
         questionWindow.style.left =
             `${windowX}px`;
@@ -1737,11 +1495,9 @@ function stopDragging(event) {
 
     }
 
-
     dragging = false;
 
     dragPointerId = null;
-
 
     try {
 
@@ -1780,6 +1536,7 @@ document
 
         }
     );
+
 
 </script>
 
