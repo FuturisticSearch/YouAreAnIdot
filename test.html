@@ -2,75 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
     <title>Popup Test</title>
 </head>
 
 <body>
-
 <script>
 "use strict";
 
-/*
- * This page is only used to confirm that a popup
- * was actually opened and loaded.
- *
- * The parent page supplies:
- *
- *     ?id=0
- *     ?id=1
- *     ?id=2
- *
- * We send the ID back to the opener.
- */
+(function () {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
 
-const params = new URLSearchParams(
-    window.location.search
-);
+    /*
+     * Only send a result for one of the expected test IDs.
+     */
+    if (!["0", "1", "2"].includes(String(id))) {
+        return;
+    }
 
-const id = params.get("id");
+    function reportSuccess() {
+        if (!window.opener || window.opener.closed) {
+            return;
+        }
 
-/*
- * Only communicate with a real opener.
- */
-if (window.opener && !window.opener.closed) {
+        try {
+            window.opener.postMessage(
+                {
+                    type: "YOUARE_POPUP_TEST_SUCCESS",
+                    id: String(id)
+                },
+                window.location.origin
+            );
+        } catch (_) {
+            return;
+        }
 
-    try {
-
-        window.opener.postMessage(
-            {
-                type: "YOUARE_POPUP_TEST_SUCCESS",
-                id: id
-            },
-            window.location.origin
-        );
-
-    } catch (_) {
         /*
-         * Ignore communication failures.
+         * This window has completed its job.
+         * Close it so the user doesn't get three tiny windows.
          */
-    }
-}
-
-/*
- * Give the message a moment to reach the parent,
- * then close ourselves.
- */
-setTimeout(() => {
-
-    try {
-        window.close();
-    } catch (_) {
-        /* Ignore close failures. */
+        setTimeout(() => {
+            try {
+                window.close();
+            } catch (_) {
+                /* Ignore close failures. */
+            }
+        }, 50);
     }
 
-}, 100);
+    /*
+     * Wait until this popup has actually loaded.
+     */
+    if (document.readyState === "loading") {
+        window.addEventListener(
+            "DOMContentLoaded",
+            reportSuccess,
+            { once: true }
+        );
+    } else {
+        reportSuccess();
+    }
+})();
 </script>
-
 </body>
 </html>
