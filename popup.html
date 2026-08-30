@@ -1,5 +1,4 @@
-<!DOCTYPE html><html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8"><meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -8,6 +7,7 @@
 <title>Are You An Idiot?</title>
 
 <style>
+
     * {
         box-sizing: border-box;
     }
@@ -59,6 +59,7 @@
         background: #c0c0c0;
 
         border: 2px solid;
+
         border-color:
             #ffffff
             #000000
@@ -85,6 +86,7 @@
         align-items: center;
 
         padding-left: 4px;
+        padding-right: 2px;
 
         background: #000080;
         color: #ffffff;
@@ -99,11 +101,60 @@
     }
 
     #title {
+        flex: 1;
+
         pointer-events: none;
 
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .window-button {
+        width: 19px;
+        height: 18px;
+
+        padding: 0;
+        margin-left: 2px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: #c0c0c0;
+        color: #000000;
+
+        border: 2px solid;
+
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
+
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
+
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+        font-weight: bold;
+        line-height: 13px;
+
+        appearance: none;
+        -webkit-appearance: none;
+    }
+
+    .window-button:active {
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
+
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
     }
 
     #pictureBox1 {
@@ -153,7 +204,6 @@
         white-space: nowrap;
 
         color: Indigo;
-
         text-align: center;
     }
 
@@ -178,6 +228,7 @@
         font-size: 12px;
 
         border: 2px solid;
+
         border-color:
             #ffffff
             #000000
@@ -194,6 +245,10 @@
 
         appearance: none;
         -webkit-appearance: none;
+    }
+
+    .answer:hover {
+        background: #c0c0c0;
     }
 
     .answer:active {
@@ -265,6 +320,7 @@
         background: #c0c0c0;
 
         border: 2px solid;
+
         border-color:
             #ffffff
             #000000
@@ -286,7 +342,6 @@
         padding-right: 2px;
 
         background: #000080;
-
         color: #ffffff;
 
         font-size: 13px;
@@ -310,6 +365,7 @@
         background: #c0c0c0;
 
         border: 2px solid;
+
         border-color:
             #ffffff
             #000000
@@ -324,7 +380,6 @@
 
         font-size: 11px;
         font-weight: bold;
-
         line-height: 13px;
     }
 
@@ -334,6 +389,10 @@
             #ffffff
             #ffffff
             #000000;
+
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
     }
 
     #popup-content {
@@ -363,6 +422,9 @@
 
         font-size: 26px;
         font-weight: bold;
+        line-height: 32px;
+
+        text-align: center;
     }
 
     #popup-message {
@@ -423,19 +485,55 @@
         color: #000000;
     }
 
+    #popup-buttons button:hover {
+        background: #c0c0c0;
+    }
+
     #popup-buttons button:active {
         border-color:
             #000000
             #ffffff
             #ffffff
             #000000;
+
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
     }
+
+    #popup-buttons button:focus {
+        outline: 1px dotted #000000;
+        outline-offset: -5px;
+    }
+
 </style>
 
 </head><body><main id="question-window"><div id="titlebar">
+
     <span id="title">
         Are You An Idiot?
     </span>
+
+    <button
+        class="window-button"
+        id="minimize"
+        type="button"
+        disabled
+    >_</button>
+
+    <button
+        class="window-button"
+        id="maximize"
+        type="button"
+        disabled
+    >□</button>
+
+    <button
+        class="window-button"
+        id="close"
+        type="button"
+    >×</button>
+
 </div>
 
 <img
@@ -446,9 +544,11 @@
 >
 
 <div id="question-area">
+
     <div id="question">
         Are You An Idiot ?
     </div>
+
 </div>
 
 <button
@@ -517,7 +617,9 @@ loop
 >
 
 </audio><script>
+
 "use strict";
+
 
 /* ============================================================
    ELEMENTS
@@ -534,6 +636,9 @@ const noneButton =
 
 const yesButton =
     document.getElementById("yes");
+
+const closeButton =
+    document.getElementById("close");
 
 const idiotAudio =
     document.getElementById("idiot-audio");
@@ -578,37 +683,23 @@ let manuallyPositioned = false;
 function updateScale() {
 
     const viewportWidth =
-        window.innerWidth;
+        Math.max(1, window.innerWidth);
 
     const viewportHeight =
-        window.innerHeight;
-
+        Math.max(1, window.innerHeight);
 
     scale = Math.min(
         viewportWidth / BASE_WIDTH,
         viewportHeight / BASE_HEIGHT
     );
 
-
-    scale = Math.min(
-        scale,
-        1
-    );
-
-
-    scale = Math.max(
-        scale,
-        0.1
-    );
-
+    scale = Math.min(scale, 1);
+    scale = Math.max(scale, 0.1);
 
     if (!manuallyPositioned) {
 
-        questionWindow.style.left =
-            "50%";
-
-        questionWindow.style.top =
-            "50%";
+        questionWindow.style.left = "50%";
+        questionWindow.style.top = "50%";
 
         questionWindow.style.transform =
             `translate(-50%, -50%) scale(${scale})`;
@@ -618,8 +709,42 @@ function updateScale() {
         questionWindow.style.transform =
             `scale(${scale})`;
 
-    }
+        const renderedWidth =
+            BASE_WIDTH * scale;
 
+        const renderedHeight =
+            BASE_HEIGHT * scale;
+
+        const maxX =
+            Math.max(
+                0,
+                window.innerWidth - renderedWidth
+            );
+
+        const maxY =
+            Math.max(
+                0,
+                window.innerHeight - renderedHeight
+            );
+
+        windowX =
+            Math.min(
+                Math.max(windowX, 0),
+                maxX
+            );
+
+        windowY =
+            Math.min(
+                Math.max(windowY, 0),
+                maxY
+            );
+
+        questionWindow.style.left =
+            `${windowX}px`;
+
+        questionWindow.style.top =
+            `${windowY}px`;
+    }
 }
 
 
@@ -633,12 +758,7 @@ window.addEventListener(
 window.addEventListener(
     "orientationchange",
     () => {
-
-        setTimeout(
-            updateScale,
-            50
-        );
-
+        setTimeout(updateScale, 50);
     }
 );
 
@@ -646,16 +766,6 @@ window.addEventListener(
 /* ============================================================
    DISCORD SIZE CALCULATION
    ============================================================ */
-
-/*
- * IMPORTANT:
- *
- * Do not use innerWidth/innerHeight here.
- *
- * screen.width / screen.height describe the actual
- * display and therefore remain stable while popup.html
- * is being resized or navigated.
- */
 
 function getDiscordPopupSize() {
 
@@ -665,113 +775,68 @@ function getDiscordPopupSize() {
     const screenHeight =
         Number(window.screen.height);
 
-
     if (
         !Number.isFinite(screenWidth) ||
         !Number.isFinite(screenHeight) ||
         screenWidth <= 0 ||
         screenHeight <= 0
     ) {
-
         return {
             width: 320,
             height: 320
         };
-
     }
 
-
-    /*
-     * Same proportions as discord.html.
-     */
-
-    const width =
-        Math.max(
-            1,
-            Math.round(
-                screenWidth * 0.1875
-            )
-        );
-
-
-    const height =
-        Math.max(
-            1,
-            Math.round(
-                screenHeight * 0.2222
-            )
-        );
-
-
     return {
-        width,
-        height
-    };
+        width: Math.max(
+            1,
+            Math.round(screenWidth * 0.1875)
+        ),
 
+        height: Math.max(
+            1,
+            Math.round(screenHeight * 0.2222)
+        )
+    };
 }
 
 
 /* ============================================================
-   SEND SIZE MESSAGE TO OPENER
+   OPENER RESIZE HANDSHAKE
    ============================================================ */
 
 function requestOpenerResize() {
 
-    const opener =
-        window.opener;
+    const opener = window.opener;
 
-
-    if (
-        !opener ||
-        opener.closed
-    ) {
-
+    if (!opener || opener.closed) {
         return false;
-
     }
-
 
     const size =
         getDiscordPopupSize();
 
-
-    const message = {
-
-        type:
-            "YOUARE_REQUEST_DISCORD_SIZE",
-
-        width:
-            size.width,
-
-        height:
-            size.height,
-
-        source:
-            "popup.html",
-
-        timestamp:
-            Date.now()
-
-    };
-
-
     try {
 
-        /*
-         * Use "*" here rather than window.location.origin.
-         *
-         * The browser already guarantees that window.opener
-         * is the window which opened this popup.
-         *
-         * This also avoids failures caused by origin changes
-         * during navigation.
-         */
-
         opener.postMessage(
-            message,
+            {
+                type:
+                    "YOUARE_REQUEST_DISCORD_SIZE",
+
+                width:
+                    size.width,
+
+                height:
+                    size.height,
+
+                source:
+                    "popup.html",
+
+                timestamp:
+                    Date.now()
+            },
             "*"
         );
-
 
         return true;
 
@@ -780,29 +845,15 @@ function requestOpenerResize() {
         return false;
 
     }
-
 }
 
-
-/* ============================================================
-   RESIZE OUR OWN WINDOW
-   ============================================================ */
 
 function resizeSelfToDiscordSize() {
 
     const size =
         getDiscordPopupSize();
 
-
-    /*
-     * Always notify opener FIRST.
-     *
-     * This is important because the opener may be the only
-     * window that is allowed to resize this popup.
-     */
-
     requestOpenerResize();
-
 
     try {
 
@@ -810,30 +861,17 @@ function resizeSelfToDiscordSize() {
             typeof window.resizeTo ===
             "function"
         ) {
-
             window.resizeTo(
                 size.width,
                 size.height
             );
-
         }
 
     } catch (_) {}
 
-
-    /*
-     * Send another request immediately after resizeTo().
-     *
-     * This is intentional: the first request handles browsers
-     * that block resizeTo(), while the second handles browsers
-     * where resizeTo() changes the popup state first.
-     */
-
     requestOpenerResize();
 
-
     return size;
-
 }
 
 
@@ -843,73 +881,32 @@ function resizeSelfToDiscordSize() {
 
 function initialPopupResize() {
 
-    /*
-     * Do not wait for load.
-     *
-     * popup.html must request the Discord size as early as
-     * possible, before the user can interact with it.
-     */
-
     resizeSelfToDiscordSize();
-
 
     requestAnimationFrame(
         () => {
-
             resizeSelfToDiscordSize();
-
         }
     );
 
-
     setTimeout(
-        () => {
-
-            resizeSelfToDiscordSize();
-
-        },
+        resizeSelfToDiscordSize,
         30
     );
 
-
     setTimeout(
-        () => {
-
-            resizeSelfToDiscordSize();
-
-        },
+        resizeSelfToDiscordSize,
         80
     );
 
-
     setTimeout(
-        () => {
-
-            resizeSelfToDiscordSize();
-
-        },
+        resizeSelfToDiscordSize,
         150
     );
-
 }
 
 
 initialPopupResize();
-
-
-window.addEventListener(
-    "load",
-    () => {
-
-        updateScale();
-
-        resizeSelfToDiscordSize();
-
-    },
-    {
-        once: true
-    }
-);
 
 
 /* ============================================================
@@ -938,13 +935,11 @@ function showPopup(
         "visible"
     );
 
-
     return new Promise(
         resolve => {
 
             popupResolver =
                 resolve;
-
 
             for (
                 const text of buttons
@@ -955,49 +950,34 @@ function showPopup(
                         "button"
                     );
 
-
                 button.type =
                     "button";
-
 
                 button.textContent =
                     text;
 
-
                 button.addEventListener(
                     "click",
                     () => {
-
-                        closePopup(
-                            text
-                        );
-
+                        closePopup(text);
                     }
                 );
-
 
                 popupButtons.appendChild(
                     button
                 );
-
             }
-
 
             const firstButton =
                 popupButtons.querySelector(
                     "button"
                 );
 
-
             if (firstButton) {
-
                 firstButton.focus();
-
             }
-
         }
     );
-
 }
 
 
@@ -1009,7 +989,6 @@ function closePopup(
         "visible"
     );
 
-
     if (popupResolver) {
 
         const resolve =
@@ -1019,20 +998,14 @@ function closePopup(
             null;
 
         resolve(result);
-
     }
-
 }
 
 
 popupClose.addEventListener(
     "click",
     () => {
-
-        closePopup(
-            "Close"
-        );
-
+        closePopup("Close");
     }
 );
 
@@ -1045,22 +1018,18 @@ function playAudio() {
 
     try {
 
-        const promise =
+        const playPromise =
             idiotAudio.play();
 
-
         if (
-            promise &&
-            typeof promise.catch ===
+            playPromise &&
+            typeof playPromise.catch ===
             "function"
         ) {
-
-            promise.catch(() => {});
-
+            playPromise.catch(() => {});
         }
 
     } catch (_) {}
-
 }
 
 
@@ -1095,7 +1064,6 @@ const fontColors = [
 
 ];
 
-
 let timerFT = 0;
 
 
@@ -1104,27 +1072,20 @@ setInterval(
 
         timerFT++;
 
-
         if (
             timerFT >= 1 &&
             timerFT <= 9
         ) {
-
             question.style.color =
                 fontColors[timerFT];
-
         }
 
-
-        if (
-            timerFT >= 9
-        ) {
+        if (timerFT >= 9) {
 
             question.style.color =
                 "Snow";
 
             timerFT = 0;
-
         }
 
     },
@@ -1142,42 +1103,20 @@ let redirecting = false;
 function redirectToDiscord() {
 
     if (redirecting) {
-
         return;
-
     }
-
 
     redirecting = true;
 
-
-    /*
-     * Perform the resize handshake repeatedly while this
-     * document still exists.
-     */
-
     resizeSelfToDiscordSize();
-
-
-    /*
-     * One more message shortly before navigation.
-     */
 
     const resizeTimer =
         setTimeout(
             () => {
-
                 requestOpenerResize();
-
             },
             60
         );
-
-
-    /*
-     * Give the browser enough time to process the resize
-     * messages before replacing the document.
-     */
 
     setTimeout(
         () => {
@@ -1186,13 +1125,7 @@ function redirectToDiscord() {
                 resizeTimer
             );
 
-
-            /*
-             * Final request immediately before navigation.
-             */
-
             requestOpenerResize();
-
 
             window.location.href =
                 "discord.html";
@@ -1200,7 +1133,6 @@ function redirectToDiscord() {
         },
         180
     );
-
 }
 
 
@@ -1211,11 +1143,8 @@ function redirectToDiscord() {
 async function handleNo() {
 
     if (redirecting) {
-
         return;
-
     }
-
 
     await showPopup(
         "Oh... I think you are an idiot. XD",
@@ -1223,9 +1152,7 @@ async function handleNo() {
         "!"
     );
 
-
     redirectToDiscord();
-
 }
 
 
@@ -1233,7 +1160,6 @@ noButton.addEventListener(
     "click",
     handleNo
 );
-
 
 noneButton.addEventListener(
     "click",
@@ -1250,11 +1176,8 @@ yesButton.addEventListener(
     async () => {
 
         if (redirecting) {
-
             return;
-
         }
-
 
         const result =
             await showPopup(
@@ -1263,18 +1186,24 @@ yesButton.addEventListener(
                 "?"
             );
 
-
         if (
             result === "Yes" ||
             result === "No" ||
             result === "Close"
         ) {
-
             redirectToDiscord();
-
         }
-
     }
+);
+
+
+/* ============================================================
+   CLOSE BUTTON
+   ============================================================ */
+
+closeButton.addEventListener(
+    "click",
+    redirectToDiscord
 );
 
 
@@ -1286,12 +1215,8 @@ document.addEventListener(
     "keydown",
     event => {
 
-        if (
-            event.key === "Escape"
-        ) {
-
+        if (event.key === "Escape") {
             redirectToDiscord();
-
         }
 
     }
@@ -1305,9 +1230,7 @@ document.addEventListener(
 document.addEventListener(
     "contextmenu",
     event => {
-
         event.preventDefault();
-
     }
 );
 
@@ -1331,20 +1254,23 @@ titlebar.addEventListener(
     "pointerdown",
     event => {
 
+        if (
+            event.target.closest(
+                ".window-button"
+            )
+        ) {
+            return;
+        }
+
         dragging = true;
 
         dragPointerId =
             event.pointerId;
 
-
-        if (
-            !manuallyPositioned
-        ) {
+        if (!manuallyPositioned) {
 
             const rect =
-                questionWindow
-                    .getBoundingClientRect();
-
+                questionWindow.getBoundingClientRect();
 
             windowX =
                 rect.left;
@@ -1352,12 +1278,18 @@ titlebar.addEventListener(
             windowY =
                 rect.top;
 
-
             manuallyPositioned =
                 true;
 
-        }
+            questionWindow.style.left =
+                `${windowX}px`;
 
+            questionWindow.style.top =
+                `${windowY}px`;
+
+            questionWindow.style.transform =
+                `scale(${scale})`;
+        }
 
         dragStartPointerX =
             event.clientX;
@@ -1365,21 +1297,17 @@ titlebar.addEventListener(
         dragStartPointerY =
             event.clientY;
 
-
         dragStartWindowX =
             windowX;
 
         dragStartWindowY =
             windowY;
 
-
         titlebar.setPointerCapture(
             event.pointerId
         );
 
-
         event.preventDefault();
-
     }
 );
 
@@ -1393,11 +1321,8 @@ titlebar.addEventListener(
             event.pointerId !==
             dragPointerId
         ) {
-
             return;
-
         }
-
 
         windowX =
             dragStartWindowX +
@@ -1406,7 +1331,6 @@ titlebar.addEventListener(
                 dragStartPointerX
             );
 
-
         windowY =
             dragStartWindowY +
             (
@@ -1414,41 +1338,51 @@ titlebar.addEventListener(
                 dragStartPointerY
             );
 
-
         const renderedWidth =
             BASE_WIDTH * scale;
 
         const renderedHeight =
             BASE_HEIGHT * scale;
 
-
         const minVisible =
-            30;
+            Math.min(
+                30,
+                renderedWidth
+            );
 
+        const minVisibleY =
+            Math.min(
+                30,
+                renderedHeight
+            );
+
+        const minX =
+            -renderedWidth +
+            minVisible;
+
+        const maxX =
+            window.innerWidth -
+            minVisible;
+
+        const minY =
+            -renderedHeight +
+            minVisibleY;
+
+        const maxY =
+            window.innerHeight -
+            minVisibleY;
 
         windowX =
             Math.min(
-                Math.max(
-                    windowX,
-                    -renderedWidth +
-                    minVisible
-                ),
-                window.innerWidth -
-                minVisible
+                Math.max(windowX, minX),
+                maxX
             );
-
 
         windowY =
             Math.min(
-                Math.max(
-                    windowY,
-                    -renderedHeight +
-                    minVisible
-                ),
-                window.innerHeight -
-                minVisible
+                Math.max(windowY, minY),
+                maxY
             );
-
 
         questionWindow.style.left =
             `${windowX}px`;
@@ -1458,7 +1392,6 @@ titlebar.addEventListener(
 
         questionWindow.style.transform =
             `scale(${scale})`;
-
     }
 );
 
@@ -1470,16 +1403,11 @@ function stopDragging(event) {
         event.pointerId !==
         dragPointerId
     ) {
-
         return;
-
     }
 
-
     dragging = false;
-
     dragPointerId = null;
-
 
     try {
 
@@ -1488,7 +1416,6 @@ function stopDragging(event) {
         );
 
     } catch (_) {}
-
 }
 
 
@@ -1496,7 +1423,6 @@ titlebar.addEventListener(
     "pointerup",
     stopDragging
 );
-
 
 titlebar.addEventListener(
     "pointercancel",
@@ -1513,11 +1439,28 @@ document
     .addEventListener(
         "dragstart",
         event => {
-
             event.preventDefault();
-
         }
     );
+
+
+/* ============================================================
+   LOAD
+   ============================================================ */
+
+window.addEventListener(
+    "load",
+    () => {
+
+        updateScale();
+
+        resizeSelfToDiscordSize();
+
+    },
+    {
+        once: true
+    }
+);
 
 </script></body>
 </html>
