@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>Are You An Idiot?</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            overflow: hidden;
+
+            background: transparent;
+
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
+
+            font-size: 11px;
+
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+
+        /*
+         * The faux Windows window now fills the
+         * entire browser popup.
+         */
+        #question-window {
+            position: fixed;
+
+            inset: 0;
+
+            width: 100vw;
+            height: 100vh;
+
+            background: #c0c0c0;
+
+            border: 2px solid;
+
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
+
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
+
+            overflow: hidden;
+        }
+
+
+        /*
+         * Main title bar.
+         *
+         * No minimize/maximize/close buttons here.
+         */
+        #titlebar {
+            position: absolute;
+
+            left: 3px;
+            right: 3px;
+            top: 3px;
+
+            height: 22px;
+
+            display: flex;
+            align-items: center;
+
+            padding-left: 4px;
+            padding-right: 4px;
+
+            background: #000080;
+
+            color: #ffffff;
+
+            font-size: 13px;
+            font-weight: bold;
+
+            line-height: 18px;
+        }
+
+
+        #title {
+            flex: 1;
+
+            pointer-events: none;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        /*
+         * Main image.
+         *
+         * The original 928x929 layout is converted
+         * proportionally to the popup viewport.
+         */
+        #pictureBox1 {
+            position: absolute;
+
+            left: 3px;
+            top: 28px;
+
+            width: calc(100% - 6px);
+
+            height:
+                calc(100% - 187px);
+
+            display: block;
+
+            object-fit: fill;
+
+            pointer-events: none;
+        }
+
+
+        #question-area {
+            position: absolute;
+
+            left: 3px;
+            right: 3px;
+
+            bottom: 90px;
+
+            height: 90px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        #question {
+            margin: 0;
+
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
+
+            font-size:
+                clamp(
+                    16px,
+                    2.2vw,
+                    20px
+                );
+
+            font-weight: normal;
+
+            line-height: 1.2;
+
+            white-space: nowrap;
+
+            color: Indigo;
+
+            text-align: center;
+        }
+
+
+        /*
+         * ANSWER BUTTONS
+         */
+        .answer {
+            position: absolute;
+
+            bottom: 10px;
+
+            height: 57px;
+
+            padding: 0;
+
+            background: #c0c0c0;
+
+            color: #000000;
+
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
+
+            font-size:
+                clamp(
+                    11px,
+                    1.35vw,
+                    12px
+                );
+
+            font-weight: normal;
+
+            border: 2px solid;
+
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
+
+            border-radius: 0;
+
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
+
+            cursor: default;
+
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+
+        .answer:hover {
+            background: #c0c0c0;
+        }
+
+
+        .answer:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
+
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+
+            padding-left: 2px;
+            padding-top: 2px;
+        }
+
+
+        .answer:focus {
+            outline: 1px dotted #000000;
+            outline-offset: -5px;
+        }
+
+
+        #no {
+            left: 3%;
+            width: 28%;
+        }
+
+
+        #none {
+            left: 32%;
+            width: 38%;
+        }
+
+
+        #yes {
+            left: 71%;
+            width: 26%;
+        }
+
+
+        /*
+         * ============================================================
+         * MESSAGE BOX OVERLAY
+         * ============================================================
+         */
+
+        #popup-overlay {
+            position: fixed;
+
+            inset: 0;
+
+            display: none;
+
+            z-index: 100000;
+        }
+
+
+        #popup-overlay.visible {
+            display: block;
+        }
+
+
+        #popup {
+            position: fixed;
+
+            left: 50%;
+            top: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            min-width: 390px;
+
+            max-width:
+                min(
+                    500px,
+                    calc(100vw - 30px)
+                );
+
+            background: #c0c0c0;
+
+            border: 2px solid;
+
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
+
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
+
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
+        }
+
+
+        #popup-titlebar {
+            height: 22px;
+
+            display: flex;
+            align-items: center;
+
+            padding-left: 4px;
+            padding-right: 2px;
+
+            background: #000080;
+
+            color: #ffffff;
+
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+
+        #popup-title {
+            flex: 1;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        /*
+         * IMPORTANT:
+         * The popup/message box keeps its X.
+         */
+        #popup-close {
+            width: 19px;
+            height: 18px;
+
+            padding: 0;
+
+            background: #c0c0c0;
+
+            border: 2px solid;
+
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
+
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 11px;
+            font-weight: bold;
+
+            line-height: 13px;
+        }
+
+
+        #popup-close:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
+
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+        }
+
+
+        #popup-content {
+            min-height: 90px;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 18px;
+        }
+
+
+        #popup-icon {
+            width: 32px;
+            min-width: 32px;
+
+            height: 32px;
+
+            margin-right: 18px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            color: #000000;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 26px;
+            font-weight: bold;
+
+            line-height: 32px;
+
+            text-align: center;
+        }
+
+
+        #popup-message {
+            flex: 1;
+
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
+
+            font-size: 13px;
+
+            color: #000000;
+
+            line-height: 1.35;
+        }
+
+
+        #popup-buttons {
+            display: flex;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            padding:
+                0
+                12px
+                14px;
+        }
+
+
+        #popup-buttons button {
+            min-width: 75px;
+
+            height: 27px;
+
+            padding:
+                2px
+                12px;
+
+            background: #c0c0c0;
+
+            border: 2px solid;
+
+            border-color:
+                #ffffff
+                #000000
+                #000000
+                #ffffff;
+
+            box-shadow:
+                inset 1px 1px 0 #dfdfdf,
+                inset -1px -1px 0 #808080;
+
+            font-family:
+                "MS Sans Serif",
+                "Microsoft Sans Serif",
+                Tahoma,
+                Arial,
+                sans-serif;
+
+            font-size: 12px;
+
+            color: #000000;
+        }
+
+
+        #popup-buttons button:active {
+            border-color:
+                #000000
+                #ffffff
+                #ffffff
+                #000000;
+
+            box-shadow:
+                inset 1px 1px 0 #808080,
+                inset -1px -1px 0 #dfdfdf;
+        }
+
+
+        #popup-buttons button:focus {
+            outline: 1px dotted #000000;
+            outline-offset: -5px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<main id="question-window">
+
+    <div id="titlebar">
+        <span id="title">
+            Are You An Idiot?
+        </span>
+    </div>
+
+
+    <img
+        id="pictureBox1"
+        src="media/idiot.gif"
+        alt=""
+        draggable="false"
+    >
+
+
+    <div id="question-area">
+
+        <div id="question">
+            Are You An Idiot ?
+        </div>
+
+    </div>
+
+
+    <button
+        class="answer"
+        id="no"
+        type="button"
+    >
+        No, I'm not.
+    </button>
+
+
+    <button
+        class="answer"
+        id="none"
+        type="button"
+    >
+        I don't know =[
+    </button>
+
+
+    <button
+        class="answer"
+        id="yes"
+        type="button"
+    >
+        Yes, I am.
+    </button>
+
+</main>
+
+
+<!-- ============================================================
+     MESSAGE BOX
+     ============================================================ -->
+
+<div id="popup-overlay">
+
+    <div id="popup">
+
+        <div id="popup-titlebar">
+
+            <span id="popup-title">
+                YouAreAnIdiot
+            </span>
+
+            <button
+                id="popup-close"
+                type="button"
+            >×</button>
+
+        </div>
+
+
+        <div id="popup-content">
+
+            <div id="popup-icon">
+                !
+            </div>
+
+            <div id="popup-message"></div>
+
+        </div>
+
+
+        <div id="popup-buttons"></div>
+
+    </div>
+
+</div>
+
+
+<audio
+    id="idiot-audio"
+    preload="auto"
+    loop
+>
+
+    <source
+        src="/media/youare-long.mp3"
+        type="audio/mpeg"
+    >
+
+</audio>
+
+
+<script>
+
+"use strict";
+
+
+const question =
+    document.getElementById("question");
+
+const noButton =
+    document.getElementById("no");
+
+const noneButton =
+    document.getElementById("none");
+
+const yesButton =
+    document.getElementById("yes");
+
+const idiotAudio =
+    document.getElementById("idiot-audio");
+
+const popupOverlay =
+    document.getElementById("popup-overlay");
+
+const popupMessage =
+    document.getElementById("popup-message");
+
+const popupButtons =
+    document.getElementById("popup-buttons");
+
+const popupClose =
+    document.getElementById("popup-close");
+
+
+/*
+ * ============================================================
+ * REDIRECT
+ * ============================================================
+ */
+
+let redirecting = false;
+
+
+function redirectToDiscord() {
+
+    if (redirecting) {
+        return;
+    }
+
+    redirecting = true;
+
+    window.location.href =
+        "discord.html";
+}
+
+
+/*
+ * ============================================================
+ * MESSAGE BOX
+ * ============================================================
+ */
+
+let popupResolver = null;
+
+
+function showPopup(
+    message,
+    buttons,
+    icon = "!"
+) {
+
+    popupMessage.textContent =
+        message;
+
+    document.getElementById(
+        "popup-icon"
+    ).textContent =
+        icon;
+
+    popupButtons.innerHTML =
+        "";
+
+    popupOverlay.classList.add(
+        "visible"
+    );
+
+
+    return new Promise(
+        resolve => {
+
+            popupResolver =
+                resolve;
+
+
+            for (
+                const text of buttons
+            ) {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+                button.type =
+                    "button";
+
+                button.textContent =
+                    text;
+
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        closePopup(
+                            text
+                        );
+
+                    }
+                );
+
+
+                popupButtons.appendChild(
+                    button
+                );
+
+            }
+
+
+            const firstButton =
+                popupButtons.querySelector(
+                    "button"
+                );
+
+
+            if (firstButton) {
+                firstButton.focus();
+            }
+
+        }
+    );
+}
+
+
+function closePopup(
+    result = "Close"
+) {
+
+    popupOverlay.classList.remove(
+        "visible"
+    );
+
+
+    if (popupResolver) {
+
+        const resolve =
+            popupResolver;
+
+        popupResolver =
+            null;
+
+        resolve(result);
+    }
+}
+
+
+popupClose.addEventListener(
+    "click",
+    () => {
+
+        closePopup("Close");
+
+    }
+);
+
+
+/*
+ * ============================================================
+ * AUDIO
+ * ============================================================
+ */
+
+function playAudio() {
+
+    const promise =
+        idiotAudio.play();
+
+
+    if (
+        promise &&
+        typeof promise.catch ===
+        "function"
+    ) {
+
+        promise.catch(() => {
+            /*
+             * Browser autoplay policy may block this.
+             */
+        });
+
+    }
+}
+
+
+playAudio();
+
+
+document.addEventListener(
+    "pointerdown",
+    playAudio,
+    {
+        once: true
+    }
+);
+
+
+/*
+ * ============================================================
+ * RAINBOW QUESTION
+ * ============================================================
+ */
+
+const fontColors = [
+
+    "Indigo",
+    "Ivory",
+    "LightPink",
+    "LightSkyBlue",
+    "Lime",
+    "MediumPurple",
+    "MediumSpringGreen",
+    "Pink",
+    "Red",
+    "Snow"
+
+];
+
+
+let timerFT = 0;
+
+
+setInterval(
+    () => {
+
+        timerFT++;
+
+
+        if (
+            timerFT >= 1 &&
+            timerFT <= 9
+        ) {
+
+            question.style.color =
+                fontColors[timerFT];
+
+        }
+
+
+        if (timerFT >= 9) {
+
+            question.style.color =
+                "Snow";
+
+            timerFT = 0;
+
+        }
+
+    },
+    55
+);
+
+
+/*
+ * ============================================================
+ * NO / I DON'T KNOW
+ * ============================================================
+ */
+
+async function handleNo() {
+
+    if (redirecting) {
+        return;
+    }
+
+
+    await showPopup(
+        "Oh... I think you are an idiot. XD",
+        ["OK"],
+        "!"
+    );
+
+
+    redirectToDiscord();
+}
+
+
+noButton.addEventListener(
+    "click",
+    handleNo
+);
+
+
+noneButton.addEventListener(
+    "click",
+    handleNo
+);
+
+
+/*
+ * ============================================================
+ * YES
+ * ============================================================
+ */
+
+yesButton.addEventListener(
+    "click",
+    async () => {
+
+        if (redirecting) {
+            return;
+        }
+
+
+        const result =
+            await showPopup(
+                "Are you sure?",
+                ["Yes", "No"],
+                "?"
+            );
+
+
+        if (
+            result === "Yes" ||
+            result === "No" ||
+            result === "Close"
+        ) {
+
+            redirectToDiscord();
+
+        }
+
+    }
+);
+
+
+/*
+ * ============================================================
+ * ESCAPE
+ * ============================================================
+ */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            redirectToDiscord();
+
+        }
+
+    }
+);
+
+
+/*
+ * ============================================================
+ * RIGHT CLICK
+ * ============================================================
+ */
+
+document.addEventListener(
+    "contextmenu",
+    event => {
+
+        event.preventDefault();
+
+    }
+);
+
+
+/*
+ * ============================================================
+ * PREVENT GIF DRAGGING
+ * ============================================================
+ */
+
+document
+    .getElementById("pictureBox1")
+    .addEventListener(
+        "dragstart",
+        event => {
+
+            event.preventDefault();
+
+        }
+    );
+
+</script>
+
+</body>
+</html>
