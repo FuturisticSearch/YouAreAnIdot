@@ -47,6 +47,10 @@
     }
 
 
+    /* ============================================================
+       WINDOWS 95 MESSAGE BOX
+       ============================================================ */
+
     #popup-overlay {
         position: fixed;
 
@@ -72,7 +76,9 @@
         transform:
             translate(-50%, -50%);
 
-        width:
+        min-width: 390px;
+
+        max-width:
             min(
                 500px,
                 calc(100vw - 30px)
@@ -91,6 +97,13 @@
         box-shadow:
             inset 1px 1px 0 #dfdfdf,
             inset -1px -1px 0 #808080;
+
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
     }
 
 
@@ -198,6 +211,8 @@
         align-items: center;
         justify-content: center;
 
+        background: #c0c0c0;
+
         color: #000000;
 
         font-family:
@@ -298,7 +313,9 @@
 
 </style>
 
-</head><body><div id="popup-overlay"><div id="popup">
+</head><body><!-- ============================================================
+     PERMISSION MESSAGE
+     ============================================================ --><div id="popup-overlay"><div id="popup">
 
     <div id="popup-titlebar">
 
@@ -331,7 +348,9 @@
 
 </div>
 
-</div><audio
+</div><!-- ============================================================
+     AUDIO USED FOR AUTOPLAY TEST
+     ============================================================ --><audio
 id="autoplay-test-audio"
 preload="auto"
 loop
@@ -352,25 +371,21 @@ loop
    CONFIGURATION
    ============================================================ */
 
-const POPUP_TEST_COUNT = 3;
+const POPUP_TEST_COUNT =
+    3;
+
 
 const TEST_PAGE =
     "test.html";
 
+
 const TARGET_PAGE =
     "popup.html";
+
 
 const DISCORD_PAGE =
     "discord.html";
 
-
-/*
- * How often the real popup is checked.
- *
- * window.closed is cheap to poll and works even when
- * the child window is on another page, as long as the
- * WindowProxy remains available.
- */
 
 const TARGET_CHECK_INTERVAL =
     250;
@@ -404,6 +419,12 @@ const popupClose =
     );
 
 
+const popupIcon =
+    document.getElementById(
+        "popup-icon"
+    );
+
+
 const autoplayAudio =
     document.getElementById(
         "autoplay-test-audio"
@@ -426,7 +447,7 @@ let popupAllowed =
     false;
 
 
-let openingTarget =
+let autoplayTestComplete =
     false;
 
 
@@ -434,7 +455,7 @@ let autoplayAllowed =
     false;
 
 
-let autoplayChecked =
+let openingTarget =
     false;
 
 
@@ -446,18 +467,9 @@ let popupResolver =
     null;
 
 
-/*
- * Reference to the ACTUAL popup.html window.
- */
-
 let targetPopup =
     null;
 
-
-/*
- * Prevent the closed-popup redirect from
- * happening more than once.
- */
 
 let targetPopupFinished =
     false;
@@ -473,52 +485,20 @@ let targetPopupMonitor =
 
 function showPopup(
     message,
-    buttons = ["OK"]
+    buttons = ["OK"],
+    icon = "!"
 ) {
 
     popupMessage.textContent =
         message;
 
 
+    popupIcon.textContent =
+        icon;
+
+
     popupButtons.innerHTML =
         "";
-
-
-    for (
-        const text of buttons
-    ) {
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-
-        button.type =
-            "button";
-
-
-        button.textContent =
-            text;
-
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                closePopup(
-                    text
-                );
-
-            }
-        );
-
-
-        popupButtons.appendChild(
-            button
-        );
-
-    }
 
 
     popupOverlay.classList.add(
@@ -526,24 +506,61 @@ function showPopup(
     );
 
 
-    const firstButton =
-        popupButtons.querySelector(
-            "button"
-        );
-
-
-    if (firstButton) {
-
-        firstButton.focus();
-
-    }
-
-
     return new Promise(
         resolve => {
 
             popupResolver =
                 resolve;
+
+
+            for (
+                const text of buttons
+            ) {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                button.type =
+                    "button";
+
+
+                button.textContent =
+                    text;
+
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        closePopup(
+                            text
+                        );
+
+                    }
+                );
+
+
+                popupButtons.appendChild(
+                    button
+                );
+
+            }
+
+
+            const firstButton =
+                popupButtons.querySelector(
+                    "button"
+                );
+
+
+            if (firstButton) {
+
+                firstButton.focus();
+
+            }
 
         }
     );
@@ -588,13 +605,143 @@ popupClose.addEventListener(
 
 
 /* ============================================================
-   AUTOPLAY CHECK
+   POPUP PERMISSION TEST
    ============================================================ */
 
-async function checkAutoplay() {
+window.addEventListener(
+    "message",
+    event => {
+
+        if (
+            event.origin !==
+            window.location.origin
+        ) {
+
+            return;
+
+        }
+
+
+        const data =
+            event.data;
+
+
+        if (
+            !data ||
+            data.type !==
+            "YOUARE_POPUP_TEST_SUCCESS"
+        ) {
+
+            return;
+
+        }
+
+
+        const id =
+            String(data.id);
+
+
+        if (
+            ![
+                "0",
+                "1",
+                "2"
+            ].includes(id)
+        ) {
+
+            return;
+
+        }
+
+
+        popupResults.add(
+            id
+        );
+
+
+        if (
+            popupResults.size >=
+            POPUP_TEST_COUNT
+        ) {
+
+            popupAllowed =
+                true;
+
+        }
+
+
+        updatePermissionMessage();
+
+    }
+);
+
+
+function testPopupPermission() {
 
     if (
-        autoplayChecked
+        popupTestStarted
+    ) {
+
+        return popupAllowed;
+
+    }
+
+
+    popupTestStarted =
+        true;
+
+
+    popupResults.clear();
+
+
+    for (
+        let i = 0;
+        i < POPUP_TEST_COUNT;
+        i++
+    ) {
+
+        try {
+
+            const popup =
+                window.open(
+                    `${TEST_PAGE}?id=${i}`,
+                    `youare_popup_test_${i}`,
+                    [
+                        "width=1",
+                        "height=1",
+                        "left=-10000",
+                        "top=-10000"
+                    ].join(",")
+                );
+
+
+            void popup;
+
+        } catch (_) {
+
+            /*
+             * Blocked popup simply does not
+             * report success.
+             */
+
+        }
+
+    }
+
+
+    return popupAllowed;
+
+}
+
+
+/* ============================================================
+   AUTOPLAY TEST
+   ============================================================ */
+
+async function testAutoplayPermission() {
+
+    if (
+        autoplayTestComplete
     ) {
 
         return autoplayAllowed;
@@ -602,36 +749,89 @@ async function checkAutoplay() {
     }
 
 
-    autoplayChecked =
+    autoplayTestComplete =
         true;
 
 
     try {
 
-        autoplayAudio.muted =
-            false;
+        autoplayAudio.pause();
 
 
-        const result =
-            autoplayAudio.play();
+        try {
 
+            autoplayAudio.currentTime =
+                0;
 
-        if (
-            result &&
-            typeof result.then ===
-            "function"
-        ) {
+        } catch (_) {
 
-            await result;
+            /*
+             * Ignore.
+             */
 
         }
 
 
+        const playPromise =
+            autoplayAudio.play();
+
+
+        if (
+            playPromise &&
+            typeof playPromise.then ===
+            "function"
+        ) {
+
+            await playPromise;
+
+        }
+
+
+        /*
+         * Match question.html:
+         *
+         * Give the browser a short moment to
+         * actually enter the playing state.
+         */
+
+        await new Promise(
+            resolve => {
+
+                setTimeout(
+                    resolve,
+                    100
+                );
+
+            }
+        );
+
+
         autoplayAllowed =
-            true;
+            !autoplayAudio.paused &&
+            !autoplayAudio.ended;
 
 
-        return true;
+        if (
+            !autoplayAllowed
+        ) {
+
+            autoplayAudio.pause();
+
+
+            try {
+
+                autoplayAudio.currentTime =
+                    0;
+
+            } catch (_) {
+
+                /*
+                 * Ignore.
+                 */
+
+            }
+
+        }
 
     } catch (_) {
 
@@ -639,153 +839,170 @@ async function checkAutoplay() {
             false;
 
 
-        return false;
+        try {
 
-    }
+            autoplayAudio.pause();
 
-}
+            autoplayAudio.currentTime =
+                0;
 
+        } catch (_) {
 
-/* ============================================================
-   AUTOPLAY PERMISSION MESSAGE
-   ============================================================ */
-
-async function showAutoplayMessage() {
-
-    if (
-        autoplayAllowed ||
-        permissionMessageVisible
-    ) {
-
-        return;
-
-    }
-
-
-    await showPopup(
-        "Autoplay is blocked by your browser. " +
-        "Tap OK or interact with the page to allow the audio.",
-        ["OK"]
-    );
-
-
-    try {
-
-        const result =
-            autoplayAudio.play();
-
-
-        if (
-            result &&
-            typeof result.then ===
-            "function"
-        ) {
-
-            await result;
+            /*
+             * Ignore.
+             */
 
         }
 
-
-        autoplayAllowed =
-            true;
-
-        autoplayChecked =
-            true;
-
-    } catch (_) {
-
-        autoplayAllowed =
-            false;
-
     }
+
+
+    updatePermissionMessage();
+
+
+    return autoplayAllowed;
 
 }
 
 
 /* ============================================================
-   UNLOCK AUTOPLAY ON USER INTERACTION
+   DYNAMIC PERMISSION MESSAGE
    ============================================================ */
 
-function tryUnlockAutoplay() {
+function getPermissionMessage() {
 
     if (
+        popupAllowed &&
         autoplayAllowed
     ) {
 
+        return null;
+
+    }
+
+
+    if (
+        !popupAllowed &&
+        autoplayAllowed
+    ) {
+
+        return (
+            "This recreation requires pop-up windows " +
+            "to be enabled in your browser. Please allow " +
+            "pop-ups for this site."
+        );
+
+    }
+
+
+    if (
+        popupAllowed &&
+        !autoplayAllowed
+    ) {
+
+        return (
+            "This recreation requires audio autoplay " +
+            "to be enabled in your browser. Please allow " +
+            "autoplay for this site."
+        );
+
+    }
+
+
+    return (
+        "This recreation requires pop-up windows and " +
+        "audio autoplay to be enabled in your browser. " +
+        "Please allow both for this site."
+    );
+
+}
+
+
+function updatePermissionMessage() {
+
+    const message =
+        getPermissionMessage();
+
+
+    /*
+     * Both permissions are available.
+     */
+
+    if (
+        !message
+    ) {
+
+        if (
+            permissionMessageVisible &&
+            popupResolver
+        ) {
+
+            closePopup(
+                "Permissions complete"
+            );
+
+        }
+
+
+        permissionMessageVisible =
+            false;
+
+
         return;
 
     }
 
 
-    try {
+    /*
+     * Update the currently visible
+     * permission dialog dynamically.
+     */
 
-        const result =
-            autoplayAudio.play();
+    if (
+        !permissionMessageVisible
+    ) {
 
-
-        if (
-            result &&
-            typeof result.then ===
-            "function"
-        ) {
-
-            result
-                .then(
-                    () => {
-
-                        autoplayAllowed =
-                            true;
-
-                        autoplayChecked =
-                            true;
-
-                    }
-                )
-                .catch(
-                    () => {
-
-                        autoplayAllowed =
-                            false;
-
-                    }
-                );
-
-        } else {
-
-            autoplayAllowed =
-                true;
-
-            autoplayChecked =
-                true;
-
-        }
-
-    } catch (_) {
-
-        autoplayAllowed =
-            false;
+        return;
 
     }
+
+
+    popupMessage.textContent =
+        message;
 
 }
 
 
-document.addEventListener(
-    "pointerdown",
-    tryUnlockAutoplay,
-    {
-        passive: true
-    }
-);
+async function showPermissionMessage() {
+
+    const message =
+        getPermissionMessage();
 
 
-document.addEventListener(
-    "keydown",
-    tryUnlockAutoplay,
-    {
-        passive: true
+    if (
+        !message
+    ) {
+
+        return;
+
     }
-);
+
+
+    permissionMessageVisible =
+        true;
+
+
+    await showPopup(
+        message,
+        ["OK"],
+        "!"
+    );
+
+
+    permissionMessageVisible =
+        false;
+
+}
 
 
 /* ============================================================
@@ -822,8 +1039,8 @@ window.addEventListener(
 
 
         /*
-         * Only allow the REAL target popup to
-         * request the resize.
+         * Only the real popup.html may request
+         * the Discord-sized window.
          */
 
         if (
@@ -901,138 +1118,6 @@ window.addEventListener(
 
 
 /* ============================================================
-   POPUP TEST RESULT HANDLING
-   ============================================================ */
-
-window.addEventListener(
-    "message",
-    event => {
-
-        if (
-            event.origin !==
-            window.location.origin
-        ) {
-
-            return;
-
-        }
-
-
-        const data =
-            event.data;
-
-
-        if (
-            !data ||
-            data.type !==
-            "YOUARE_POPUP_TEST_SUCCESS"
-        ) {
-
-            return;
-
-        }
-
-
-        const id =
-            String(data.id);
-
-
-        if (
-            ![
-                "0",
-                "1",
-                "2"
-            ].includes(id)
-        ) {
-
-            return;
-
-        }
-
-
-        popupResults.add(id);
-
-
-        if (
-            popupResults.size >=
-            POPUP_TEST_COUNT
-        ) {
-
-            popupAllowed =
-                true;
-
-
-            closePopup(
-                "Permissions complete"
-            );
-
-
-            openQuestionPopup();
-
-        }
-
-    }
-);
-
-
-/* ============================================================
-   PERMISSION MESSAGE
-   ============================================================ */
-
-function getPermissionMessage() {
-
-    return (
-        "This recreation requires pop-up windows " +
-        "to be enabled in your browser. Please allow " +
-        "pop-ups for this site."
-    );
-
-}
-
-
-async function showPermissionMessage() {
-
-    if (
-        popupAllowed ||
-        permissionMessageVisible
-    ) {
-
-        return;
-
-    }
-
-
-    permissionMessageVisible =
-        true;
-
-
-    await showPopup(
-        getPermissionMessage(),
-        ["OK"]
-    );
-
-
-    permissionMessageVisible =
-        false;
-
-
-    if (
-        !popupAllowed
-    ) {
-
-        popupTestStarted =
-            false;
-
-        popupResults.clear();
-
-        testPopupPermission();
-
-    }
-
-}
-
-
-/* ============================================================
    INITIAL / FAKE WINDOW SIZE
    ============================================================ */
 
@@ -1051,6 +1136,10 @@ function getPopupFeatures() {
             screen.availHeight - 40
         );
 
+
+    /*
+     * Fake question-window aspect ratio.
+     */
 
     const aspectRatio =
         928 / 929;
@@ -1182,8 +1271,8 @@ function handleTargetPopupClosed() {
 
 
     /*
-     * Redirect ONLY after the actual popup
-     * window has really been closed.
+     * Redirect only after the actual
+     * popup window has closed.
      */
 
     window.location.href =
@@ -1215,13 +1304,6 @@ function monitorTargetPopup(
         setInterval(
             () => {
 
-                /*
-                 * The popup may become inaccessible
-                 * in unusual browser situations.
-                 *
-                 * window.closed is the important check.
-                 */
-
                 try {
 
                     if (
@@ -1235,11 +1317,7 @@ function monitorTargetPopup(
                 } catch (_) {
 
                     /*
-                     * If reading .closed itself throws,
-                     * do not immediately redirect.
-                     *
-                     * Keep monitoring because the
-                     * popup may still exist.
+                     * Keep monitoring.
                      */
 
                 }
@@ -1301,7 +1379,7 @@ function openQuestionPopup() {
 
 
     /*
-     * A blocked popup normally returns null.
+     * Blocked real popup.
      */
 
     if (
@@ -1311,11 +1389,14 @@ function openQuestionPopup() {
         openingTarget =
             false;
 
+
         popupAllowed =
             false;
 
+
         popupTestStarted =
             false;
+
 
         popupResults.clear();
 
@@ -1327,13 +1408,6 @@ function openQuestionPopup() {
     }
 
 
-    /*
-     * Save the WindowProxy immediately.
-     *
-     * This is what lets index.html detect when
-     * the actual popup is closed.
-     */
-
     targetPopup =
         popup;
 
@@ -1341,10 +1415,6 @@ function openQuestionPopup() {
     openingTarget =
         false;
 
-
-    /*
-     * Start monitoring immediately.
-     */
 
     monitorTargetPopup(
         popup
@@ -1361,98 +1431,7 @@ function openQuestionPopup() {
 
 
 /* ============================================================
-   THREE-POPUP PERMISSION TEST
-   ============================================================ */
-
-function testPopupPermission() {
-
-    if (
-        popupTestStarted ||
-        popupAllowed
-    ) {
-
-        return;
-
-    }
-
-
-    popupTestStarted =
-        true;
-
-
-    popupResults.clear();
-
-
-    for (
-        let i = 0;
-        i < POPUP_TEST_COUNT;
-        i++
-    ) {
-
-        try {
-
-            const testPopup =
-                window.open(
-                    `${TEST_PAGE}?id=${i}`,
-                    `youare_popup_test_${i}`,
-                    [
-                        "width=1",
-                        "height=1",
-                        "left=-10000",
-                        "top=-10000"
-                    ].join(",")
-                );
-
-
-            /*
-             * Do not keep these windows around.
-             *
-             * test.html is responsible for sending
-             * its success message.
-             */
-
-            if (
-                testPopup
-            ) {
-
-                try {
-
-                    testPopup.blur();
-
-                } catch (_) {}
-
-            }
-
-        } catch (_) {}
-
-    }
-
-
-    setTimeout(
-        () => {
-
-            if (
-                popupAllowed ||
-                popupResults.size >=
-                POPUP_TEST_COUNT
-            ) {
-
-                return;
-
-            }
-
-
-            showPermissionMessage();
-
-        },
-        1500
-    );
-
-}
-
-
-/* ============================================================
-   STARTUP
+   STARTUP FEATURE DETECTION
    ============================================================ */
 
 window.addEventListener(
@@ -1460,42 +1439,81 @@ window.addEventListener(
     async () => {
 
         /*
-         * Run both checks independently.
+         * Exactly like question.html:
+         *
+         * 1. Start popup detection.
+         * 2. Test autoplay.
+         * 3. Show ONE combined permission dialog
+         *    if something is still unavailable.
          */
-
-        const autoplay =
-            await checkAutoplay();
-
 
         testPopupPermission();
 
 
-        /*
-         * Autoplay warning is independent from
-         * popup permission.
-         */
+        await testAutoplayPermission();
 
-        if (
-            !autoplay
-        ) {
 
-            setTimeout(
-                () => {
+        await showPermissionMessage();
 
-                    if (
-                        !permissionMessageVisible &&
-                        !autoplayAllowed
-                    ) {
+    },
+    {
+        once: true
+    }
+);
 
-                        showAutoplayMessage();
 
-                    }
+/* ============================================================
+   NORMAL AUDIO PLAYBACK
+   ============================================================ */
 
-                },
-                250
-            );
+function playAudio() {
 
-        }
+    const playPromise =
+        autoplayAudio.play();
+
+
+    if (
+        playPromise &&
+        typeof playPromise.catch ===
+        "function"
+    ) {
+
+        playPromise.catch(
+            () => {
+
+                /*
+                 * Autoplay may still be blocked.
+                 */
+
+            }
+        );
+
+    }
+
+}
+
+
+playAudio();
+
+
+document.addEventListener(
+    "pointerdown",
+    () => {
+
+        playAudio();
+
+    },
+    {
+        once: true
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    () => {
+
+        playAudio();
 
     },
     {
@@ -1513,13 +1531,14 @@ window.addEventListener(
     () => {
 
         /*
-         * Do not retest popup permission after
-         * the real question popup has already opened.
+         * Match question.html behavior:
+         *
+         * Do not repeatedly start the popup test
+         * once it has already been started.
          */
 
         if (
             !popupAllowed &&
-            !permissionMessageVisible &&
             !targetPopup
         ) {
 
@@ -1529,15 +1548,6 @@ window.addEventListener(
             popupResults.clear();
 
             testPopupPermission();
-
-        }
-
-
-        if (
-            !autoplayAllowed
-        ) {
-
-            tryUnlockAutoplay();
 
         }
 
@@ -1580,5 +1590,4 @@ document.addEventListener(
     }
 );
 
-</script></body>
-</html>
+</script></body></html>
