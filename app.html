@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="UTF-8"><meta
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+
+<meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 >
@@ -40,11 +41,6 @@
         justify-content: center;
     }
 
-
-    /* ============================================================
-       WINDOWS 95 MESSAGE BOX
-       ============================================================ */
-
     #popup-overlay {
         position: fixed;
 
@@ -58,7 +54,6 @@
     #popup-overlay.visible {
         display: block;
     }
-
 
     #popup {
         position: fixed;
@@ -89,11 +84,6 @@
             inset -1px -1px 0 #808080;
     }
 
-
-    /* ============================================================
-       TITLE BAR
-       ============================================================ */
-
     #popup-titlebar {
         height: 22px;
 
@@ -113,7 +103,6 @@
         line-height: 18px;
     }
 
-
     #popup-title {
         flex: 1;
 
@@ -122,7 +111,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
 
     #popup-close {
         width: 19px;
@@ -145,6 +133,7 @@
             inset -1px -1px 0 #808080;
 
         font-family: Arial, sans-serif;
+
         font-size: 11px;
         font-weight: bold;
 
@@ -152,7 +141,6 @@
 
         cursor: default;
     }
-
 
     #popup-close:active {
         border-color:
@@ -166,11 +154,6 @@
             inset -1px -1px 0 #dfdfdf;
     }
 
-
-    /* ============================================================
-       MESSAGE CONTENT
-       ============================================================ */
-
     #popup-content {
         min-height: 90px;
 
@@ -180,7 +163,6 @@
 
         padding: 18px;
     }
-
 
     #popup-icon {
         width: 32px;
@@ -207,7 +189,6 @@
         text-align: center;
     }
 
-
     #popup-message {
         flex: 1;
 
@@ -217,11 +198,6 @@
 
         line-height: 1.35;
     }
-
-
-    /* ============================================================
-       BUTTONS
-       ============================================================ */
 
     #popup-buttons {
         display: flex;
@@ -235,7 +211,6 @@
             12px
             14px;
     }
-
 
     #popup-buttons button {
         min-width: 75px;
@@ -274,7 +249,6 @@
         cursor: default;
     }
 
-
     #popup-buttons button:active {
         border-color:
             #000000
@@ -287,7 +261,6 @@
             inset -1px -1px 0 #dfdfdf;
     }
 
-
     #popup-buttons button:focus {
         outline: 1px dotted #000000;
         outline-offset: -5px;
@@ -295,794 +268,818 @@
 
 </style>
 
-</head><body><!-- ============================================================
-     PERMISSION MESSAGE
-     ============================================================ -->
+</head><body><div id="popup-overlay"><div id="popup">
 
-<div id="popup-overlay">
+    <div id="popup-titlebar">
 
-    <div id="popup">
+        <span id="popup-title">
+            YouAreAnIdiot
+        </span>
 
-        <div id="popup-titlebar">
-
-            <span id="popup-title">
-                YouAreAnIdiot
-            </span>
-
-            <button
-                id="popup-close"
-                type="button"
-            >×</button>
-
-        </div>
-
-
-        <div id="popup-content">
-
-            <div id="popup-icon">
-                !
-            </div>
-
-            <div id="popup-message"></div>
-
-        </div>
-
-
-        <div id="popup-buttons"></div>
+        <button
+            id="popup-close"
+            type="button"
+        >×</button>
 
     </div>
 
+    <div id="popup-content">
+
+        <div id="popup-icon">
+            !
+        </div>
+
+        <div id="popup-message"></div>
+
+    </div>
+
+    <div id="popup-buttons"></div>
+
 </div>
 
+</div><script>
+
+"use strict";
 
 
-<script>
+/* ============================================================
+   CONFIGURATION
+   ============================================================ */
 
-    "use strict";
+const POPUP_TEST_COUNT = 3;
 
+const TEST_PAGE =
+    "test.html";
 
-    /* ============================================================
-       CONFIGURATION
-       ============================================================ */
-
-    const POPUP_TEST_COUNT = 3;
-
-    const TEST_PAGE =
-        "test.html";
-
-    const TARGET_PAGE =
-        "popup.html";
+const TARGET_PAGE =
+    "popup.html";
 
 
-    /*
-     * Maximum browser-window size.
-     *
-     * popup.html contains the original 928×929
-     * Windows-style design, but we deliberately
-     * open the browser window smaller than that.
-     */
-    const MAX_POPUP_WIDTH = 820;
-    const MAX_POPUP_HEIGHT = 820;
+const MAX_POPUP_WIDTH = 820;
+
+const MAX_POPUP_HEIGHT = 820;
+
+const SCREEN_MARGIN = 40;
 
 
-    /*
-     * Keep some room around the popup so that
-     * mobile browsers do not attempt to create a
-     * window larger than the available display.
-     */
-    const SCREEN_MARGIN = 40;
+/* ============================================================
+   ELEMENTS
+   ============================================================ */
+
+const popupOverlay =
+    document.getElementById(
+        "popup-overlay"
+    );
+
+const popupMessage =
+    document.getElementById(
+        "popup-message"
+    );
+
+const popupButtons =
+    document.getElementById(
+        "popup-buttons"
+    );
+
+const popupClose =
+    document.getElementById(
+        "popup-close"
+    );
 
 
-    /* ============================================================
-       ELEMENTS
-       ============================================================ */
+/* ============================================================
+   POPUP TEST STATE
+   ============================================================ */
 
-    const popupOverlay =
-        document.getElementById(
-            "popup-overlay"
-        );
+const popupResults =
+    new Set();
 
-    const popupMessage =
-        document.getElementById(
-            "popup-message"
-        );
+let popupTestStarted =
+    false;
 
-    const popupButtons =
-        document.getElementById(
-            "popup-buttons"
-        );
+let popupAllowed =
+    false;
 
-    const popupClose =
-        document.getElementById(
-            "popup-close"
-        );
+let openingTarget =
+    false;
 
 
-    /* ============================================================
-       POPUP TEST STATE
-       ============================================================ */
+/*
+ * Reference to the actual question popup.
+ *
+ * This is important because the fallback resize request
+ * must only be allowed to resize the popup that we created.
+ */
 
-    const popupResults =
-        new Set();
-
-    let popupTestStarted =
-        false;
-
-    let popupAllowed =
-        false;
-
-    let openingTarget =
-        false;
+let questionPopup =
+    null;
 
 
-    /* ============================================================
-       MESSAGE BOX
-       ============================================================ */
+/* ============================================================
+   MESSAGE BOX
+   ============================================================ */
 
-    let popupResolver =
-        null;
+let popupResolver =
+    null;
 
 
-    function showPopup(
-        message,
-        buttons = ["OK"]
+function showPopup(
+    message,
+    buttons = ["OK"]
+) {
+
+    popupMessage.textContent =
+        message;
+
+
+    popupButtons.innerHTML =
+        "";
+
+
+    for (
+        const text of buttons
     ) {
 
-        popupMessage.textContent =
-            message;
-
-
-        popupButtons.innerHTML =
-            "";
-
-
-        for (
-            const text of buttons
-        ) {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-
-            button.type =
-                "button";
-
-
-            button.textContent =
-                text;
-
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    closePopup(
-                        text
-                    );
-
-                }
-            );
-
-
-            popupButtons.appendChild(
-                button
-            );
-
-        }
-
-
-        popupOverlay.classList.add(
-            "visible"
-        );
-
-
-        const firstButton =
-            popupButtons.querySelector(
+        const button =
+            document.createElement(
                 "button"
             );
 
 
-        if (firstButton) {
-
-            firstButton.focus();
-
-        }
+        button.type =
+            "button";
 
 
-        return new Promise(
-            resolve => {
+        button.textContent =
+            text;
 
-                popupResolver =
-                    resolve;
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                closePopup(
+                    text
+                );
 
             }
         );
 
+
+        popupButtons.appendChild(
+            button
+        );
+
     }
 
 
-    function closePopup(
-        result = "Close"
-    ) {
+    popupOverlay.classList.add(
+        "visible"
+    );
 
-        popupOverlay.classList.remove(
-            "visible"
+
+    const firstButton =
+        popupButtons.querySelector(
+            "button"
         );
 
 
-        if (popupResolver) {
+    if (firstButton) {
 
-            const resolve =
-                popupResolver;
+        firstButton.focus();
+
+    }
+
+
+    return new Promise(
+        resolve => {
 
             popupResolver =
-                null;
+                resolve;
 
-            resolve(result);
+        }
+    );
+
+}
+
+
+function closePopup(
+    result = "Close"
+) {
+
+    popupOverlay.classList.remove(
+        "visible"
+    );
+
+
+    if (popupResolver) {
+
+        const resolve =
+            popupResolver;
+
+        popupResolver =
+            null;
+
+        resolve(result);
+
+    }
+
+}
+
+
+popupClose.addEventListener(
+    "click",
+    () => {
+
+        closePopup(
+            "Close"
+        );
+
+    }
+);
+
+
+/* ============================================================
+   PERMISSION MESSAGE
+   ============================================================ */
+
+let permissionMessageVisible =
+    false;
+
+
+function getPermissionMessage() {
+
+    return (
+        "This recreation requires pop-up windows " +
+        "to be enabled in your browser. Please allow " +
+        "pop-ups for this site."
+    );
+
+}
+
+
+async function showPermissionMessage() {
+
+    if (popupAllowed) {
+
+        return;
+
+    }
+
+
+    if (permissionMessageVisible) {
+
+        return;
+
+    }
+
+
+    permissionMessageVisible =
+        true;
+
+
+    await showPopup(
+        getPermissionMessage(),
+        ["OK"]
+    );
+
+
+    permissionMessageVisible =
+        false;
+
+
+    if (!popupAllowed) {
+
+        popupTestStarted =
+            false;
+
+        popupResults.clear();
+
+        testPopupPermission();
+
+    }
+
+}
+
+
+/* ============================================================
+   RESIZE REQUEST FROM popup.html
+   ============================================================ */
+
+window.addEventListener(
+    "message",
+    event => {
+
+        /*
+         * Only same-origin messages are accepted.
+         */
+
+        if (
+            event.origin !==
+            window.location.origin
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+         * The message must come from the exact popup
+         * that this page opened.
+         */
+
+        if (
+            !questionPopup ||
+            event.source !== questionPopup
+        ) {
+
+            return;
+
+        }
+
+
+        const data =
+            event.data;
+
+
+        if (
+            !data ||
+            data.type !==
+            "YOUARE_RESIZE_REQUEST"
+        ) {
+
+            return;
+
+        }
+
+
+        const width =
+            Number(
+                data.outerWidth
+            );
+
+
+        const height =
+            Number(
+                data.outerHeight
+            );
+
+
+        /*
+         * Validate the dimensions before passing them to
+         * resizeTo(). This prevents malformed messages from
+         * causing unreasonable resize requests.
+         */
+
+        if (
+            !Number.isFinite(width) ||
+            !Number.isFinite(height) ||
+            width < 100 ||
+            height < 100 ||
+            width > 5000 ||
+            height > 5000
+        ) {
+
+            return;
+
+        }
+
+
+        try {
+
+            questionPopup.resizeTo(
+                Math.round(width),
+                Math.round(height)
+            );
+
+        } catch (_) {
+
+            /*
+             * Browser may prohibit resizing the child.
+             */
 
         }
 
     }
+);
 
 
-    popupClose.addEventListener(
-        "click",
+/* ============================================================
+   TEST RESULT HANDLING
+   ============================================================ */
+
+window.addEventListener(
+    "message",
+    event => {
+
+        if (
+            event.origin !==
+            window.location.origin
+        ) {
+
+            return;
+
+        }
+
+
+        const data =
+            event.data;
+
+
+        if (
+            !data ||
+            data.type !==
+            "YOUARE_POPUP_TEST_SUCCESS"
+        ) {
+
+            return;
+
+        }
+
+
+        const id =
+            String(data.id);
+
+
+        if (
+            ![
+                "0",
+                "1",
+                "2"
+            ].includes(id)
+        ) {
+
+            return;
+
+        }
+
+
+        popupResults.add(id);
+
+
+        if (
+            popupResults.size >=
+            POPUP_TEST_COUNT
+        ) {
+
+            popupAllowed =
+                true;
+
+
+            closePopup(
+                "Permissions complete"
+            );
+
+
+            openQuestionPopup();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   CALCULATE POPUP WINDOW SIZE
+   ============================================================ */
+
+function getPopupFeatures() {
+
+    const availableWidth =
+        Math.max(
+            320,
+            screen.availWidth -
+            SCREEN_MARGIN
+        );
+
+
+    const availableHeight =
+        Math.max(
+            320,
+            screen.availHeight -
+            SCREEN_MARGIN
+        );
+
+
+    const aspectRatio =
+        928 / 929;
+
+
+    let width =
+        Math.min(
+            MAX_POPUP_WIDTH,
+            availableWidth
+        );
+
+
+    let height =
+        width /
+        aspectRatio;
+
+
+    if (
+        height >
+        Math.min(
+            MAX_POPUP_HEIGHT,
+            availableHeight
+        )
+    ) {
+
+        height =
+            Math.min(
+                MAX_POPUP_HEIGHT,
+                availableHeight
+            );
+
+
+        width =
+            height *
+            aspectRatio;
+
+    }
+
+
+    width =
+        Math.max(
+            320,
+            Math.floor(width)
+        );
+
+
+    height =
+        Math.max(
+            320,
+            Math.floor(height)
+        );
+
+
+    const left =
+        Math.max(
+            0,
+            Math.floor(
+                (
+                    screen.availWidth -
+                    width
+                ) / 2
+            )
+        );
+
+
+    const top =
+        Math.max(
+            0,
+            Math.floor(
+                (
+                    screen.availHeight -
+                    height
+                ) / 2
+            )
+        );
+
+
+    return [
+        `width=${width}`,
+        `height=${height}`,
+        `left=${left}`,
+        `top=${top}`,
+        "resizable=yes",
+        "scrollbars=no",
+        "toolbar=no",
+        "menubar=no",
+        "location=no",
+        "status=no"
+    ].join(",");
+
+}
+
+
+/* ============================================================
+   OPEN QUESTION POPUP
+   ============================================================ */
+
+function openQuestionPopup() {
+
+    if (openingTarget) {
+
+        return;
+
+    }
+
+
+    openingTarget =
+        true;
+
+
+    const features =
+        getPopupFeatures();
+
+
+    let popup = null;
+
+
+    try {
+
+        popup =
+            window.open(
+                TARGET_PAGE,
+                "YouAreAnIdiotQuestion",
+                features
+            );
+
+    } catch (_) {
+
+        popup = null;
+
+    }
+
+
+    if (!popup) {
+
+        openingTarget =
+            false;
+
+        popupAllowed =
+            false;
+
+        popupTestStarted =
+            false;
+
+        popupResults.clear();
+
+
+        showPermissionMessage();
+
+        return;
+
+    }
+
+
+    /*
+     * Keep the WindowProxy alive so popup.html can request
+     * fallback resizing through postMessage().
+     */
+
+    questionPopup =
+        popup;
+
+
+    try {
+
+        popup.focus();
+
+    } catch (_) {}
+
+}
+
+
+/* ============================================================
+   START THREE-POPUP TEST
+   ============================================================ */
+
+function testPopupPermission() {
+
+    if (
+        popupTestStarted ||
+        popupAllowed
+    ) {
+
+        return;
+
+    }
+
+
+    popupTestStarted =
+        true;
+
+
+    popupResults.clear();
+
+
+    for (
+        let i = 0;
+        i < POPUP_TEST_COUNT;
+        i++
+    ) {
+
+        try {
+
+            const testPopup =
+                window.open(
+                    `${TEST_PAGE}?id=${i}`,
+                    `youare_popup_test_${i}`,
+                    [
+                        "width=1",
+                        "height=1",
+                        "left=-10000",
+                        "top=-10000"
+                    ].join(",")
+                );
+
+
+            void testPopup;
+
+        } catch (_) {}
+
+    }
+
+
+    setTimeout(
         () => {
+
+            if (
+                popupAllowed ||
+                popupResults.size >=
+                POPUP_TEST_COUNT
+            ) {
+
+                return;
+
+            }
+
+
+            showPermissionMessage();
+
+        },
+        1500
+    );
+
+}
+
+
+/* ============================================================
+   STARTUP
+   ============================================================ */
+
+window.addEventListener(
+    "load",
+    () => {
+
+        testPopupPermission();
+
+    },
+    {
+        once: true
+    }
+);
+
+
+/* ============================================================
+   RETEST WHEN WINDOW GETS FOCUS
+   ============================================================ */
+
+window.addEventListener(
+    "focus",
+    () => {
+
+        if (
+            !popupAllowed &&
+            !permissionMessageVisible
+        ) {
+
+            popupTestStarted =
+                false;
+
+            popupResults.clear();
+
+            testPopupPermission();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   ESCAPE / CONTEXT MENU
+   ============================================================ */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape"
+        ) {
 
             closePopup(
                 "Close"
             );
 
         }
-    );
-
-
-    /* ============================================================
-       POPUP PERMISSION MESSAGE
-       ============================================================ */
-
-    let permissionMessageVisible =
-        false;
-
-
-    function getPermissionMessage() {
-
-        return (
-            "This recreation requires pop-up windows " +
-            "to be enabled in your browser. Please allow " +
-            "pop-ups for this site."
-        );
 
     }
+);
 
 
-    async function showPermissionMessage() {
+document.addEventListener(
+    "contextmenu",
+    event => {
 
-        if (popupAllowed) {
-            return;
-        }
-
-
-        if (permissionMessageVisible) {
-            return;
-        }
-
-
-        permissionMessageVisible =
-            true;
-
-
-        await showPopup(
-            getPermissionMessage(),
-            ["OK"]
-        );
-
-
-        permissionMessageVisible =
-            false;
-
-
-        /*
-         * The user may have enabled popups while
-         * the message was displayed.
-         *
-         * Run the test again after they dismiss it.
-         */
-        if (!popupAllowed) {
-
-            popupTestStarted =
-                false;
-
-            popupResults.clear();
-
-            testPopupPermission();
-
-        }
+        event.preventDefault();
 
     }
+);
 
-
-    /* ============================================================
-       TEST RESULT HANDLING
-       ============================================================ */
-
-    window.addEventListener(
-        "message",
-        event => {
-
-            /*
-             * Only accept messages from this
-             * exact origin.
-             */
-            if (
-                event.origin !==
-                window.location.origin
-            ) {
-
-                return;
-
-            }
-
-
-            const data =
-                event.data;
-
-
-            if (
-                !data ||
-                data.type !==
-                "YOUARE_POPUP_TEST_SUCCESS"
-            ) {
-
-                return;
-
-            }
-
-
-            const id =
-                String(data.id);
-
-
-            /*
-             * Only accept the three IDs that
-             * this page generated.
-             */
-            if (
-                ![
-                    "0",
-                    "1",
-                    "2"
-                ].includes(id)
-            ) {
-
-                return;
-
-            }
-
-
-            popupResults.add(id);
-
-
-            /*
-             * IMPORTANT:
-             *
-             * Do not require all responses to arrive
-             * immediately. A browser may delay a popup
-             * or its message.
-             */
-            if (
-                popupResults.size >=
-                POPUP_TEST_COUNT
-            ) {
-
-                popupAllowed =
-                    true;
-
-
-                closePopup(
-                    "Permissions complete"
-                );
-
-
-                openQuestionPopup();
-
-            }
-
-        }
-    );
-
-
-    /* ============================================================
-       CALCULATE POPUP WINDOW SIZE
-       ============================================================ */
-
-    function getPopupFeatures() {
-
-        /*
-         * screen.availWidth / availHeight are used
-         * instead of innerWidth / innerHeight because
-         * window.open() creates a browser window,
-         * not an element inside this document.
-         */
-
-        const availableWidth =
-            Math.max(
-                320,
-                screen.availWidth -
-                SCREEN_MARGIN
-            );
-
-
-        const availableHeight =
-            Math.max(
-                320,
-                screen.availHeight -
-                SCREEN_MARGIN
-            );
-
-
-        /*
-         * Preserve the 928:929 aspect ratio of
-         * the original question window.
-         */
-        const aspectRatio =
-            928 / 929;
-
-
-        let width =
-            Math.min(
-                MAX_POPUP_WIDTH,
-                availableWidth
-            );
-
-
-        let height =
-            width /
-            aspectRatio;
-
-
-        /*
-         * Height may be the limiting dimension
-         * on a portrait/mobile display.
-         */
-        if (
-            height >
-            Math.min(
-                MAX_POPUP_HEIGHT,
-                availableHeight
-            )
-        ) {
-
-            height =
-                Math.min(
-                    MAX_POPUP_HEIGHT,
-                    availableHeight
-                );
-
-
-            width =
-                height *
-                aspectRatio;
-
-        }
-
-
-        width =
-            Math.max(
-                320,
-                Math.floor(width)
-            );
-
-
-        height =
-            Math.max(
-                320,
-                Math.floor(height)
-            );
-
-
-        /*
-         * Center the browser window on the
-         * available screen area.
-         */
-        const left =
-            Math.max(
-                0,
-                Math.floor(
-                    (
-                        screen.availWidth -
-                        width
-                    ) / 2
-                )
-            );
-
-
-        const top =
-            Math.max(
-                0,
-                Math.floor(
-                    (
-                        screen.availHeight -
-                        height
-                    ) / 2
-                )
-            );
-
-
-        return [
-            `width=${width}`,
-            `height=${height}`,
-            `left=${left}`,
-            `top=${top}`,
-            "resizable=yes",
-            "scrollbars=no",
-            "toolbar=no",
-            "menubar=no",
-            "location=no",
-            "status=no"
-        ].join(",");
-
-    }
-
-
-    /* ============================================================
-       OPEN QUESTION POPUP
-       ============================================================ */
-
-    function openQuestionPopup() {
-
-        if (openingTarget) {
-            return;
-        }
-
-
-        openingTarget =
-            true;
-
-
-        const features =
-            getPopupFeatures();
-
-
-        let popup = null;
-
-
-        try {
-
-            popup =
-                window.open(
-                    TARGET_PAGE,
-                    "YouAreAnIdiotQuestion",
-                    features
-                );
-
-        } catch (_) {
-
-            popup = null;
-
-        }
-
-
-        /*
-         * If the browser refused the popup despite
-         * the permission test, reset the state and
-         * show the normal permission message.
-         */
-        if (!popup) {
-
-            openingTarget =
-                false;
-
-            popupAllowed =
-                false;
-
-            popupTestStarted =
-                false;
-
-            popupResults.clear();
-
-
-            showPermissionMessage();
-
-            return;
-
-        }
-
-
-        /*
-         * Focus it when browsers permit this.
-         */
-        try {
-
-            popup.focus();
-
-        } catch (_) {
-
-            /* Ignore browser restrictions. */
-
-        }
-
-    }
-
-
-    /* ============================================================
-       START THREE-POPUP TEST
-       ============================================================ */
-
-    function testPopupPermission() {
-
-        if (
-            popupTestStarted ||
-            popupAllowed
-        ) {
-
-            return;
-
-        }
-
-
-        popupTestStarted =
-            true;
-
-
-        popupResults.clear();
-
-
-        for (
-            let i = 0;
-            i < POPUP_TEST_COUNT;
-            i++
-        ) {
-
-            try {
-
-                const testPopup =
-                    window.open(
-                        `${TEST_PAGE}?id=${i}`,
-                        `youare_popup_test_${i}`,
-                        [
-                            "width=1",
-                            "height=1",
-                            "left=-10000",
-                            "top=-10000"
-                        ].join(",")
-                    );
-
-
-                /*
-                 * test.html is responsible for
-                 * reporting success and closing
-                 * itself.
-                 *
-                 * We intentionally do not inspect
-                 * the returned window here because
-                 * some browsers return a WindowProxy
-                 * even when the popup is subsequently
-                 * blocked/delayed.
-                 */
-                void testPopup;
-
-            } catch (_) {
-
-                /*
-                 * A blocked popup simply won't
-                 * report success.
-                 */
-
-            }
-
-        }
-
-
-        /*
-         * Give blocked/delayed browsers time to
-         * report their responses before displaying
-         * the permission message.
-         */
-        setTimeout(
-            () => {
-
-                if (
-                    popupAllowed ||
-                    popupResults.size >=
-                    POPUP_TEST_COUNT
-                ) {
-
-                    return;
-
-                }
-
-
-                showPermissionMessage();
-
-            },
-            1500
-        );
-
-    }
-
-
-    /* ============================================================
-       STARTUP
-       ============================================================ */
-
-    window.addEventListener(
-        "load",
-        () => {
-
-            /*
-             * Start immediately after the page has
-             * loaded. The popup test is therefore
-             * associated with the initial navigation.
-             */
-            testPopupPermission();
-
-        },
-        {
-            once: true
-        }
-    );
-
-
-    /* ============================================================
-       RETEST WHEN WINDOW GETS FOCUS
-       ============================================================ */
-
-    window.addEventListener(
-        "focus",
-        () => {
-
-            if (
-                !popupAllowed &&
-                !permissionMessageVisible
-            ) {
-
-                popupTestStarted =
-                    false;
-
-                popupResults.clear();
-
-                testPopupPermission();
-
-            }
-
-        }
-    );
-
-
-    /* ============================================================
-       ESCAPE / CONTEXT MENU
-       ============================================================ */
-
-    document.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key === "Escape"
-            ) {
-
-                closePopup(
-                    "Close"
-                );
-
-            }
-
-        }
-    );
-
-
-    document.addEventListener(
-        "contextmenu",
-        event => {
-
-            event.preventDefault();
-
-        }
-    );
-
-</script>
-
-</body></html>
+</script></body>
+</html>
