@@ -41,13 +41,6 @@
         justify-content: center;
     }
 
-
-    /*
-     * ========================================================
-     * MAIN WINDOWS 95 WINDOW
-     * ========================================================
-     */
-
     #question-window {
         position: absolute;
 
@@ -80,13 +73,6 @@
         overflow: hidden;
     }
 
-
-    /*
-     * ========================================================
-     * TITLE BAR
-     * ========================================================
-     */
-
     #titlebar {
         position: absolute;
 
@@ -111,7 +97,6 @@
         line-height: 18px;
 
         cursor: move;
-
         touch-action: none;
     }
 
@@ -123,13 +108,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
-
-    /*
-     * ========================================================
-     * IMAGE
-     * ========================================================
-     */
 
     #pictureBox1 {
         position: absolute;
@@ -146,13 +124,6 @@
 
         pointer-events: none;
     }
-
-
-    /*
-     * ========================================================
-     * QUESTION
-     * ========================================================
-     */
 
     #question-area {
         position: absolute;
@@ -190,13 +161,6 @@
 
         text-align: center;
     }
-
-
-    /*
-     * ========================================================
-     * ANSWERS
-     * ========================================================
-     */
 
     .answer {
         position: absolute;
@@ -274,13 +238,6 @@
         width: 244px;
     }
 
-
-    /*
-     * ========================================================
-     * MESSAGE BOX OVERLAY
-     * ========================================================
-     */
-
     #popup-overlay {
         position: fixed;
 
@@ -294,7 +251,6 @@
     #popup-overlay.visible {
         display: block;
     }
-
 
     #popup {
         position: fixed;
@@ -328,7 +284,6 @@
             inset -1px -1px 0 #808080;
     }
 
-
     #popup-titlebar {
         height: 22px;
 
@@ -354,11 +309,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
-
-    /*
-     * Popup X remains.
-     */
 
     #popup-close {
         width: 19px;
@@ -395,7 +345,6 @@
             #ffffff
             #000000;
     }
-
 
     #popup-content {
         min-height: 90px;
@@ -437,7 +386,6 @@
 
         line-height: 1.35;
     }
-
 
     #popup-buttons {
         display: flex;
@@ -503,7 +451,6 @@
     </span>
 </div>
 
-
 <img
     id="pictureBox1"
     src="media/idiot.gif"
@@ -511,15 +458,11 @@
     draggable="false"
 >
 
-
 <div id="question-area">
-
     <div id="question">
         Are You An Idiot ?
     </div>
-
 </div>
-
 
 <button
     class="answer"
@@ -529,7 +472,6 @@
     No, I'm not.
 </button>
 
-
 <button
     class="answer"
     id="none"
@@ -537,7 +479,6 @@
 >
     I don't know =[
 </button>
-
 
 <button
     class="answer"
@@ -547,9 +488,7 @@
     Yes, I am.
 </button>
 
-</main><!-- ============================================================
-     CUSTOM MESSAGE BOX
-     ============================================================ --><div id="popup-overlay"><div id="popup">
+</main><div id="popup-overlay"><div id="popup">
 
     <div id="popup-titlebar">
 
@@ -591,14 +530,13 @@ loop
 >
 
 </audio><script>
+
 "use strict";
 
 
-/*
- * ============================================================
- * ELEMENTS
- * ============================================================
- */
+/* ============================================================
+   ELEMENTS
+   ============================================================ */
 
 const question =
     document.getElementById("question");
@@ -637,11 +575,9 @@ const titlebar =
     document.getElementById("titlebar");
 
 
-/*
- * ============================================================
- * RESPONSIVE SCALING
- * ============================================================
- */
+/* ============================================================
+   RESPONSIVE SCALING
+   ============================================================ */
 
 const BASE_WIDTH = 928;
 const BASE_HEIGHT = 929;
@@ -675,10 +611,6 @@ function updateScale() {
     );
 
 
-    /*
-     * Never allow a zero/negative transform.
-     */
-
     scale = Math.max(
         scale,
         0.1
@@ -708,10 +640,12 @@ function updateScale() {
 
 updateScale();
 
+
 window.addEventListener(
     "resize",
     updateScale
 );
+
 
 window.addEventListener(
     "orientationchange",
@@ -726,11 +660,263 @@ window.addEventListener(
 );
 
 
+/* ============================================================
+   POPUP SELF-RESIZE
+   ============================================================ */
+
 /*
- * ============================================================
- * CUSTOM MESSAGE BOX
- * ============================================================
+ * This calculates the browser outer size required for the
+ * actual rendered fake Windows window.
+ *
+ * If the popup is currently scaled, the rendered dimensions
+ * are used rather than blindly requesting 928x929.
  */
+
+function getDesiredPopupSize() {
+
+    const rect =
+        questionWindow.getBoundingClientRect();
+
+
+    const desiredWidth =
+        Math.max(
+            1,
+            Math.round(rect.width)
+        );
+
+
+    const desiredHeight =
+        Math.max(
+            1,
+            Math.round(rect.height)
+        );
+
+
+    const chromeWidth =
+        Math.max(
+            0,
+            window.outerWidth -
+            window.innerWidth
+        );
+
+
+    const chromeHeight =
+        Math.max(
+            0,
+            window.outerHeight -
+            window.innerHeight
+        );
+
+
+    return {
+        viewportWidth: desiredWidth,
+        viewportHeight: desiredHeight,
+
+        outerWidth:
+            desiredWidth +
+            chromeWidth,
+
+        outerHeight:
+            desiredHeight +
+            chromeHeight
+    };
+
+}
+
+
+/*
+ * Actually attempt to resize this popup.
+ *
+ * Returns a Promise<boolean> indicating whether the browser
+ * appears to have accepted the resize.
+ */
+
+function resizePopupToActualSize() {
+
+    return new Promise(resolve => {
+
+        const target =
+            getDesiredPopupSize();
+
+
+        if (
+            typeof window.resizeTo !==
+            "function"
+        ) {
+
+            resolve(false);
+
+            return;
+
+        }
+
+
+        try {
+
+            window.resizeTo(
+                target.outerWidth,
+                target.outerHeight
+            );
+
+        } catch (_) {
+
+            resolve(false);
+
+            return;
+
+        }
+
+
+        /*
+         * resizeTo() does not necessarily throw when a browser
+         * ignores it, so verify the result afterwards.
+         */
+
+        setTimeout(
+            () => {
+
+                const widthDifference =
+                    Math.abs(
+                        window.innerWidth -
+                        target.viewportWidth
+                    );
+
+
+                const heightDifference =
+                    Math.abs(
+                        window.innerHeight -
+                        target.viewportHeight
+                    );
+
+
+                const success =
+                    widthDifference <= 3 &&
+                    heightDifference <= 3;
+
+
+                resolve(success);
+
+            },
+            120
+        );
+
+    });
+
+}
+
+
+/*
+ * Ask the opener to perform the resize when this window
+ * cannot resize itself.
+ */
+
+function requestOpenerResize() {
+
+    const target =
+        getDesiredPopupSize();
+
+
+    try {
+
+        if (
+            window.opener &&
+            !window.opener.closed
+        ) {
+
+            window.opener.postMessage(
+                {
+                    type:
+                        "YOUARE_RESIZE_REQUEST",
+
+                    outerWidth:
+                        target.outerWidth,
+
+                    outerHeight:
+                        target.outerHeight,
+
+                    viewportWidth:
+                        target.viewportWidth,
+
+                    viewportHeight:
+                        target.viewportHeight
+                },
+                window.location.origin
+            );
+
+            return true;
+
+        }
+
+    } catch (_) {
+
+        /* Ignore inaccessible/closed opener. */
+
+    }
+
+
+    return false;
+
+}
+
+
+/*
+ * Final resize operation used immediately before navigation.
+ *
+ * First try the popup itself.
+ *
+ * If that fails, ask index.html to resize this window.
+ *
+ * We wait briefly for the opener to perform the request before
+ * navigating away.
+ */
+
+async function prepareWindowForRedirect() {
+
+    const selfResizeWorked =
+        await resizePopupToActualSize();
+
+
+    if (selfResizeWorked) {
+
+        return;
+
+    }
+
+
+    const requested =
+        requestOpenerResize();
+
+
+    if (!requested) {
+
+        return;
+
+    }
+
+
+    /*
+     * Give index.html enough time to execute resizeTo().
+     *
+     * Navigation follows immediately afterwards.
+     */
+
+    await new Promise(
+        resolve => {
+
+            setTimeout(
+                resolve,
+                120
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   CUSTOM MESSAGE BOX
+   ============================================================ */
 
 let popupResolver = null;
 
@@ -744,11 +930,14 @@ function showPopup(
     popupMessage.textContent =
         message;
 
+
     popupIcon.textContent =
         icon;
 
+
     popupButtons.innerHTML =
         "";
+
 
     popupOverlay.classList.add(
         "visible"
@@ -771,11 +960,14 @@ function showPopup(
                         "button"
                     );
 
+
                 button.type =
                     "button";
 
+
                 button.textContent =
                     text;
+
 
                 button.addEventListener(
                     "click",
@@ -787,6 +979,7 @@ function showPopup(
 
                     }
                 );
+
 
                 popupButtons.appendChild(
                     button
@@ -800,8 +993,11 @@ function showPopup(
                     "button"
                 );
 
+
             if (firstButton) {
+
                 firstButton.focus();
+
             }
 
         }
@@ -838,22 +1034,23 @@ popupClose.addEventListener(
     "click",
     () => {
 
-        closePopup("Close");
+        closePopup(
+            "Close"
+        );
 
     }
 );
 
 
-/*
- * ============================================================
- * AUDIO
- * ============================================================
- */
+/* ============================================================
+   AUDIO
+   ============================================================ */
 
 function playAudio() {
 
     const promise =
         idiotAudio.play();
+
 
     if (
         promise &&
@@ -861,9 +1058,7 @@ function playAudio() {
         "function"
     ) {
 
-        promise.catch(() => {
-            /* Browser blocked autoplay. */
-        });
+        promise.catch(() => {});
 
     }
 
@@ -886,13 +1081,12 @@ document.addEventListener(
 );
 
 
-/*
- * ============================================================
- * RAINBOW QUESTION
- * ============================================================
- */
+/* ============================================================
+   RAINBOW QUESTION
+   ============================================================ */
 
 const fontColors = [
+
     "Indigo",
     "Ivory",
     "LightPink",
@@ -903,14 +1097,18 @@ const fontColors = [
     "Pink",
     "Red",
     "Snow"
+
 ];
 
+
 let timerFT = 0;
+
 
 setInterval(
     () => {
 
         timerFT++;
+
 
         if (
             timerFT >= 1 &&
@@ -922,7 +1120,10 @@ setInterval(
 
         }
 
-        if (timerFT >= 9) {
+
+        if (
+            timerFT >= 9
+        ) {
 
             question.style.color =
                 "Snow";
@@ -936,22 +1137,36 @@ setInterval(
 );
 
 
-/*
- * ============================================================
- * REDIRECT
- * ============================================================
- */
+/* ============================================================
+   REDIRECT
+   ============================================================ */
 
 let redirecting = false;
 
 
-function redirectToDiscord() {
+async function redirectToDiscord() {
 
     if (redirecting) {
+
         return;
+
     }
 
+
     redirecting = true;
+
+
+    /*
+     * Resize immediately before the navigation.
+     */
+
+    await prepareWindowForRedirect();
+
+
+    /*
+     * Navigate only after the resize/fallback request
+     * has been given a chance to execute.
+     */
 
     window.location.href =
         "discord.html";
@@ -959,23 +1174,25 @@ function redirectToDiscord() {
 }
 
 
-/*
- * ============================================================
- * NO / I DON'T KNOW
- * ============================================================
- */
+/* ============================================================
+   NO / I DON'T KNOW
+   ============================================================ */
 
 async function handleNo() {
 
     if (redirecting) {
+
         return;
+
     }
+
 
     await showPopup(
         "Oh... I think you are an idiot. XD",
         ["OK"],
         "!"
     );
+
 
     redirectToDiscord();
 
@@ -987,25 +1204,27 @@ noButton.addEventListener(
     handleNo
 );
 
+
 noneButton.addEventListener(
     "click",
     handleNo
 );
 
 
-/*
- * ============================================================
- * YES
- * ============================================================
- */
+/* ============================================================
+   YES
+   ============================================================ */
 
 yesButton.addEventListener(
     "click",
     async () => {
 
         if (redirecting) {
+
             return;
+
         }
+
 
         const result =
             await showPopup(
@@ -1013,6 +1232,7 @@ yesButton.addEventListener(
                 ["Yes", "No"],
                 "?"
             );
+
 
         if (
             result === "Yes" ||
@@ -1028,11 +1248,9 @@ yesButton.addEventListener(
 );
 
 
-/*
- * ============================================================
- * ESCAPE
- * ============================================================
- */
+/* ============================================================
+   ESCAPE
+   ============================================================ */
 
 document.addEventListener(
     "keydown",
@@ -1050,11 +1268,9 @@ document.addEventListener(
 );
 
 
-/*
- * ============================================================
- * RIGHT CLICK
- * ============================================================
- */
+/* ============================================================
+   RIGHT CLICK
+   ============================================================ */
 
 document.addEventListener(
     "contextmenu",
@@ -1066,11 +1282,9 @@ document.addEventListener(
 );
 
 
-/*
- * ============================================================
- * DRAGGING
- * ============================================================
- */
+/* ============================================================
+   DRAGGING
+   ============================================================ */
 
 let dragging = false;
 
@@ -1093,16 +1307,20 @@ titlebar.addEventListener(
             event.pointerId;
 
 
-        if (!manuallyPositioned) {
+        if (
+            !manuallyPositioned
+        ) {
 
             const rect =
                 questionWindow.getBoundingClientRect();
+
 
             windowX =
                 rect.left;
 
             windowY =
                 rect.top;
+
 
             manuallyPositioned =
                 true;
@@ -1116,6 +1334,7 @@ titlebar.addEventListener(
         dragStartPointerY =
             event.clientY;
 
+
         dragStartWindowX =
             windowX;
 
@@ -1126,6 +1345,7 @@ titlebar.addEventListener(
         titlebar.setPointerCapture(
             event.pointerId
         );
+
 
         event.preventDefault();
 
@@ -1142,7 +1362,9 @@ titlebar.addEventListener(
             event.pointerId !==
             dragPointerId
         ) {
+
             return;
+
         }
 
 
@@ -1153,6 +1375,7 @@ titlebar.addEventListener(
                 dragStartPointerX
             );
 
+
         windowY =
             dragStartWindowY +
             (
@@ -1162,22 +1385,28 @@ titlebar.addEventListener(
 
 
         const renderedWidth =
-            BASE_WIDTH * scale;
+            BASE_WIDTH *
+            scale;
+
 
         const renderedHeight =
-            BASE_HEIGHT * scale;
+            BASE_HEIGHT *
+            scale;
 
 
-        const minVisible = 30;
+        const minVisible =
+            30;
 
 
         windowX =
             Math.min(
                 Math.max(
                     windowX,
-                    -renderedWidth + minVisible
+                    -renderedWidth +
+                    minVisible
                 ),
-                window.innerWidth - minVisible
+                window.innerWidth -
+                minVisible
             );
 
 
@@ -1185,17 +1414,21 @@ titlebar.addEventListener(
             Math.min(
                 Math.max(
                     windowY,
-                    -renderedHeight + minVisible
+                    -renderedHeight +
+                    minVisible
                 ),
-                window.innerHeight - minVisible
+                window.innerHeight -
+                minVisible
             );
 
 
         questionWindow.style.left =
             `${windowX}px`;
 
+
         questionWindow.style.top =
             `${windowY}px`;
+
 
         questionWindow.style.transform =
             `scale(${scale})`;
@@ -1211,12 +1444,16 @@ function stopDragging(event) {
         event.pointerId !==
         dragPointerId
     ) {
+
         return;
+
     }
+
 
     dragging = false;
 
     dragPointerId = null;
+
 
     try {
 
@@ -1234,17 +1471,16 @@ titlebar.addEventListener(
     stopDragging
 );
 
+
 titlebar.addEventListener(
     "pointercancel",
     stopDragging
 );
 
 
-/*
- * ============================================================
- * PREVENT GIF DRAGGING
- * ============================================================
- */
+/* ============================================================
+   PREVENT GIF DRAGGING
+   ============================================================ */
 
 document
     .getElementById("pictureBox1")
