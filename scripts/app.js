@@ -72,58 +72,94 @@ function proCreate() {
         openWindow("discord.html");
     }
 }
-  
-  
-let xOff = 5, yOff = 5;
-let xPos = 400, yPos = -100;
+
+let xOff = 0, yOff = 0;
+let xPos = 0, yPos = 0;
 let flagRun = 1;
 
-function newXlt() {
-    xOff = Math.ceil(-6 * Math.random()) * 5 - 10;
-    window.focus();
-}
-
-function newXrt() {
-    xOff = Math.ceil(7 * Math.random()) * 5 - 10;
-}
-
-function newYup() {
-    yOff = Math.ceil(-6 * Math.random()) * 5 - 10;
-}
-
-function newYdn() {
-    yOff = Math.ceil(7 * Math.random()) * 5 - 10;
-}
-
-function fOff() {
-    flagRun = 0;
+function randomSpeed(multiplier) {
+    return (1 + Math.round(34 * Math.random())) * multiplier;
 }
 
 function playBall() {
+    const multiplier = screen.height >= 1440 ? 2 : 1;
+
+    // Approximate the C#:
+    // Screen.PrimaryScreen.Bounds.Width - this.Width
+    const maxX = Math.max(0, screen.width - window.outerWidth);
+
+    // Approximate the C#:
+    // Screen.PrimaryScreen.Bounds.Height - this.Height
+    const maxY = Math.max(0, screen.height - window.outerHeight);
+
+    // Hit right edge
+    if (xPos >= maxX) {
+        xPos = maxX;
+        xOff = -randomSpeed(multiplier);
+
+        if (yOff < 0) {
+            yOff = -randomSpeed(multiplier);
+        } else if (yOff > 0) {
+            yOff = randomSpeed(multiplier);
+        } else {
+            yOff = randomSpeed(multiplier);
+        }
+    }
+
+    // Hit bottom edge
+    if (yPos >= maxY) {
+        yPos = maxY;
+        yOff = -randomSpeed(multiplier);
+
+        if (xOff < 0) {
+            xOff = -randomSpeed(multiplier);
+        } else if (xOff > 0) {
+            xOff = randomSpeed(multiplier);
+        } else {
+            xOff = randomSpeed(multiplier);
+        }
+    }
+
+    // Hit left edge
+    if (xPos <= 0) {
+        xPos = 0;
+        xOff = randomSpeed(multiplier);
+
+        if (yOff < 0) {
+            yOff = -randomSpeed(multiplier);
+        } else if (yOff > 0) {
+            yOff = randomSpeed(multiplier);
+        } else {
+            yOff = randomSpeed(multiplier);
+        }
+    }
+
+    // Hit top edge
+    if (yPos <= 0) {
+        yPos = 0;
+        yOff = randomSpeed(multiplier);
+
+        if (xOff < 0) {
+            xOff = -randomSpeed(multiplier);
+        } else if (xOff > 0) {
+            xOff = randomSpeed(multiplier);
+        } else {
+            xOff = randomSpeed(multiplier);
+        }
+    }
+
     xPos += xOff;
     yPos += yOff;
 
-    if (xPos > screen.width - 357) {
-        newXlt();
-    }
-
-    if (xPos < 0) {
-        newXrt();
-    }
-
-    if (yPos > screen.height - 330) {
-        newYup();
-    }
-
-    if (yPos < 0) {
-        newYdn();
-    }
-
     if (flagRun === 1) {
         try {
-            window.moveTo(xPos, yPos);
-        } catch (e) {
+            window.moveTo(
+                Math.round(xPos),
+                Math.round(yPos)
+            );
+        } catch {
             flagRun = 0;
+            return;
         }
 
         setTimeout(playBall, 1);
