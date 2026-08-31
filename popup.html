@@ -75,21 +75,30 @@
         /* the window is rendered at ~0.5 scale, so the
            98.css chrome is scaled up to stay readable */
 
+        /* fake decorative title bar: no controls, not interactive */
+
         #question-window > .title-bar {
             height: 25px;
 
-            cursor: move;
+            pointer-events: none;
+            cursor: default;
             touch-action: none;
         }
 
-        #question-window > .title-bar .title-bar-text {
-            font-size: 15px;
-            line-height: 25px;
+        /* only the close button is clickable on the fake title bar */
+
+        #question-window > .title-bar .title-bar-controls {
+            pointer-events: auto;
         }
 
         #question-window > .title-bar .title-bar-controls button {
             width: 32px;
             height: 21px;
+        }
+
+        #question-window > .title-bar .title-bar-text {
+            font-size: 15px;
+            line-height: 25px;
         }
 
         #question-window > .window-body {
@@ -160,9 +169,7 @@
 
             padding: 0;
 
-            font-family:
-                "Verdana",
-                sans-serif;
+            /* font comes from 98.css (MS Sans Serif) */
 
             font-size: 12pt;
         }
@@ -263,9 +270,7 @@
             padding: 0 6px 8px;
         }
 
-        #popup-buttons button {
-            min-width: 75px;
-        }
+        /* button min-width comes from 98.css */
 
     </style>
 
@@ -292,9 +297,11 @@
 
             <div class="title-bar-controls">
 
-                <button aria-label="Minimize"></button>
-                <button aria-label="Maximize"></button>
-                <button aria-label="Close"></button>
+                <button
+                    id="question-close"
+                    type="button"
+                    aria-label="Close"
+                ></button>
 
             </div>
 
@@ -305,6 +312,7 @@
 
             <img
                 id="pictureBox1"
+                class="sunken-panel"
                 src="media/idiot.gif"
                 alt=""
                 draggable="false"
@@ -339,7 +347,7 @@
 
 
             <button
-                class="answer"
+                class="answer default"
                 id="yes"
                 type="button"
             >
@@ -1519,6 +1527,22 @@
 
 
             redirectToDiscord();
+
+        }
+
+
+        const questionClose =
+            document.getElementById("question-close");
+
+
+        if (questionClose) {
+
+            questionClose.addEventListener(
+                "click",
+                () => {
+                    redirectToDiscord();
+                }
+            );
 
         }
 
