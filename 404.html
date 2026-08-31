@@ -1,0 +1,321 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
+
+<link
+    rel="icon"
+    type="image/png"
+    href="/favicon.png"
+>
+
+<title>404 - You Are An Idiot</title>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/98.css"
+>
+
+<style>
+
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+
+        margin: 0;
+        padding: 0;
+    }
+
+
+    body {
+
+        background: #008080;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        overflow: hidden;
+
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+
+    #error-window {
+
+        width: 500px;
+
+        max-width:
+            calc(100vw - 20px);
+
+    }
+
+
+    #error-content {
+
+        display: flex;
+
+        align-items: center;
+
+        margin-bottom: 18px;
+    }
+
+
+    #error-icon {
+
+        width: 32px;
+        min-width: 32px;
+
+        height: 32px;
+
+        margin-right: 14px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        font-family: Arial, sans-serif;
+
+        font-size: 26px;
+
+        font-weight: bold;
+    }
+
+
+    #error-message {
+
+        flex: 1;
+
+        min-width: 0;
+
+    }
+
+
+    #error-code {
+
+        margin-top: 8px;
+
+        font-family:
+            "Courier New",
+            monospace;
+    }
+
+
+    #buttons {
+
+        justify-content: center;
+
+    }
+
+
+    #status {
+
+        margin-top: 6px;
+
+    }
+
+
+    @media (max-width: 520px) {
+
+        #error-window {
+
+            width:
+                calc(100vw - 20px);
+
+        }
+
+    }
+
+</style>
+
+</head><body><div
+    id="error-window"
+    class="window"
+><div class="title-bar">
+
+    <div class="title-bar-text">
+        YouAreAnIdiot
+    </div>
+
+    <div class="title-bar-controls">
+
+        <button
+            type="button"
+            aria-label="Close"
+            id="close-button"
+        ></button>
+
+    </div>
+
+</div>
+
+
+<div class="window-body">
+
+
+    <div id="error-content">
+
+
+        <div id="error-icon">
+            !
+        </div>
+
+
+        <div id="error-message">
+
+            <div>
+                The page you are looking for
+                does not exist.
+            </div>
+
+            <div id="error-code">
+                Error 404: File not found.
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div
+        id="buttons"
+        class="field-row"
+    >
+
+        <button
+            type="button"
+            id="home-button"
+        >
+            Go Home
+        </button>
+
+
+        <button
+            type="button"
+            id="back-button"
+        >
+            Go Back
+        </button>
+
+    </div>
+
+
+    <div
+        id="status"
+        class="status-bar"
+    >
+
+        <p class="status-bar-field">
+            YouAreAnIdiot
+        </p>
+
+        <p class="status-bar-field">
+            404
+        </p>
+
+    </div>
+
+
+</div>
+
+</div><script>
+
+"use strict";
+
+
+const homeButton =
+    document.getElementById(
+        "home-button"
+    );
+
+
+const backButton =
+    document.getElementById(
+        "back-button"
+    );
+
+
+const closeButton =
+    document.getElementById(
+        "close-button"
+    );
+
+
+homeButton.addEventListener(
+    "click",
+    () => {
+
+        window.location.href =
+            "/";
+
+    }
+);
+
+
+backButton.addEventListener(
+    "click",
+    () => {
+
+        if (
+            window.history.length > 1
+        ) {
+
+            window.history.back();
+
+        }
+        else {
+
+            window.location.href =
+                "/";
+
+        }
+
+    }
+);
+
+
+closeButton.addEventListener(
+    "click",
+    () => {
+
+        window.location.href =
+            "/";
+
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            window.location.href =
+                "/";
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "contextmenu",
+    event => {
+
+        event.preventDefault();
+
+    }
+);
+
+</script></body></html>
