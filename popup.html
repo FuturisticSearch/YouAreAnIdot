@@ -79,35 +79,46 @@
         left: 3px;
         right: 3px;
         top: 3px;
-
-        height: 22px;
-
+    
+        height: 25px;
+    
         display: flex;
         align-items: center;
-
-        padding-left: 4px;
-        padding-right: 2px;
-
+    
+        padding-left: 6px;
+        padding-right: 3px;
+    
         background: #000080;
         color: #ffffff;
-
-        font-size: 13px;
+    
+        font-family: Tahoma, "MS Sans Serif", Arial, sans-serif;
+        font-size: 15px;
         font-weight: bold;
-
-        line-height: 18px;
-
+    
+        line-height: 25px;
+        letter-spacing: 0;
+    
         cursor: move;
         touch-action: none;
+    
+        user-select: none;
+        -webkit-user-select: none;
+    
+        box-sizing: border-box;
     }
-
+    
     #title {
         flex: 1;
-
+    
+        min-width: 0;
+    
         pointer-events: none;
-
+    
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    
+        text-rendering: optimizeLegibility;
     }
 
     #pictureBox1 {
