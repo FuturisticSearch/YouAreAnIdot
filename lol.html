@@ -2,23 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>You Are An Idiot!</title>
 
-    <link
-        rel="preload"
-        href="/media/idiot.gif"
-        as="image"
-    >
+    <link rel="preload" href="/media/idiot.gif" as="image">
+    <link rel="preload" href="/media/youare.mp3" as="audio">
 
-    <script
-        src="/scripts/app.js"
-        defer
-    ></script>
+    <script src="scripts/app.js" defer></script>
 
     <style>
         html,
@@ -50,10 +40,22 @@
 
 <body>
 
-    <img
-        src="/media/idiot.gif"
-        alt="You Are An Idiot!"
-    >
+    <img src="/media/idiot.gif" alt="You Are An Idiot!">
+
+    <audio id="youare-audio" autoplay loop hidden>
+        <source src="/media/youare.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Autoplay fallback
+        document.addEventListener("click", () => {
+            const audio = document.getElementById("youare-audio");
+
+            if (audio && audio.paused) {
+                audio.play().catch(() => {});
+            }
+        }, { once: true });
+    </script>
 
 </body>
 </html>
