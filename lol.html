@@ -51,17 +51,17 @@ const id =
     Date.now().toString(36) +
     Math.random().toString(36).slice(2);
 
-const HEARTBEAT = 40;
+const HEARTBEAT = 20;
 const TIMEOUT = 300;
-const SYNC_LIMIT = 0.04;
+const SYNC_THRESHOLD = 0.03;
 
 let leader = null;
 let lastBeat = 0;
 let remoteTime = 0;
 let remoteStamp = 0;
 let heartbeatTimer = null;
-let dead = false;
 let claiming = false;
+let dead = false;
 
 
 /* ================= AUDIO ================= */
@@ -73,29 +73,24 @@ try {
     audio.load();
 } catch (_) {}
 
+function playAudio() {
+    if (dead || !audio.paused)
+        return;
 
-async function play() {
-    try {
-        await audio.play();
-    } catch (_) {
-        /*
-         * Browser autoplay policy may require user interaction.
-         */
-    }
+    audio.play().catch(() => {});
 }
 
 
 /* ================= TIME ================= */
 
-function duration() {
+function getDuration() {
     return Number.isFinite(audio.duration) && audio.duration > 0
         ? audio.duration
         : 0;
 }
 
-
 function normalize(t) {
-    const d = duration();
+    const d = getDuration();
 
     if (!d)
         return Math.max(0, t);
@@ -103,12 +98,14 @@ function normalize(t) {
     return ((t % d) + d) % d;
 }
 
-
-function targetTime() {
+function getTargetTime() {
     let t = remoteTime;
 
     if (remoteStamp) {
-        t += (performance.now() - remoteStamp) / 1000;
+        t += (
+            performance.now() -
+            remoteStamp
+        ) / 1000;
     }
 
     return normalize(t);
@@ -117,61 +114,62 @@ function targetTime() {
 
 /* ================= SYNC ================= */
 
-function sync() {
+function syncAudio() {
 
     if (leader === id)
         return;
 
-    const d = duration();
+    const d = getDuration();
 
     if (!d)
         return;
 
-    const target = targetTime();
+    const target = getTargetTime();
     const current = audio.currentTime;
 
     let diff = Math.abs(target - current);
 
-    /*
-     * Handle loop boundary.
-     */
-    diff = Math.min(diff, d - diff);
+    diff = Math.min(
+        diff,
+        d - diff
+    );
 
-    if (diff > SYNC_LIMIT) {
+    if (diff > SYNC_THRESHOLD) {
+
         try {
             audio.currentTime = target;
         } catch (_) {}
+
     }
 
-    /*
-     * Make sure every window keeps playing at full volume.
-     */
     audio.muted = false;
     audio.volume = 1;
 
-    if (audio.paused)
-        play();
+    playAudio();
 }
 
 
 /* ================= HEARTBEAT ================= */
 
-function heartbeat() {
+function sendHeartbeat() {
 
-    if (dead || leader !== id)
+    if (
+        dead ||
+        leader !== id
+    )
         return;
 
-    const now = performance.now();
+    const stamp = performance.now();
     const time = audio.currentTime;
 
     remoteTime = time;
-    remoteStamp = now;
+    remoteStamp = stamp;
 
     channel.postMessage({
         type: "beat",
         id,
         time,
-        stamp: now
+        stamp
     });
 }
 
@@ -180,10 +178,13 @@ function startHeartbeat() {
 
     clearInterval(heartbeatTimer);
 
-    heartbeat();
+    sendHeartbeat();
 
     heartbeatTimer =
-        setInterval(heartbeat, HEARTBEAT);
+        setInterval(
+            sendHeartbeat,
+            HEARTBEAT
+        );
 }
 
 
@@ -191,20 +192,26 @@ function startHeartbeat() {
 
 async function becomeLeader() {
 
-    if (dead || leader === id || claiming)
+    if (
+        dead ||
+        leader === id ||
+        claiming
+    )
         return;
 
     claiming = true;
 
-    /*
-     * Tiny election delay so multiple new windows don't
-     * all immediately declare themselves leader.
-     */
-    await new Promise(r =>
-        setTimeout(r, Math.random() * 30)
+    await new Promise(resolve =>
+        setTimeout(
+            resolve,
+            Math.random() * 20
+        )
     );
 
-    if (dead || leader === id) {
+    if (
+        dead ||
+        leader === id
+    ) {
         claiming = false;
         return;
     }
@@ -217,7 +224,7 @@ async function becomeLeader() {
         return;
     }
 
-    const time = targetTime();
+    const time = getTargetTime();
     const stamp = performance.now();
 
     channel.postMessage({
@@ -230,7 +237,7 @@ async function becomeLeader() {
     leader = id;
     claiming = false;
 
-    if (duration()) {
+    if (getDuration()) {
         try {
             audio.currentTime = time;
         } catch (_) {}
@@ -239,7 +246,7 @@ async function becomeLeader() {
     audio.muted = false;
     audio.volume = 1;
 
-    await play();
+    playAudio();
 
     startHeartbeat();
 }
@@ -255,20 +262,26 @@ channel.onmessage = event => {
         return;
 
 
+    /* ---------- HEARTBEAT ---------- */
+
     if (m.type === "beat") {
 
         const other = String(m.id);
 
-        /*
-         * Resolve accidental simultaneous leaders.
-         */
         if (leader === id) {
 
             if (other < id) {
+
                 leader = other;
-                clearInterval(heartbeatTimer);
+
+                clearInterval(
+                    heartbeatTimer
+                );
+
             } else {
-                heartbeat();
+
+                sendHeartbeat();
+
                 return;
             }
         }
@@ -276,59 +289,80 @@ channel.onmessage = event => {
         leader = other;
         lastBeat = performance.now();
 
-        remoteTime = Number(m.time) || 0;
-        remoteStamp = Number(m.stamp) || performance.now();
+        remoteTime =
+            Number(m.time) || 0;
+
+        remoteStamp =
+            Number(m.stamp) ||
+            performance.now();
 
         claiming = false;
 
-        sync();
+        syncAudio();
 
         return;
     }
 
 
+    /* ---------- CLAIM ---------- */
+
     if (m.type === "claim") {
 
         const other = String(m.id);
 
-        /*
-         * Smaller ID wins.
-         */
-        if (leader === id && other >= id) {
-            heartbeat();
+        if (
+            leader === id &&
+            other >= id
+        ) {
+            sendHeartbeat();
             return;
         }
 
         leader = other;
         lastBeat = performance.now();
 
-        remoteTime = Number(m.time) || 0;
-        remoteStamp = Number(m.stamp) || performance.now();
+        remoteTime =
+            Number(m.time) || 0;
+
+        remoteStamp =
+            Number(m.stamp) ||
+            performance.now();
 
         claiming = false;
 
-        sync();
+        syncAudio();
 
         return;
     }
 
+
+    /* ---------- DISCOVERY ---------- */
 
     if (m.type === "discover") {
 
         if (leader === id)
-            heartbeat();
+            sendHeartbeat();
 
         return;
     }
 
 
+    /* ---------- LEADER CLOSED ---------- */
+
     if (m.type === "closing") {
 
-        if (String(m.id) !== String(leader))
+        if (
+            String(m.id) !==
+            String(leader)
+        )
             return;
 
-        remoteTime = Number(m.time) || 0;
-        remoteStamp = Number(m.stamp) || performance.now();
+        remoteTime =
+            Number(m.time) || 0;
+
+        remoteStamp =
+            Number(m.stamp) ||
+            performance.now();
 
         leader = null;
         lastBeat = 0;
@@ -338,39 +372,64 @@ channel.onmessage = event => {
 };
 
 
-/* ================= START ================= */
+/* ================= STARTUP ================= */
 
-audio.addEventListener("loadedmetadata", () => {
-    sync();
-    play();
-});
+audio.addEventListener(
+    "loadedmetadata",
+    () => {
 
+        syncAudio();
+        playAudio();
 
-audio.addEventListener("playing", () => {
-    if (leader === id)
-        heartbeat();
-});
-
-
-audio.addEventListener("timeupdate", () => {
-    if (leader === id) {
-        remoteTime = audio.currentTime;
-        remoteStamp = performance.now();
     }
-});
+);
 
 
-audio.addEventListener("pause", () => {
-    if (!dead)
-        play();
-});
+audio.addEventListener(
+    "play",
+    () => {
+
+        audio.muted = false;
+        audio.volume = 1;
+
+    }
+);
 
 
-audio.addEventListener("play", () => {
-    audio.muted = false;
-    audio.volume = 1;
-});
+audio.addEventListener(
+    "pause",
+    () => {
 
+        if (!dead)
+            playAudio();
+
+    }
+);
+
+
+audio.addEventListener(
+    "playing",
+    () => {
+
+        if (leader === id)
+            sendHeartbeat();
+
+    }
+);
+
+
+audio.addEventListener(
+    "waiting",
+    () => {
+
+        if (leader === id)
+            sendHeartbeat();
+
+    }
+);
+
+
+/* Ask existing windows who the leader is. */
 
 channel.postMessage({
     type: "discover",
@@ -378,19 +437,21 @@ channel.postMessage({
 });
 
 
-/*
- * Start audio immediately in every popup.
- */
-play();
+/* Start audio immediately. */
+
+playAudio();
 
 
-/*
- * If nobody answers, become leader.
- */
+/* Elect a leader if nobody answers. */
+
 setTimeout(() => {
 
-    if (!dead && leader === null)
+    if (
+        !dead &&
+        leader === null
+    ) {
         becomeLeader();
+    }
 
 }, TIMEOUT);
 
@@ -404,11 +465,15 @@ setInterval(() => {
         leader !== id &&
         (
             leader === null ||
-            performance.now() - lastBeat > TIMEOUT
+            performance.now() -
+            lastBeat >
+            TIMEOUT
         )
     ) {
+
         leader = null;
         becomeLeader();
+
     }
 
 }, 100);
@@ -431,6 +496,7 @@ function cleanup() {
             time: audio.currentTime,
             stamp: performance.now()
         });
+
     }
 
     clearInterval(heartbeatTimer);
@@ -439,644 +505,19 @@ function cleanup() {
         audio.pause();
         channel.close();
     } catch (_) {}
-}
 
-window.addEventListener("pagehide", cleanup, {once:true});
-window.addEventListener("beforeunload", cleanup, {once:true});
-
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>You Are An Idiot!</title>
-
-<link rel="preload" href="/media/idiot.gif" as="image">
-<link rel="preload" href="/media/youare-long.mp3" as="audio">
-
-<script src="scripts/app.js" defer></script>
-
-<style>
-html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#000;
-}
-body{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    user-select:none;
-    -webkit-user-drag:none;
-}
-</style>
-</head>
-
-<body>
-
-<img src="/media/idiot.gif" alt="You Are An Idiot!">
-
-<audio id="youare-audio"
-       preload="auto"
-       loop
-       muted
-       hidden>
-    <source src="/media/youare-long.mp3" type="audio/mpeg">
-</audio>
-
-<script>
-"use strict";
-
-const audio = document.getElementById("youare-audio");
-const channel = new BroadcastChannel("youare-idiot-audio");
-
-const id =
-    Date.now().toString(36) +
-    Math.random().toString(36).slice(2);
-
-const HEARTBEAT = 150;
-const TIMEOUT = 600;
-const SYNC_THRESHOLD = 0.15;
-
-let leader = null;
-let lastBeat = 0;
-
-let remoteTime = 0;
-let remoteStamp = 0;
-
-let isLeader = false;
-let claiming = false;
-let dead = false;
-
-let heartbeatTimer = null;
-let timeoutTimer = null;
-
-
-/* ================= AUDIO ================= */
-
-audio.preload = "auto";
-audio.muted = true;
-audio.volume = 0;
-
-try {
-    audio.load();
-} catch (_) {}
-
-
-function getTime() {
-    return Number.isFinite(audio.currentTime)
-        ? audio.currentTime
-        : 0;
-}
-
-
-function getDuration() {
-    return Number.isFinite(audio.duration) &&
-           audio.duration > 0
-        ? audio.duration
-        : 0;
-}
-
-
-function normalize(t) {
-    const d = getDuration();
-
-    if (!d)
-        return Math.max(0, t);
-
-    return ((t % d) + d) % d;
-}
-
-
-function estimatedTime() {
-    let t = remoteTime;
-
-    if (remoteStamp) {
-        t += Math.min(
-            2,
-            Math.max(
-                0,
-                (performance.now() - remoteStamp) / 1000
-            )
-        );
-    }
-
-    return normalize(t);
-}
-
-
-/* ================= SILENT PLAY ================= */
-
-let starting = false;
-
-async function ensureSilentPlaying() {
-
-    if (
-        dead ||
-        starting ||
-        !audio.paused
-    )
-        return;
-
-    starting = true;
-
-    audio.muted = true;
-    audio.volume = 0;
-
-    try {
-        await audio.play();
-    } catch (_) {}
-
-    starting = false;
-}
-
-
-/* ================= SYNC ================= */
-
-function syncToRemote() {
-
-    if (
-        isLeader ||
-        leader === null
-    )
-        return;
-
-    const d = getDuration();
-
-    if (!d)
-        return;
-
-    const target = estimatedTime();
-    const current = getTime();
-
-    let diff = Math.abs(target - current);
-
-    diff = Math.min(
-        diff,
-        d - diff
-    );
-
-    if (diff > SYNC_THRESHOLD) {
-        try {
-            audio.currentTime = target;
-        } catch (_) {}
-    }
-}
-
-
-/* ================= HEARTBEAT ================= */
-
-function sendHeartbeat() {
-
-    if (
-        dead ||
-        !isLeader
-    )
-        return;
-
-    const now = performance.now();
-    const t = getTime();
-
-    remoteTime = t;
-    remoteStamp = now;
-
-    channel.postMessage({
-        type: "beat",
-        id: id,
-        time: t,
-        stamp: now
-    });
-}
-
-
-function startHeartbeat() {
-
-    if (heartbeatTimer)
-        clearInterval(heartbeatTimer);
-
-    sendHeartbeat();
-
-    heartbeatTimer = setInterval(
-        sendHeartbeat,
-        HEARTBEAT
-    );
-}
-
-
-/* ================= BECOME LEADER ================= */
-
-async function becomeLeader() {
-
-    if (
-        dead ||
-        isLeader ||
-        claiming
-    )
-        return;
-
-    claiming = true;
-
-    /*
-     * Small election delay.
-     *
-     * This prevents 100 popups from claiming at exactly
-     * the same instant.
-     */
-    await new Promise(resolve =>
-        setTimeout(
-            resolve,
-            Math.random() * 35
-        )
-    );
-
-    if (
-        dead ||
-        isLeader
-    ) {
-        claiming = false;
-        return;
-    }
-
-    /*
-     * Someone else is alive.
-     */
-    if (
-        leader !== null &&
-        performance.now() - lastBeat < TIMEOUT
-    ) {
-        claiming = false;
-        return;
-    }
-
-    const position = estimatedTime();
-    const stamp = performance.now();
-
-    channel.postMessage({
-        type: "claim",
-        id: id,
-        time: position,
-        stamp: stamp
-    });
-
-    leader = id;
-    isLeader = true;
-    claiming = false;
-
-    /*
-     * Sync before making sound.
-     */
-    if (getDuration()) {
-        try {
-            audio.currentTime = position;
-        } catch (_) {}
-    }
-
-    await ensureSilentPlaying();
-
-    /*
-     * NOW become audible.
-     */
-    audio.muted = false;
-    audio.volume = 1;
-
-    startHeartbeat();
-}
-
-
-/* ================= STOP LEADER ================= */
-
-function stopLeader() {
-
-    if (!isLeader)
-        return;
-
-    isLeader = false;
-
-    if (heartbeatTimer) {
-        clearInterval(heartbeatTimer);
-        heartbeatTimer = null;
-    }
-
-    audio.muted = true;
-    audio.volume = 0;
-}
-
-
-/* ================= ARM TIMEOUT ================= */
-
-function armTimeout() {
-
-    if (timeoutTimer)
-        clearTimeout(timeoutTimer);
-
-    timeoutTimer = setTimeout(() => {
-
-        if (
-            dead ||
-            isLeader
-        )
-            return;
-
-        if (
-            leader === null ||
-            performance.now() - lastBeat >= TIMEOUT
-        ) {
-            leader = null;
-            becomeLeader();
-        }
-
-    }, TIMEOUT + 20);
-}
-
-
-/* ================= MESSAGES ================= */
-
-channel.onmessage = event => {
-
-    const m = event.data;
-
-    if (
-        !m ||
-        !m.type ||
-        m.id === id
-    )
-        return;
-
-
-    /* ---------- HEARTBEAT ---------- */
-
-    if (m.type === "beat") {
-
-        const other = String(m.id);
-
-        /*
-         * If we're both leaders, deterministic winner.
-         */
-        if (isLeader) {
-
-            if (other < id) {
-                stopLeader();
-                leader = other;
-            } else {
-                sendHeartbeat();
-                return;
-            }
-        }
-
-        leader = other;
-        lastBeat = performance.now();
-
-        remoteTime = Number(m.time) || 0;
-        remoteStamp = Number(m.stamp) || performance.now();
-
-        claiming = false;
-
-        /*
-         * Sync ONLY when heartbeat arrives.
-         *
-         * No separate sync timer.
-         */
-        syncToRemote();
-
-        /*
-         * Keep standby decoder alive.
-         */
-        ensureSilentPlaying();
-
-        armTimeout();
-
-        return;
-    }
-
-
-    /* ---------- CLAIM ---------- */
-
-    if (m.type === "claim") {
-
-        const other = String(m.id);
-
-        /*
-         * Smaller ID wins simultaneous elections.
-         */
-        if (
-            isLeader &&
-            other >= id
-        ) {
-            sendHeartbeat();
-            return;
-        }
-
-        if (isLeader)
-            stopLeader();
-
-        leader = other;
-        lastBeat = performance.now();
-
-        remoteTime = Number(m.time) || 0;
-        remoteStamp = Number(m.stamp) || performance.now();
-
-        claiming = false;
-
-        audio.muted = true;
-        audio.volume = 0;
-
-        syncToRemote();
-        ensureSilentPlaying();
-
-        armTimeout();
-
-        return;
-    }
-
-
-    /* ---------- DISCOVERY ---------- */
-
-    if (m.type === "discover") {
-
-        if (isLeader)
-            sendHeartbeat();
-
-        return;
-    }
-
-
-    /* ---------- LEADER CLOSING ---------- */
-
-    if (m.type === "closing") {
-
-        if (
-            String(m.id) !== String(leader)
-        )
-            return;
-
-        remoteTime = Number(m.time) || 0;
-        remoteStamp = Number(m.stamp) || performance.now();
-
-        leader = null;
-        lastBeat = 0;
-
-        /*
-         * Already-playing silent audio = fast handoff.
-         */
-        becomeLeader();
-    }
-};
-
-
-/* ================= STARTUP ================= */
-
-/*
- * Start silent playback once.
- */
-ensureSilentPlaying();
-
-/*
- * Ask existing windows for the leader.
- */
-channel.postMessage({
-    type: "discover",
-    id: id
-});
-
-
-/*
- * If nobody responds, elect ourselves.
- */
-setTimeout(() => {
-
-    if (
-        !dead &&
-        leader === null &&
-        !isLeader
-    ) {
-        becomeLeader();
-    }
-
-}, TIMEOUT);
-
-
-/* ================= AUDIO EVENTS ================= */
-
-audio.addEventListener("play", () => {
-
-    if (!isLeader) {
-        audio.muted = true;
-        audio.volume = 0;
-    }
-
-});
-
-
-audio.addEventListener("pause", () => {
-
-    if (
-        !dead &&
-        !isLeader
-    ) {
-        /*
-         * Only restart if actually needed.
-         *
-         * No timer spam.
-         */
-        ensureSilentPlaying();
-    }
-
-});
-
-
-audio.addEventListener("playing", () => {
-
-    if (isLeader)
-        sendHeartbeat();
-
-});
-
-
-audio.addEventListener("waiting", () => {
-
-    /*
-     * Buffering does NOT kill leadership.
-     */
-    if (isLeader)
-        sendHeartbeat();
-
-});
-
-
-audio.addEventListener("timeupdate", () => {
-
-    if (isLeader) {
-        remoteTime = getTime();
-        remoteStamp = performance.now();
-    }
-
-});
-
-
-audio.addEventListener("loadedmetadata", () => {
-
-    if (!isLeader)
-        syncToRemote();
-
-    ensureSilentPlaying();
-
-});
-
-
-/* ================= CLEANUP ================= */
-
-function cleanup() {
-
-    if (dead)
-        return;
-
-    dead = true;
-
-    if (isLeader) {
-
-        channel.postMessage({
-            type: "closing",
-            id: id,
-            time: getTime(),
-            stamp: performance.now()
-        });
-    }
-
-    if (heartbeatTimer)
-        clearInterval(heartbeatTimer);
-
-    if (timeoutTimer)
-        clearTimeout(timeoutTimer);
-
-    try {
-        audio.pause();
-    } catch (_) {}
-
-    try {
-        channel.close();
-    } catch (_) {}
 }
 
 window.addEventListener(
     "pagehide",
     cleanup,
-    { once: true }
+    {once:true}
 );
 
 window.addEventListener(
     "beforeunload",
     cleanup,
-    { once: true }
+    {once:true}
 );
 
 </script>
