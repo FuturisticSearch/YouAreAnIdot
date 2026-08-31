@@ -153,6 +153,10 @@
 
             line-height: 18px;
 
+            cursor: move;
+
+            touch-action: none;
+
             flex-shrink: 0;
         }
 
@@ -623,6 +627,11 @@ const autoplayAudio =
         "autoplay-test-audio"
     );
 
+const popupTitlebar =
+    document.getElementById(
+        "popup-titlebar"
+    );
+
 
 /* ============================================================
    STATE
@@ -678,6 +687,273 @@ let permissionStartupComplete =
 
 let initialPopupOpenAttempted =
     false;
+
+
+/* ============================================================
+   PERMISSION POPUP DRAGGING
+   ============================================================ */
+
+let popupDragging =
+    false;
+
+
+let popupDragPointerId =
+    null;
+
+
+let popupDragStartX =
+    0;
+
+
+let popupDragStartY =
+    0;
+
+
+let popupStartLeft =
+    0;
+
+
+let popupStartTop =
+    0;
+
+
+popupTitlebar.addEventListener(
+    "pointerdown",
+    event => {
+
+        /*
+         * Do not start dragging when the
+         * close button is pressed.
+         */
+        if (
+            event.target.closest(
+                "#popup-close"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            !popupOverlay.classList.contains(
+                "visible"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        const rect =
+            popup.getBoundingClientRect();
+
+
+        /*
+         * The popup starts centered using
+         * translate(-50%, -50%). Convert that
+         * to explicit viewport coordinates
+         * before dragging.
+         */
+        popupStartLeft =
+            rect.left;
+
+
+        popupStartTop =
+            rect.top;
+
+
+        popupDragStartX =
+            event.clientX;
+
+
+        popupDragStartY =
+            event.clientY;
+
+
+        popup.style.transform =
+            "none";
+
+
+        popup.style.left =
+            `${popupStartLeft}px`;
+
+
+        popup.style.top =
+            `${popupStartTop}px`;
+
+
+        popupDragging =
+            true;
+
+
+        popupDragPointerId =
+            event.pointerId;
+
+
+        try {
+
+            popupTitlebar.setPointerCapture(
+                event.pointerId
+            );
+
+        } catch (_) {}
+
+
+        event.preventDefault();
+
+    }
+);
+
+
+popupTitlebar.addEventListener(
+    "pointermove",
+    event => {
+
+        if (
+            !popupDragging ||
+            event.pointerId !==
+            popupDragPointerId
+        ) {
+
+            return;
+
+        }
+
+
+        const deltaX =
+            event.clientX -
+            popupDragStartX;
+
+
+        const deltaY =
+            event.clientY -
+            popupDragStartY;
+
+
+        const rect =
+            popup.getBoundingClientRect();
+
+
+        const minVisibleX =
+            Math.min(
+                30,
+                rect.width
+            );
+
+
+        const minVisibleY =
+            Math.min(
+                30,
+                rect.height
+            );
+
+
+        const minX =
+            -rect.width +
+            minVisibleX;
+
+
+        const maxX =
+            window.innerWidth -
+            minVisibleX;
+
+
+        const minY =
+            -rect.height +
+            minVisibleY;
+
+
+        const maxY =
+            window.innerHeight -
+            minVisibleY;
+
+
+        let newLeft =
+            popupStartLeft +
+            deltaX;
+
+
+        let newTop =
+            popupStartTop +
+            deltaY;
+
+
+        newLeft =
+            Math.min(
+                Math.max(
+                    newLeft,
+                    minX
+                ),
+                maxX
+            );
+
+
+        newTop =
+            Math.min(
+                Math.max(
+                    newTop,
+                    minY
+                ),
+                maxY
+            );
+
+
+        popup.style.left =
+            `${newLeft}px`;
+
+
+        popup.style.top =
+            `${newTop}px`;
+
+    }
+);
+
+
+function stopPopupDragging(event) {
+
+    if (
+        !popupDragging ||
+        event.pointerId !==
+        popupDragPointerId
+    ) {
+
+        return;
+
+    }
+
+
+    popupDragging =
+        false;
+
+
+    popupDragPointerId =
+        null;
+
+
+    try {
+
+        popupTitlebar.releasePointerCapture(
+            event.pointerId
+        );
+
+    } catch (_) {}
+
+}
+
+
+popupTitlebar.addEventListener(
+    "pointerup",
+    stopPopupDragging
+);
+
+
+popupTitlebar.addEventListener(
+    "pointercancel",
+    stopPopupDragging
+);
 
 
 /* ============================================================
