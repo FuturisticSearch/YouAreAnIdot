@@ -2,323 +2,506 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>You Are An Idiot!</title>
 
 <link rel="preload" href="/media/idiot.gif" as="image">
 <link rel="preload" href="/media/youare-long.mp3" as="audio">
+
 <script src="scripts/app.js" defer></script>
 
 <style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
-body{display:flex;align-items:center;justify-content:center}
-img{width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none}
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+}
+body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    user-select:none;
+    -webkit-user-drag:none;
+}
 </style>
 </head>
 
 <body>
+
 <img src="/media/idiot.gif" alt="You Are An Idiot!">
 
 <audio id="youare-audio" preload="auto" loop muted hidden>
-<source src="/media/youare-long.mp3" type="audio/mpeg">
+    <source src="/media/youare-long.mp3" type="audio/mpeg">
 </audio>
 
 <script>
 "use strict";
 
-const audio=document.getElementById("youare-audio");
-const ch=new BroadcastChannel("youare-idiot-audio");
-const id=crypto.randomUUID();
+const audio = document.getElementById("youare-audio");
+const bc = new BroadcastChannel("youare-idiot-audio");
 
-const HB=50;
-const TIMEOUT=300;
-const SYNC=100;
-const THRESHOLD=.12;
+const id =
+    Date.now().toString(36) + "-" +
+    Math.random().toString(36).slice(2);
 
-let leader=null,lastBeat=0,lastTime=0,lastStamp=0;
-let isLeader=false,claiming=false,dead=false;
+const HEARTBEAT = 100;
+const TIMEOUT = 500;
+const SYNC = 200;
+const THRESHOLD = 0.12;
 
-audio.preload="auto";
-audio.muted=true;
-audio.volume=0;
-audio.load();
+let leader = null;
+let lastBeat = 0;
+let remoteTime = 0;
+let remoteStamp = 0;
+let isLeader = false;
+let claiming = false;
+let dead = false;
 
-function now(){return performance.now()}
+audio.preload = "auto";
+audio.muted = true;
+audio.volume = 0;
 
-function norm(t){
-    const d=audio.duration;
-    if(!Number.isFinite(t)||t<0)return 0;
-    return d>0?t%d:t;
+try {
+    audio.load();
+} catch (_) {}
+
+
+/* ---------------- AUDIO ---------------- */
+
+function time() {
+    return Number.isFinite(audio.currentTime)
+        ? audio.currentTime
+        : 0;
 }
 
-function time(){return norm(audio.currentTime)}
-
-function estimate(){
-    let t=lastTime;
-    if(Number.isFinite(lastStamp))
-        t+=Math.min(2,Math.max(0,(now()-lastStamp)/1000));
-    return norm(t);
+function duration() {
+    return Number.isFinite(audio.duration) && audio.duration > 0
+        ? audio.duration
+        : 0;
 }
 
-function remember(t,s){
-    if(Number.isFinite(t)&&t>=0){
-        lastTime=norm(t);
-        lastStamp=Number.isFinite(s)?s:now();
+function normalize(t) {
+    const d = duration();
+    if (!d) return Math.max(0, t);
+    return ((t % d) + d) % d;
+}
+
+function estimatedTime() {
+    let t = remoteTime;
+
+    if (remoteStamp) {
+        t += Math.min(
+            2,
+            Math.max(0, performance.now() - remoteStamp) / 1000
+        );
     }
+
+    return normalize(t);
 }
 
-function silent(){
-    audio.muted=true;
-    audio.volume=0;
-}
+async function silentPlay() {
+    if (dead) return;
 
-function audible(){
-    audio.muted=false;
-    audio.volume=1;
-}
+    audio.muted = true;
+    audio.volume = 0;
 
-function hb(){
-    if(!isLeader||dead)return;
-    const t=now(),p=time();
-    remember(p,t);
-    ch.postMessage({type:"hb",id,time:p,stamp:t});
-}
+    if (!audio.paused) return;
 
-function startHB(){
-    clearInterval(startHB.t);
-    hb();
-    startHB.t=setInterval(hb,HB);
-}
-
-async function startSilent(){
-    silent();
-    try{
+    try {
         await audio.play();
-        return !audio.paused;
-    }catch{
-        return false;
-    }
+    } catch (_) {}
 }
 
-function sync(){
-    if(!leader||isLeader||dead)return;
+function sync() {
+    if (isLeader || leader === null) return;
 
-    if(audio.paused){
-        startSilent();
-        return;
+    const target = estimatedTime();
+    const current = time();
+    const d = duration();
+
+    if (!d) return;
+
+    let diff = Math.abs(target - current);
+    diff = Math.min(diff, d - diff);
+
+    if (diff > THRESHOLD) {
+        try {
+            audio.currentTime = target;
+        } catch (_) {}
     }
 
-    const target=estimate(),cur=time(),d=audio.duration;
-    if(!Number.isFinite(d)||d<=0)return;
-
-    let diff=Math.abs(target-cur);
-    diff=Math.min(diff,d-diff);
-
-    if(diff>THRESHOLD){
-        try{audio.currentTime=target}catch{}
-    }
+    silentPlay();
 }
 
-async function becomeLeader(){
-    if(isLeader||claiming||dead)return;
 
-    claiming=true;
+/* ---------------- HEARTBEAT ---------------- */
 
-    if(
-        leader &&
-        now()-lastBeat<=TIMEOUT
-    ){
-        claiming=false;
-        return;
-    }
+function beat() {
+    if (!isLeader || dead) return;
 
-    ch.postMessage({
-        type:"claim",
+    const now = performance.now();
+    const t = time();
+
+    remoteTime = t;
+    remoteStamp = now;
+
+    bc.postMessage({
+        type: "beat",
         id,
-        time:estimate(),
-        stamp:now()
+        time: t,
+        stamp: now
+    });
+}
+
+
+/* ---------------- BECOME LEADER ---------------- */
+
+async function becomeLeader() {
+    if (dead || isLeader || claiming) return;
+
+    claiming = true;
+
+    /*
+     * Wait a tiny random amount so several surviving windows
+     * don't all claim simultaneously.
+     */
+    await new Promise(r =>
+        setTimeout(r, Math.random() * 40)
+    );
+
+    if (dead || isLeader) {
+        claiming = false;
+        return;
+    }
+
+    /*
+     * Someone else became leader while we waited.
+     */
+    if (
+        leader &&
+        performance.now() - lastBeat < TIMEOUT
+    ) {
+        claiming = false;
+        return;
+    }
+
+    /*
+     * Tell everybody who won.
+     */
+    bc.postMessage({
+        type: "claim",
+        id,
+        time: estimatedTime(),
+        stamp: performance.now()
     });
 
-    leader=id;
-    isLeader=true;
-    claiming=false;
+    leader = id;
+    isLeader = true;
+    claiming = false;
 
-    await startSilent();
-    sync();
+    /*
+     * Synchronize BEFORE making sound.
+     */
+    const t = estimatedTime();
 
-    audible();
-
-    if(audio.paused){
-        try{await audio.play()}
-        catch{
-            isLeader=false;
-            leader=null;
-            silent();
-            return;
-        }
+    if (duration()) {
+        try {
+            audio.currentTime = t;
+        } catch (_) {}
     }
 
-    startHB();
+    await silentPlay();
+
+    /*
+     * Only now become audible.
+     */
+    audio.muted = false;
+    audio.volume = 1;
+
+    beat();
 }
 
-function loseLeader(){
-    if(isLeader)remember(time(),now());
 
-    isLeader=false;
-    clearInterval(startHB.t);
-    silent();
+/* ---------------- MESSAGES ---------------- */
 
-    if(leader===id)leader=null;
-}
+bc.onmessage = e => {
+    const m = e.data;
 
-function takeover(){
-    if(claiming||isLeader||dead)return;
+    if (!m || !m.type || m.id === id) return;
 
-    claiming=true;
 
-    setTimeout(()=>{
-        claiming=false;
+    /* Leader heartbeat */
 
-        if(
-            !dead &&
-            !isLeader &&
-            (!leader||now()-lastBeat>TIMEOUT)
-        )
-            becomeLeader();
+    if (m.type === "beat") {
 
-    },Math.random()*30);
-}
-
-ch.onmessage=e=>{
-    const d=e.data;
-    if(!d||!d.type||d.id===id)return;
-
-    if(d.type==="hb"){
-        remember(Number(d.time),Number(d.stamp));
-
-        const remote=String(d.id);
-        leader=remote;
-        lastBeat=now();
-        claiming=false;
-
-        if(isLeader){
-            if(remote<id)loseLeader();
-            else{
-                leader=id;
-                hb();
+        /*
+         * If another leader is already alive, keep it.
+         */
+        if (
+            !isLeader ||
+            String(m.id) < String(id)
+        ) {
+            if (isLeader) {
+                isLeader = false;
+                audio.muted = true;
+                audio.volume = 0;
             }
-        }else{
-            silent();
+
+            leader = String(m.id);
+            lastBeat = performance.now();
+
+            remoteTime = Number(m.time) || 0;
+            remoteStamp = Number(m.stamp) || performance.now();
+
+            claiming = false;
+
             sync();
         }
+
         return;
     }
 
-    if(d.type==="claim"){
-        remember(Number(d.time),Number(d.stamp));
 
-        const remote=String(d.id);
+    /* Somebody claims leadership */
 
-        if(isLeader){
-            if(remote<id)loseLeader();
-            else{
-                leader=id;
-                hb();
+    if (m.type === "claim") {
+
+        const other = String(m.id);
+
+        /*
+         * Deterministic winner.
+         * Smaller ID wins if two windows claim simultaneously.
+         */
+        if (
+            !isLeader ||
+            other < String(id)
+        ) {
+
+            if (isLeader) {
+                isLeader = false;
+                audio.muted = true;
+                audio.volume = 0;
             }
-        }else{
-            leader=remote;
-            lastBeat=now();
-            claiming=false;
-            silent();
+
+            leader = other;
+            lastBeat = performance.now();
+
+            remoteTime = Number(m.time) || 0;
+            remoteStamp = Number(m.stamp) || performance.now();
+
+            claiming = false;
+
             sync();
         }
+
+        else if (isLeader) {
+
+            /*
+             * We won the tie.
+             */
+            beat();
+        }
+
         return;
     }
 
-    if(d.type==="close"&&String(d.id)===String(leader)){
-        remember(Number(d.time),Number(d.stamp));
-        leader=null;
-        lastBeat=0;
-        takeover();
-    }
 
-    if(d.type==="discover"&&isLeader)hb();
-};
+    /* New popup asks who is leader */
 
-audio.onplay=()=>{
-    if(!isLeader)silent();
-};
+    if (m.type === "discover") {
 
-audio.onpause=()=>{
-    if(!dead&&!isLeader)
-        setTimeout(()=>{
-            if(!dead&&!isLeader&&audio.paused)startSilent();
-        },10);
-};
+        if (isLeader) beat();
 
-audio.onplaying=()=>{if(isLeader)hb()};
-
-audio.ontimeupdate=()=>{
-    if(isLeader)remember(time(),now());
-};
-
-audio.onwaiting=()=>{
-    if(isLeader)hb();
-};
-
-audio.onended=()=>{
-    if(isLeader){
-        lastTime=0;
-        lastStamp=now();
-        hb();
+        return;
     }
 };
 
-document.addEventListener("visibilitychange",()=>{
-    if(isLeader)hb();
-    else if(!document.hidden&&audio.paused)startSilent();
+
+/* ---------------- STARTUP ---------------- */
+
+/*
+ * Every popup immediately starts its own silent decoder.
+ */
+silentPlay();
+
+/*
+ * Ask existing popups who the leader is.
+ */
+bc.postMessage({
+    type: "discover",
+    id
 });
 
-ch.postMessage({type:"discover",id});
 
-startSilent();
-
-setInterval(()=>{
-    if(dead||isLeader)return;
-
-    if(!leader||now()-lastBeat>TIMEOUT){
-        leader=null;
-        takeover();
+/*
+ * If nobody answers, become leader.
+ */
+setTimeout(() => {
+    if (
+        !dead &&
+        leader === null &&
+        !isLeader
+    ) {
+        becomeLeader();
     }
-},HB);
+}, TIMEOUT);
 
-setInterval(sync,SYNC);
 
-setTimeout(()=>{
-    if(!leader&&!isLeader)takeover();
-},150);
+/* ---------------- TIMERS ---------------- */
 
-function cleanup(){
-    if(dead)return;
-    dead=true;
+setInterval(() => {
 
-    if(isLeader){
-        remember(time(),now());
-        ch.postMessage({
-            type:"close",
+    if (dead) return;
+
+    if (isLeader) {
+        beat();
+        return;
+    }
+
+    /*
+     * Leader hasn't been heard from.
+     */
+    if (
+        leader === null ||
+        performance.now() - lastBeat > TIMEOUT
+    ) {
+
+        leader = null;
+
+        becomeLeader();
+
+    }
+
+}, HEARTBEAT);
+
+
+/*
+ * Keep every silent popup synchronized.
+ */
+setInterval(sync, SYNC);
+
+
+/* ---------------- AUDIO EVENTS ---------------- */
+
+audio.addEventListener("play", () => {
+
+    if (!isLeader) {
+        audio.muted = true;
+        audio.volume = 0;
+    }
+
+});
+
+
+audio.addEventListener("pause", () => {
+
+    if (!dead && !isLeader) {
+        setTimeout(silentPlay, 20);
+    }
+
+});
+
+
+audio.addEventListener("playing", () => {
+
+    if (isLeader) beat();
+
+});
+
+
+audio.addEventListener("waiting", () => {
+
+    /*
+     * Do NOT surrender leadership just because buffering occurs.
+     */
+    if (isLeader) beat();
+
+});
+
+
+audio.addEventListener("timeupdate", () => {
+
+    if (isLeader) {
+        remoteTime = time();
+        remoteStamp = performance.now();
+    }
+
+});
+
+
+audio.addEventListener("loadedmetadata", () => {
+
+    silentPlay();
+
+});
+
+
+/* ---------------- CLEANUP ---------------- */
+
+function cleanup() {
+
+    if (dead) return;
+
+    dead = true;
+
+    if (isLeader) {
+
+        /*
+         * Give the surviving popups the latest position.
+         */
+        bc.postMessage({
+            type: "closing",
             id,
-            time:lastTime,
-            stamp:lastStamp
+            time: time(),
+            stamp: performance.now()
         });
+
     }
 
-    clearInterval(startHB.t);
-    silent();
-    ch.close();
+    try {
+        audio.pause();
+    } catch (_) {}
+
+    try {
+        bc.close();
+    } catch (_) {}
 }
 
-addEventListener("beforeunload",cleanup,{once:true});
-addEventListener("pagehide",cleanup,{once:true});
+window.addEventListener("pagehide", cleanup);
+window.addEventListener("beforeunload", cleanup);
+
+
+/* ---------------- IMMEDIATE HANDOFF ---------------- */
+
+bc.addEventListener("message", e => {
+
+    const m = e.data;
+
+    if (!m || m.type !== "closing") return;
+
+    if (String(m.id) !== String(leader)) return;
+
+    remoteTime = Number(m.time) || 0;
+    remoteStamp = Number(m.stamp) || performance.now();
+
+    leader = null;
+    lastBeat = 0;
+
+    /*
+     * The audio is already loaded and playing silently,
+     * so takeover can happen immediately.
+     */
+    becomeLeader();
+
+});
 </script>
+
 </body>
 </html>
