@@ -1,554 +1,557 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+```
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
 
-    <title>Are you an idiot?</title>
+<title>Are you an idiot?</title>
 
-    <style>
+<style>
 
-        * {
-            box-sizing: border-box;
-        }
-
-
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-
-            margin: 0;
-            padding: 0;
-        }
+    * {
+        box-sizing: border-box;
+    }
 
 
-        body {
-            /*
-             * Startup page is intentionally just
-             * the classic Windows 95 teal background.
-             */
-            background: #008080;
+    html,
+    body {
+        width: 100%;
+        height: 100%;
 
-            overflow: hidden;
-
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
-
-            font-size: 11px;
-
-            user-select: none;
-            -webkit-user-select: none;
-        }
+        margin: 0;
+        padding: 0;
+    }
 
 
-        /* ============================================================
-           WINDOWS 95 MESSAGE BOX
-           ============================================================ */
+    body {
+        /*
+         * Startup page is intentionally just
+         * the classic Windows 95 teal background.
+         */
+        background: #008080;
 
-        #popup-overlay {
+        overflow: hidden;
 
-            position: fixed;
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
 
-            inset: 0;
+        font-size: 11px;
 
-            display: none;
-
-            z-index: 100000;
-
-            overflow: hidden;
-        }
+        user-select: none;
+        -webkit-user-select: none;
+    }
 
 
-        #popup-overlay.visible {
-            display: block;
-        }
+    /* ============================================================
+       WINDOWS 95 MESSAGE BOX
+       ============================================================ */
 
+    #popup-overlay {
+
+        position: fixed;
+
+        inset: 0;
+
+        display: none;
+
+        z-index: 100000;
+
+        overflow: hidden;
+    }
+
+
+    #popup-overlay.visible {
+        display: block;
+    }
+
+
+    #popup {
+
+        position: fixed;
+
+        left: 50%;
+        top: 50%;
+
+        transform:
+            translate(-50%, -50%);
+
+        /*
+         * Normal desktop size.
+         */
+        width: 500px;
+
+        /*
+         * Dynamic viewport limit.
+         */
+        max-width:
+            calc(100vw - 30px);
+
+        max-height:
+            calc(100vh - 30px);
+
+        /*
+         * IMPORTANT:
+         *
+         * Do not use min-width: 390px.
+         * That breaks on narrow phones.
+         */
+        min-width: 0;
+
+        background: #c0c0c0;
+
+        border: 2px solid;
+
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
+
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
+
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
+
+        overflow: hidden;
+    }
+
+
+    #popup-titlebar {
+
+        height: 22px;
+
+        display: flex;
+
+        align-items: center;
+
+        padding-left: 4px;
+        padding-right: 2px;
+
+        background: #000080;
+
+        color: #ffffff;
+
+        font-size: 13px;
+
+        font-weight: bold;
+
+        line-height: 18px;
+
+        cursor: move;
+
+        touch-action: none;
+
+        flex-shrink: 0;
+    }
+
+
+    #popup-title {
+
+        flex: 1;
+
+        min-width: 0;
+
+        white-space: nowrap;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+    }
+
+
+    #popup-close {
+
+        width: 19px;
+        min-width: 19px;
+
+        height: 18px;
+
+        padding: 0;
+
+        margin-left: 2px;
+
+        background: #c0c0c0;
+
+        border: 2px solid;
+
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
+
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
+
+        font-family:
+            Arial,
+            sans-serif;
+
+        font-size: 11px;
+
+        font-weight: bold;
+
+        line-height: 13px;
+
+        cursor: default;
+
+        appearance: none;
+        -webkit-appearance: none;
+
+        flex-shrink: 0;
+    }
+
+
+    #popup-close:active {
+
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
+
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
+    }
+
+
+    #popup-content {
+
+        min-height: 90px;
+
+        display: flex;
+
+        align-items: center;
+
+        padding: 18px;
+
+        min-width: 0;
+    }
+
+
+    #popup-icon {
+
+        width: 32px;
+        min-width: 32px;
+
+        height: 32px;
+
+        margin-right: 18px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        background: #c0c0c0;
+
+        color: #000000;
+
+        font-family:
+            Arial,
+            sans-serif;
+
+        font-size: 26px;
+
+        font-weight: bold;
+
+        line-height: 32px;
+
+        text-align: center;
+
+        flex-shrink: 0;
+    }
+
+
+    #popup-message {
+
+        flex: 1;
+
+        min-width: 0;
+
+        font-size: 13px;
+
+        color: #000000;
+
+        line-height: 1.35;
+
+        overflow-wrap: break-word;
+    }
+
+
+    #popup-buttons {
+
+        display: flex;
+
+        justify-content: center;
+
+        gap: 8px;
+
+        padding:
+            0
+            12px
+            14px;
+
+        flex-wrap: wrap;
+    }
+
+
+    #popup-buttons button {
+
+        min-width: 75px;
+
+        height: 27px;
+
+        padding:
+            2px
+            12px;
+
+        background: #c0c0c0;
+
+        border: 2px solid;
+
+        border-color:
+            #ffffff
+            #000000
+            #000000
+            #ffffff;
+
+        box-shadow:
+            inset 1px 1px 0 #dfdfdf,
+            inset -1px -1px 0 #808080;
+
+        font-family:
+            "MS Sans Serif",
+            "Microsoft Sans Serif",
+            Tahoma,
+            Arial,
+            sans-serif;
+
+        font-size: 12px;
+
+        color: #000000;
+
+        cursor: default;
+
+        appearance: none;
+        -webkit-appearance: none;
+    }
+
+
+    #popup-buttons button:hover {
+        background: #c0c0c0;
+    }
+
+
+    #popup-buttons button:active {
+
+        border-color:
+            #000000
+            #ffffff
+            #ffffff
+            #000000;
+
+        box-shadow:
+            inset 1px 1px 0 #808080,
+            inset -1px -1px 0 #dfdfdf;
+    }
+
+
+    #popup-buttons button:focus {
+
+        outline:
+            1px dotted #000000;
+
+        outline-offset: -5px;
+    }
+
+
+    /* ============================================================
+       SMALL SCREEN MESSAGE BOX
+       ============================================================ */
+
+    @media (max-width: 520px) {
 
         #popup {
 
-            position: fixed;
-
-            left: 50%;
-            top: 50%;
-
-            transform:
-                translate(-50%, -50%);
-
-            /*
-             * Normal desktop size.
-             */
-            width: 500px;
-
-            /*
-             * Dynamic viewport limit.
-             */
-            max-width:
+            width:
                 calc(100vw - 30px);
 
-            max-height:
-                calc(100vh - 30px);
-
-            /*
-             * IMPORTANT:
-             *
-             * Do not use min-width: 390px.
-             * That breaks on narrow phones.
-             */
-            min-width: 0;
-
-            background: #c0c0c0;
-
-            border: 2px solid;
-
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
-
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
-
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
-
-            overflow: hidden;
-        }
-
-
-        #popup-titlebar {
-
-            height: 22px;
-
-            display: flex;
-
-            align-items: center;
-
-            padding-left: 4px;
-            padding-right: 2px;
-
-            background: #000080;
-
-            color: #ffffff;
-
-            font-size: 13px;
-
-            font-weight: bold;
-
-            line-height: 18px;
-
-            cursor: move;
-
-            touch-action: none;
-
-            flex-shrink: 0;
-        }
-
-
-        #popup-title {
-
-            flex: 1;
-
-            min-width: 0;
-
-            white-space: nowrap;
-
-            overflow: hidden;
-
-            text-overflow: ellipsis;
-        }
-
-
-        #popup-close {
-
-            width: 19px;
-            min-width: 19px;
-
-            height: 18px;
-
-            padding: 0;
-
-            margin-left: 2px;
-
-            background: #c0c0c0;
-
-            border: 2px solid;
-
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
-
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
-
-            font-family:
-                Arial,
-                sans-serif;
-
-            font-size: 11px;
-
-            font-weight: bold;
-
-            line-height: 13px;
-
-            cursor: default;
-
-            appearance: none;
-            -webkit-appearance: none;
-
-            flex-shrink: 0;
-        }
-
-
-        #popup-close:active {
-
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
-
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
+            max-width:
+                calc(100vw - 30px);
         }
 
 
         #popup-content {
-
-            min-height: 90px;
-
-            display: flex;
-
-            align-items: center;
-
-            padding: 18px;
-
-            min-width: 0;
+            padding: 14px;
         }
 
 
         #popup-icon {
-
-            width: 32px;
-            min-width: 32px;
-
-            height: 32px;
-
-            margin-right: 18px;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            background: #c0c0c0;
-
-            color: #000000;
-
-            font-family:
-                Arial,
-                sans-serif;
-
-            font-size: 26px;
-
-            font-weight: bold;
-
-            line-height: 32px;
-
-            text-align: center;
-
-            flex-shrink: 0;
+            margin-right: 12px;
         }
 
 
         #popup-message {
-
-            flex: 1;
-
-            min-width: 0;
-
-            font-size: 13px;
-
-            color: #000000;
-
-            line-height: 1.35;
-
-            overflow-wrap: break-word;
+            font-size: 12px;
         }
 
 
         #popup-buttons {
 
-            display: flex;
-
-            justify-content: center;
-
-            gap: 8px;
+            gap: 6px;
 
             padding:
                 0
-                12px
-                14px;
-
-            flex-wrap: wrap;
+                10px
+                12px;
         }
 
 
         #popup-buttons button {
+            min-width: 70px;
+        }
 
-            min-width: 75px;
+    }
 
-            height: 27px;
+
+    /* ============================================================
+       VERY SMALL SCREEN
+       ============================================================ */
+
+    @media (max-width: 360px) {
+
+        #popup {
+
+            width:
+                calc(100vw - 16px);
+
+            max-width:
+                calc(100vw - 16px);
+        }
+
+
+        #popup-content {
+            padding: 10px;
+        }
+
+
+        #popup-icon {
+
+            width: 28px;
+            min-width: 28px;
+
+            height: 28px;
+
+            margin-right: 8px;
+
+            font-size: 22px;
+
+            line-height: 28px;
+        }
+
+
+        #popup-message {
+            font-size: 11px;
+        }
+
+
+        #popup-buttons {
 
             padding:
-                2px
-                12px;
-
-            background: #c0c0c0;
-
-            border: 2px solid;
-
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
-
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
-
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
-
-            font-size: 12px;
-
-            color: #000000;
-
-            cursor: default;
-
-            appearance: none;
-            -webkit-appearance: none;
+                0
+                8px
+                10px;
         }
 
+    }
 
-        #popup-buttons button:hover {
-            background: #c0c0c0;
-        }
-
-
-        #popup-buttons button:active {
-
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
-
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
-        }
-
-
-        #popup-buttons button:focus {
-
-            outline:
-                1px dotted #000000;
-
-            outline-offset: -5px;
-        }
-
-
-        /* ============================================================
-           SMALL SCREEN MESSAGE BOX
-           ============================================================ */
-
-        @media (max-width: 520px) {
-
-            #popup {
-
-                width:
-                    calc(100vw - 30px);
-
-                max-width:
-                    calc(100vw - 30px);
-            }
-
-
-            #popup-content {
-                padding: 14px;
-            }
-
-
-            #popup-icon {
-                margin-right: 12px;
-            }
-
-
-            #popup-message {
-                font-size: 12px;
-            }
-
-
-            #popup-buttons {
-
-                gap: 6px;
-
-                padding:
-                    0
-                    10px
-                    12px;
-            }
-
-
-            #popup-buttons button {
-                min-width: 70px;
-            }
-
-        }
-
-
-        /* ============================================================
-           VERY SMALL SCREEN
-           ============================================================ */
-
-        @media (max-width: 360px) {
-
-            #popup {
-
-                width:
-                    calc(100vw - 16px);
-
-                max-width:
-                    calc(100vw - 16px);
-            }
-
-
-            #popup-content {
-                padding: 10px;
-            }
-
-
-            #popup-icon {
-
-                width: 28px;
-                min-width: 28px;
-
-                height: 28px;
-
-                margin-right: 8px;
-
-                font-size: 22px;
-
-                line-height: 28px;
-            }
-
-
-            #popup-message {
-                font-size: 11px;
-            }
-
-
-            #popup-buttons {
-
-                padding:
-                    0
-                    8px
-                    10px;
-            }
-
-        }
-
-    </style>
+</style>
+```
 
 </head>
 
-
 <body>
 
-    <!--
-        Intentionally empty.
+```
+<!--
+    Intentionally empty.
 
-        There is NO "Are You An Idiot?" text here.
-        The normal startup page is only the teal background.
-    -->
-
-
-    <div id="popup-overlay">
-
-        <div id="popup">
-
-            <div id="popup-titlebar">
-
-                <span id="popup-title">
-                    YouAreAnIdiot
-                </span>
-
-                <button
-                    id="popup-close"
-                    type="button"
-                >×</button>
-
-            </div>
+    There is NO "Are You An Idiot?" text here.
+    The normal startup page is only the teal background.
+-->
 
 
-            <div id="popup-content">
+<div id="popup-overlay">
 
-                <div id="popup-icon">
-                    !
-                </div>
+    <div id="popup">
 
+        <div id="popup-titlebar">
 
-                <div id="popup-message"></div>
+            <span id="popup-title">
+                YouAreAnIdiot
+            </span>
 
-            </div>
-
-
-            <div id="popup-buttons"></div>
+            <button
+                id="popup-close"
+                type="button"
+            >×</button>
 
         </div>
 
+
+        <div id="popup-content">
+
+            <div id="popup-icon">
+                !
+            </div>
+
+
+            <div id="popup-message"></div>
+
+        </div>
+
+
+        <div id="popup-buttons"></div>
+
     </div>
 
+</div>
 
-    <audio
-        id="autoplay-test-audio"
-        preload="auto"
-        loop
+
+<audio
+    id="autoplay-test-audio"
+    preload="auto"
+    loop
+>
+
+    <source
+        src="/media/test.mp3"
+        type="audio/mpeg"
     >
 
-        <source
-            src="/media/test.mp3"
-            type="audio/mpeg"
-        >
-
-    </audio>
-
+</audio>
+```
 
 <script>
 
@@ -715,6 +718,24 @@ let popupStartLeft =
 
 let popupStartTop =
     0;
+
+
+/*
+ * Return the permission popup to the exact
+ * center of the viewport.
+ */
+function resetPermissionPopupPosition() {
+
+    popup.style.left =
+        "50%";
+
+    popup.style.top =
+        "50%";
+
+    popup.style.transform =
+        "translate(-50%, -50%)";
+
+}
 
 
 popupTitlebar.addEventListener(
@@ -1574,8 +1595,21 @@ function updatePermissionMessage() {
     }
 
 
-    popupMessage.textContent =
-        message;
+    /*
+     * Only reset the position when the actual
+     * permission message changes.
+     */
+    if (
+        popupMessage.textContent !==
+        message
+    ) {
+
+        popupMessage.textContent =
+            message;
+
+        resetPermissionPopupPosition();
+
+    }
 
 }
 
@@ -1769,7 +1803,6 @@ window.addEventListener(
             );
 
         } catch (_) {}
-
 
 
         try {
