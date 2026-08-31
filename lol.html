@@ -6,7 +6,7 @@
     <title>You Are An Idiot!</title>
 
     <link rel="preload" href="/media/idiot.gif" as="image">
-    <link rel="preload" href="/media/youare.mp3" as="audio">
+    <link rel="preload" href="/media/youare-long.mp3" as="audio">
 
     <script src="scripts/app.js" defer></script>
 
@@ -42,19 +42,272 @@
 
     <img src="/media/idiot.gif" alt="You Are An Idiot!">
 
-    <audio id="youare-audio" autoplay loop hidden>
-        <source src="/media/youare.mp3" type="audio/mpeg">
+    <audio id="youare-audio" loop hidden>
+        <source src="/media/youare-long.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        // Autoplay fallback
-        document.addEventListener("click", () => {
-            const audio = document.getElementById("youare-audio");
+        "use strict";
 
-            if (audio && audio.paused) {
-                audio.play().catch(() => {});
+        /*
+         * ============================================================
+         * AUDIO BROADCASTING
+         * ============================================================
+         *
+         * Every lol.html window joins the same BroadcastChannel.
+         *
+         * When one window starts the audio, it broadcasts that event
+         * to the other windows so they can start the same audio too.
+         *
+         * BroadcastChannel only works between pages from the same
+         * origin, which is exactly what we want here.
+         */
+
+        const audio =
+            document.getElementById("youare-audio");
+
+        const audioChannel =
+            new BroadcastChannel("youare-idiot-audio");
+
+
+        let audioStarted =
+            false;
+
+
+        /*
+         * ============================================================
+         * START AUDIO
+         * ============================================================
+         */
+
+        function startAudio() {
+
+            if (!audio) {
+                return;
             }
-        }, { once: true });
+
+
+            const playPromise =
+                audio.play();
+
+
+            if (
+                playPromise &&
+                typeof playPromise.then === "function"
+            ) {
+
+                playPromise
+                    .then(() => {
+
+                        audioStarted = true;
+
+                        audioChannel.postMessage({
+                            type: "AUDIO_STARTED"
+                        });
+
+                    })
+                    .catch(() => {
+
+                        /*
+                         * Browser autoplay policy may block this.
+                         * Do not treat the failure as a successful
+                         * start.
+                         */
+
+                        audioStarted = false;
+
+                    });
+
+            }
+            else {
+
+                audioStarted = true;
+
+                audioChannel.postMessage({
+                    type: "AUDIO_STARTED"
+                });
+
+            }
+
+        }
+
+
+        /*
+         * ============================================================
+         * BROADCAST RECEIVER
+         * ============================================================
+         */
+
+        audioChannel.addEventListener(
+            "message",
+            event => {
+
+                const data =
+                    event.data;
+
+
+                if (
+                    !data ||
+                    typeof data.type !== "string"
+                ) {
+
+                    return;
+
+                }
+
+
+                if (
+                    data.type === "AUDIO_STARTED"
+                ) {
+
+                    if (
+                        audio &&
+                        audio.paused
+                    ) {
+
+                        audio.play()
+                            .then(() => {
+
+                                audioStarted = true;
+
+                            })
+                            .catch(() => {
+
+                                /*
+                                 * Autoplay was blocked in this
+                                 * particular window.
+                                 */
+
+                                audioStarted = false;
+
+                            });
+
+                    }
+
+                }
+
+
+                if (
+                    data.type === "AUDIO_STOPPED"
+                ) {
+
+                    if (audio) {
+
+                        audio.pause();
+
+                    }
+
+                    audioStarted =
+                        false;
+
+                }
+
+
+                if (
+                    data.type === "AUDIO_RESTART"
+                ) {
+
+                    if (audio) {
+
+                        try {
+
+                            audio.currentTime =
+                                0;
+
+                        } catch (_) {}
+
+
+                        audio.play()
+                            .then(() => {
+
+                                audioStarted = true;
+
+                            })
+                            .catch(() => {
+
+                                audioStarted = false;
+
+                            });
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /*
+         * ============================================================
+         * INITIAL AUDIO START
+         * ============================================================
+         *
+         * Try immediately when the page loads.
+         *
+         * If the browser allows autoplay, it starts immediately.
+         * If not, the browser simply rejects the play() promise.
+         */
+
+        window.addEventListener(
+            "load",
+            () => {
+
+                startAudio();
+
+            },
+            {
+                once: true
+            }
+        );
+
+
+        /*
+         * ============================================================
+         * BROADCAST WHEN THIS WINDOW BECOMES ACTIVE
+         * ============================================================
+         */
+
+        window.addEventListener(
+            "focus",
+            () => {
+
+                if (
+                    audio &&
+                    !audio.paused
+                ) {
+
+                    audioChannel.postMessage({
+                        type: "AUDIO_STARTED"
+                    });
+
+                }
+
+            }
+        );
+
+
+        /*
+         * ============================================================
+         * CLEANUP
+         * ============================================================
+         */
+
+        window.addEventListener(
+            "beforeunload",
+            () => {
+
+                audioChannel.postMessage({
+                    type: "AUDIO_WINDOW_CLOSED"
+                });
+
+                audioChannel.close();
+
+            },
+            {
+                once: true
+            }
+        );
+
     </script>
 
 </body>
