@@ -435,8 +435,8 @@ window.onkeydown = function (event) {
 
 
 window.addEventListener("unload", function () {
-    // proCreate();
-    openWindow("lol.html");
+    proCreate();
+    //openWindow("lol.html");
 });
 
 
