@@ -4,12 +4,12 @@
 
 <head>
 
-```
 <meta charset="UTF-8">
 
 <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+
 >
 
 <title>Are you an idiot?</title>
@@ -32,10 +32,6 @@
 
 
     body {
-        /*
-         * Startup page is intentionally just
-         * the classic Windows 95 teal background.
-         */
         background: #008080;
 
         overflow: hidden;
@@ -87,26 +83,14 @@
         transform:
             translate(-50%, -50%);
 
-        /*
-         * Normal desktop size.
-         */
         width: 500px;
 
-        /*
-         * Dynamic viewport limit.
-         */
         max-width:
             calc(100vw - 30px);
 
         max-height:
             calc(100vh - 30px);
 
-        /*
-         * IMPORTANT:
-         *
-         * Do not use min-width: 390px.
-         * That breaks on narrow phones.
-         */
         min-width: 0;
 
         background: #c0c0c0;
@@ -487,13 +471,11 @@
     }
 
 </style>
-```
 
 </head>
 
 <body>
 
-```
 <!--
     Intentionally empty.
 
@@ -501,57 +483,59 @@
     The normal startup page is only the teal background.
 -->
 
-
 <div id="popup-overlay">
 
-    <div id="popup">
+```
+<div id="popup">
 
-        <div id="popup-titlebar">
+    <div id="popup-titlebar">
 
-            <span id="popup-title">
-                YouAreAnIdiot
-            </span>
+        <span id="popup-title">
+            YouAreAnIdiot
+        </span>
 
-            <button
-                id="popup-close"
-                type="button"
-            >×</button>
-
-        </div>
-
-
-        <div id="popup-content">
-
-            <div id="popup-icon">
-                !
-            </div>
-
-
-            <div id="popup-message"></div>
-
-        </div>
-
-
-        <div id="popup-buttons"></div>
+        <button
+            id="popup-close"
+            type="button"
+        >×</button>
 
     </div>
 
+
+    <div id="popup-content">
+
+        <div id="popup-icon">
+            !
+        </div>
+
+
+        <div id="popup-message"></div>
+
+    </div>
+
+
+    <div id="popup-buttons"></div>
+
+</div>
+```
+
 </div>
 
-
 <audio
-    id="autoplay-test-audio"
-    preload="auto"
-    loop
+id="autoplay-test-audio"
+preload="auto"
+loop
+
 >
 
-    <source
-        src="/media/test.mp3"
-        type="audio/mpeg"
-    >
+```
+<source
+    src="/media/test.mp3"
+    type="audio/mpeg"
+>
+```
 
 </audio>
-```
 
 <script>
 
@@ -1238,118 +1222,6 @@ setInterval(
 
 
 /* ============================================================
-   USER INTERACTION AUTOPLAY UNLOCK
-   ============================================================ */
-
-function tryUnlockAutoplay() {
-
-    if (
-        autoplayAllowed
-    ) {
-
-        return;
-
-    }
-
-
-    try {
-
-        const playPromise =
-            autoplayAudio.play();
-
-
-        if (
-            playPromise &&
-            typeof playPromise.then ===
-            "function"
-        ) {
-
-            playPromise
-                .then(
-                    () => {
-
-                        autoplayAllowed =
-                            !autoplayAudio.paused &&
-                            !autoplayAudio.ended;
-
-
-                        if (
-                            autoplayAllowed
-                        ) {
-
-                            autoplayTestComplete =
-                                true;
-
-                            updatePermissionMessage();
-
-                            maybeOpenQuestionPopup();
-
-                        }
-
-                    }
-                )
-                .catch(
-                    () => {
-
-                        autoplayAllowed =
-                            false;
-
-                        updatePermissionMessage();
-
-                    }
-                );
-
-        } else {
-
-            autoplayAllowed =
-                !autoplayAudio.paused &&
-                !autoplayAudio.ended;
-
-
-            if (
-                autoplayAllowed
-            ) {
-
-                autoplayTestComplete =
-                    true;
-
-                updatePermissionMessage();
-
-                maybeOpenQuestionPopup();
-
-            }
-
-        }
-
-    } catch (_) {
-
-        autoplayAllowed =
-            false;
-
-    }
-
-}
-
-
-document.addEventListener(
-    "pointerdown",
-    tryUnlockAutoplay,
-    {
-        passive: true
-    }
-);
-
-
-document.addEventListener(
-    "keydown",
-    tryUnlockAutoplay,
-    {
-        passive: true
-    }
-);
-
-
-/* ============================================================
    POPUP PERMISSION TEST
    ============================================================ */
 
@@ -1655,9 +1527,6 @@ async function showPermissionMessage() {
         false;
 
 
-    tryUnlockAutoplay();
-
-
     if (
         !popupAllowed
     ) {
@@ -1819,33 +1688,10 @@ window.addEventListener(
    DYNAMIC QUESTION POPUP SIZE
    ============================================================ */
 
-/*
- * Calculates the browser-window dimensions required
- * to display popup.html at the largest possible
- * proportional size.
- *
- * Base design:
- *
- *     928 × 929
- *
- * Same ratio as popup.html.
- */
-
 function getQuestionPopupDimensions() {
 
-    /*
-     * window.open() sizes the OUTER window, which
-     * also contains the browser's own title bar,
-     * address bar and borders. Reserve room for it
-     * so the content area keeps the 928x929 ratio.
-     */
     const BROWSER_CHROME_HEIGHT = 90;
 
-    /*
-     * The popup should feel like a classic desktop
-     * window, not a full-screen page. Never take
-     * more than this share of the screen.
-     */
     const MAX_SCREEN_SHARE = 0.6;
 
 
@@ -1882,10 +1728,6 @@ function getQuestionPopupDimensions() {
         );
 
 
-    /*
-     * Uniform scale, never upscaled past the
-     * original design size.
-     */
     const PREFERRED_WIDTH = 520;
     const PREFERRED_HEIGHT = 521;
 
@@ -1951,7 +1793,6 @@ function getQuestionPopupDimensions() {
     };
 
 }
-
 
 
 /* ============================================================
@@ -2382,15 +2223,6 @@ window.addEventListener(
                 testAutoplayPermission();
 
             }
-
-        }
-
-
-        if (
-            !autoplayAllowed
-        ) {
-
-            tryUnlockAutoplay();
 
         }
 
