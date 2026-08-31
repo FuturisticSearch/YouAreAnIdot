@@ -11,7 +11,46 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 >
 
-<title>Are you an idiot?</title>
+<title>Are You An Idiot? - Classic Windows 98 Prank Recreation</title>
+
+<meta
+    name="description"
+    content="A faithful browser recreation of the classic YouAreAnIdiot Windows 98 prank page, complete with retro 98.css dialogs and bouncing pop-up windows."
+>
+
+<meta name="author" content="Vojtik Vokoun">
+
+<meta name="robots" content="index, follow">
+
+<meta name="theme-color" content="#008080">
+
+<link rel="canonical" href="/">
+
+<meta property="og:type" content="website">
+
+<meta
+    property="og:title"
+    content="Are You An Idiot? - Classic Windows 98 Prank Recreation"
+>
+
+<meta
+    property="og:description"
+    content="A faithful browser recreation of the classic YouAreAnIdiot Windows 98 prank page, complete with retro 98.css dialogs and bouncing pop-up windows."
+>
+
+<meta property="og:url" content="/">
+
+<meta name="twitter:card" content="summary_large_image">
+
+<meta
+    name="twitter:title"
+    content="Are You An Idiot? - Classic Windows 98 Prank Recreation"
+>
+
+<meta
+    name="twitter:description"
+    content="A faithful browser recreation of the classic YouAreAnIdiot Windows 98 prank page with retro 98.css dialogs and pop-up windows."
+>
 
 <link
     rel="stylesheet"
@@ -1169,6 +1208,16 @@ window.addEventListener(
 
 function getPermissionMessage() {
 
+    const REFRESH_HINT =
+        " If you already enabled it and nothing " +
+        "changes, refresh the page.";
+
+
+    const AUTOPLAY_HINT =
+        " If you don't see an option to turn " +
+        "autoplay on, just click OK.";
+
+
     if (
         popupAllowed &&
         autoplayAllowed
@@ -1187,7 +1236,8 @@ function getPermissionMessage() {
         return (
             "This recreation requires pop-up windows " +
             "to be enabled in your browser. Please allow " +
-            "pop-ups for this site."
+            "pop-ups for this site." +
+            REFRESH_HINT
         );
 
     }
@@ -1201,7 +1251,9 @@ function getPermissionMessage() {
         return (
             "This recreation requires audio autoplay " +
             "to be enabled in your browser. Please allow " +
-            "autoplay for this site."
+            "autoplay for this site." +
+            AUTOPLAY_HINT +
+            REFRESH_HINT
         );
 
     }
@@ -1210,7 +1262,9 @@ function getPermissionMessage() {
     return (
         "This recreation requires pop-up windows and " +
         "audio autoplay to be enabled in your browser. " +
-        "Please allow both for this site."
+        "Please allow both for this site." +
+        AUTOPLAY_HINT +
+        REFRESH_HINT
     );
 
 }
