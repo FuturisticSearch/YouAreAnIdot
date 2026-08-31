@@ -1,0 +1,98 @@
+# YouAreAnIdiot
+
+A recreation of the classic **"You Are An Idiot"** web experience, rebuilt with plain HTML, CSS and JavaScript.
+
+The goal is to recreate the original behavior as closely as possible while keeping the project simple and easy to run.
+
+> **Warning:** This project uses popup windows, autoplaying audio and other browser features that can behave differently depending on the browser.
+
+## Features
+
+* Windows 95-style UI
+* Real browser popup windows
+* Popup permission testing
+* Audio autoplay detection
+* Audio unlocking through user interaction
+* Mouse, touch, pen and keyboard input
+* Cross-window communication using `postMessage()`
+* Window resizing through `window.resizeTo()`
+* No frameworks or build system required
+
+## Browser Behavior
+
+Browser behavior is different depending on the browser. This table is based on testing the project.
+
+| Browser            | Behavior                                                                              | Notes                                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Google Chrome**  | Opens very fast; difficult to close normally and may require Task Manager.            | There is no simple way to enable autoplay, so click **OK** when prompted.                                                 |
+| **Firefox Based**  | Autoplay, popup detection and popup spam work. Easier to close with **Alt+F4**.       | Close the popups quickly. Firefox can sometimes open new ones even after they appear to be fully closed.                  |
+| **Microsoft Edge** | Very similar to Chrome and may require Task Manager to close. Autoplay usually works. | After enabling popups, click **OK** or refresh the page. Edge can also reopen the popup windows after force-closing them. |
+| **Opera**          | Currently broken. Some popup windows can open fullscreen, which ruins the experience. | Like Chrome, there is no simple way to enable autoplay, so click **OK** when prompted.                                    |
+
+More browser testing will be added later.
+
+## Running
+
+There is no build process. It's just a static website.
+
+You can run it with any HTTP server. For example:
+
+```bash
+python -m http.server 8000
+```
+
+Then open:
+
+```text
+http://localhost:8000
+```
+
+Using a local server is recommended instead of opening `index.html` directly.
+
+## Popup Flow
+
+The main flow starts in `index.html`.
+
+```text
+index.html
+    |
+    +-- Check autoplay
+    |
+    +-- Test popup permission
+    |     |
+    |     +-- test.html?id=0
+    |     +-- test.html?id=1
+    |     +-- test.html?id=2
+    |
+    +-- Open popup.html
+            |
+            +-- Main experience
+```
+
+The three test windows are used to check whether the browser is allowing the popups required by the project.
+
+`popup.html` can also communicate with `index.html` using `postMessage()` and request a window resize when needed.
+
+## Technologies
+
+* HTML
+* CSS
+* JavaScript
+* HTML5 Audio
+* `window.open()`
+* `window.resizeTo()`
+* `window.postMessage()`
+
+No framework is used.
+
+## License
+
+This project is licensed under the **GNU General Public License v3.0**.
+
+You can use, modify and redistribute the project under the terms of the license.
+
+[GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html)
+
+---
+
+*Copyright © 2026 YouAreAnIdiot contributors.*
