@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>You Are An Idiot!</title>
 
 <link rel="preload" href="/media/idiot.gif" as="image">
@@ -37,7 +37,11 @@ img{
 
 <img src="/media/idiot.gif" alt="You Are An Idiot!">
 
-<audio id="youare-audio" preload="auto" loop muted hidden>
+<audio id="youare-audio"
+       preload="auto"
+       loop
+       muted
+       hidden>
     <source src="/media/youare-long.mp3" type="audio/mpeg">
 </audio>
 
@@ -45,24 +49,31 @@ img{
 "use strict";
 
 const audio = document.getElementById("youare-audio");
-const bc = new BroadcastChannel("youare-idiot-audio");
+const channel = new BroadcastChannel("youare-idiot-audio");
 
 const id =
-    Date.now().toString(36) + "-" +
+    Date.now().toString(36) +
     Math.random().toString(36).slice(2);
 
-const HEARTBEAT = 100;
-const TIMEOUT = 500;
-const SYNC = 200;
-const THRESHOLD = 0.12;
+const HEARTBEAT = 150;
+const TIMEOUT = 600;
+const SYNC_THRESHOLD = 0.15;
 
 let leader = null;
 let lastBeat = 0;
+
 let remoteTime = 0;
 let remoteStamp = 0;
+
 let isLeader = false;
 let claiming = false;
 let dead = false;
+
+let heartbeatTimer = null;
+let timeoutTimer = null;
+
+
+/* ================= AUDIO ================= */
 
 audio.preload = "auto";
 audio.muted = true;
@@ -73,25 +84,30 @@ try {
 } catch (_) {}
 
 
-/* ---------------- AUDIO ---------------- */
-
-function time() {
+function getTime() {
     return Number.isFinite(audio.currentTime)
         ? audio.currentTime
         : 0;
 }
 
-function duration() {
-    return Number.isFinite(audio.duration) && audio.duration > 0
+
+function getDuration() {
+    return Number.isFinite(audio.duration) &&
+           audio.duration > 0
         ? audio.duration
         : 0;
 }
 
+
 function normalize(t) {
-    const d = duration();
-    if (!d) return Math.max(0, t);
+    const d = getDuration();
+
+    if (!d)
+        return Math.max(0, t);
+
     return ((t % d) + d) % d;
 }
+
 
 function estimatedTime() {
     let t = remoteTime;
@@ -99,107 +115,168 @@ function estimatedTime() {
     if (remoteStamp) {
         t += Math.min(
             2,
-            Math.max(0, performance.now() - remoteStamp) / 1000
+            Math.max(
+                0,
+                (performance.now() - remoteStamp) / 1000
+            )
         );
     }
 
     return normalize(t);
 }
 
-async function silentPlay() {
-    if (dead) return;
+
+/* ================= SILENT PLAY ================= */
+
+let starting = false;
+
+async function ensureSilentPlaying() {
+
+    if (
+        dead ||
+        starting ||
+        !audio.paused
+    )
+        return;
+
+    starting = true;
 
     audio.muted = true;
     audio.volume = 0;
 
-    if (!audio.paused) return;
-
     try {
         await audio.play();
     } catch (_) {}
+
+    starting = false;
 }
 
-function sync() {
-    if (isLeader || leader === null) return;
+
+/* ================= SYNC ================= */
+
+function syncToRemote() {
+
+    if (
+        isLeader ||
+        leader === null
+    )
+        return;
+
+    const d = getDuration();
+
+    if (!d)
+        return;
 
     const target = estimatedTime();
-    const current = time();
-    const d = duration();
-
-    if (!d) return;
+    const current = getTime();
 
     let diff = Math.abs(target - current);
-    diff = Math.min(diff, d - diff);
 
-    if (diff > THRESHOLD) {
+    diff = Math.min(
+        diff,
+        d - diff
+    );
+
+    if (diff > SYNC_THRESHOLD) {
         try {
             audio.currentTime = target;
         } catch (_) {}
     }
-
-    silentPlay();
 }
 
 
-/* ---------------- HEARTBEAT ---------------- */
+/* ================= HEARTBEAT ================= */
 
-function beat() {
-    if (!isLeader || dead) return;
+function sendHeartbeat() {
+
+    if (
+        dead ||
+        !isLeader
+    )
+        return;
 
     const now = performance.now();
-    const t = time();
+    const t = getTime();
 
     remoteTime = t;
     remoteStamp = now;
 
-    bc.postMessage({
+    channel.postMessage({
         type: "beat",
-        id,
+        id: id,
         time: t,
         stamp: now
     });
 }
 
 
-/* ---------------- BECOME LEADER ---------------- */
+function startHeartbeat() {
+
+    if (heartbeatTimer)
+        clearInterval(heartbeatTimer);
+
+    sendHeartbeat();
+
+    heartbeatTimer = setInterval(
+        sendHeartbeat,
+        HEARTBEAT
+    );
+}
+
+
+/* ================= BECOME LEADER ================= */
 
 async function becomeLeader() {
-    if (dead || isLeader || claiming) return;
+
+    if (
+        dead ||
+        isLeader ||
+        claiming
+    )
+        return;
 
     claiming = true;
 
     /*
-     * Wait a tiny random amount so several surviving windows
-     * don't all claim simultaneously.
+     * Small election delay.
+     *
+     * This prevents 100 popups from claiming at exactly
+     * the same instant.
      */
-    await new Promise(r =>
-        setTimeout(r, Math.random() * 40)
+    await new Promise(resolve =>
+        setTimeout(
+            resolve,
+            Math.random() * 35
+        )
     );
 
-    if (dead || isLeader) {
-        claiming = false;
-        return;
-    }
-
-    /*
-     * Someone else became leader while we waited.
-     */
     if (
-        leader &&
-        performance.now() - lastBeat < TIMEOUT
+        dead ||
+        isLeader
     ) {
         claiming = false;
         return;
     }
 
     /*
-     * Tell everybody who won.
+     * Someone else is alive.
      */
-    bc.postMessage({
+    if (
+        leader !== null &&
+        performance.now() - lastBeat < TIMEOUT
+    ) {
+        claiming = false;
+        return;
+    }
+
+    const position = estimatedTime();
+    const stamp = performance.now();
+
+    channel.postMessage({
         type: "claim",
-        id,
-        time: estimatedTime(),
-        stamp: performance.now()
+        id: id,
+        time: position,
+        stamp: stamp
     });
 
     leader = id;
@@ -207,143 +284,227 @@ async function becomeLeader() {
     claiming = false;
 
     /*
-     * Synchronize BEFORE making sound.
+     * Sync before making sound.
      */
-    const t = estimatedTime();
-
-    if (duration()) {
+    if (getDuration()) {
         try {
-            audio.currentTime = t;
+            audio.currentTime = position;
         } catch (_) {}
     }
 
-    await silentPlay();
+    await ensureSilentPlaying();
 
     /*
-     * Only now become audible.
+     * NOW become audible.
      */
     audio.muted = false;
     audio.volume = 1;
 
-    beat();
+    startHeartbeat();
 }
 
 
-/* ---------------- MESSAGES ---------------- */
+/* ================= STOP LEADER ================= */
 
-bc.onmessage = e => {
-    const m = e.data;
+function stopLeader() {
 
-    if (!m || !m.type || m.id === id) return;
+    if (!isLeader)
+        return;
+
+    isLeader = false;
+
+    if (heartbeatTimer) {
+        clearInterval(heartbeatTimer);
+        heartbeatTimer = null;
+    }
+
+    audio.muted = true;
+    audio.volume = 0;
+}
 
 
-    /* Leader heartbeat */
+/* ================= ARM TIMEOUT ================= */
+
+function armTimeout() {
+
+    if (timeoutTimer)
+        clearTimeout(timeoutTimer);
+
+    timeoutTimer = setTimeout(() => {
+
+        if (
+            dead ||
+            isLeader
+        )
+            return;
+
+        if (
+            leader === null ||
+            performance.now() - lastBeat >= TIMEOUT
+        ) {
+            leader = null;
+            becomeLeader();
+        }
+
+    }, TIMEOUT + 20);
+}
+
+
+/* ================= MESSAGES ================= */
+
+channel.onmessage = event => {
+
+    const m = event.data;
+
+    if (
+        !m ||
+        !m.type ||
+        m.id === id
+    )
+        return;
+
+
+    /* ---------- HEARTBEAT ---------- */
 
     if (m.type === "beat") {
 
+        const other = String(m.id);
+
         /*
-         * If another leader is already alive, keep it.
+         * If we're both leaders, deterministic winner.
          */
-        if (
-            !isLeader ||
-            String(m.id) < String(id)
-        ) {
-            if (isLeader) {
-                isLeader = false;
-                audio.muted = true;
-                audio.volume = 0;
+        if (isLeader) {
+
+            if (other < id) {
+                stopLeader();
+                leader = other;
+            } else {
+                sendHeartbeat();
+                return;
             }
-
-            leader = String(m.id);
-            lastBeat = performance.now();
-
-            remoteTime = Number(m.time) || 0;
-            remoteStamp = Number(m.stamp) || performance.now();
-
-            claiming = false;
-
-            sync();
         }
+
+        leader = other;
+        lastBeat = performance.now();
+
+        remoteTime = Number(m.time) || 0;
+        remoteStamp = Number(m.stamp) || performance.now();
+
+        claiming = false;
+
+        /*
+         * Sync ONLY when heartbeat arrives.
+         *
+         * No separate sync timer.
+         */
+        syncToRemote();
+
+        /*
+         * Keep standby decoder alive.
+         */
+        ensureSilentPlaying();
+
+        armTimeout();
 
         return;
     }
 
 
-    /* Somebody claims leadership */
+    /* ---------- CLAIM ---------- */
 
     if (m.type === "claim") {
 
         const other = String(m.id);
 
         /*
-         * Deterministic winner.
-         * Smaller ID wins if two windows claim simultaneously.
+         * Smaller ID wins simultaneous elections.
          */
         if (
-            !isLeader ||
-            other < String(id)
+            isLeader &&
+            other >= id
         ) {
-
-            if (isLeader) {
-                isLeader = false;
-                audio.muted = true;
-                audio.volume = 0;
-            }
-
-            leader = other;
-            lastBeat = performance.now();
-
-            remoteTime = Number(m.time) || 0;
-            remoteStamp = Number(m.stamp) || performance.now();
-
-            claiming = false;
-
-            sync();
+            sendHeartbeat();
+            return;
         }
 
-        else if (isLeader) {
+        if (isLeader)
+            stopLeader();
 
-            /*
-             * We won the tie.
-             */
-            beat();
-        }
+        leader = other;
+        lastBeat = performance.now();
+
+        remoteTime = Number(m.time) || 0;
+        remoteStamp = Number(m.stamp) || performance.now();
+
+        claiming = false;
+
+        audio.muted = true;
+        audio.volume = 0;
+
+        syncToRemote();
+        ensureSilentPlaying();
+
+        armTimeout();
 
         return;
     }
 
 
-    /* New popup asks who is leader */
+    /* ---------- DISCOVERY ---------- */
 
     if (m.type === "discover") {
 
-        if (isLeader) beat();
+        if (isLeader)
+            sendHeartbeat();
 
         return;
+    }
+
+
+    /* ---------- LEADER CLOSING ---------- */
+
+    if (m.type === "closing") {
+
+        if (
+            String(m.id) !== String(leader)
+        )
+            return;
+
+        remoteTime = Number(m.time) || 0;
+        remoteStamp = Number(m.stamp) || performance.now();
+
+        leader = null;
+        lastBeat = 0;
+
+        /*
+         * Already-playing silent audio = fast handoff.
+         */
+        becomeLeader();
     }
 };
 
 
-/* ---------------- STARTUP ---------------- */
+/* ================= STARTUP ================= */
 
 /*
- * Every popup immediately starts its own silent decoder.
+ * Start silent playback once.
  */
-silentPlay();
+ensureSilentPlaying();
 
 /*
- * Ask existing popups who the leader is.
+ * Ask existing windows for the leader.
  */
-bc.postMessage({
+channel.postMessage({
     type: "discover",
-    id
+    id: id
 });
 
 
 /*
- * If nobody answers, become leader.
+ * If nobody responds, elect ourselves.
  */
 setTimeout(() => {
+
     if (
         !dead &&
         leader === null &&
@@ -351,44 +512,11 @@ setTimeout(() => {
     ) {
         becomeLeader();
     }
+
 }, TIMEOUT);
 
 
-/* ---------------- TIMERS ---------------- */
-
-setInterval(() => {
-
-    if (dead) return;
-
-    if (isLeader) {
-        beat();
-        return;
-    }
-
-    /*
-     * Leader hasn't been heard from.
-     */
-    if (
-        leader === null ||
-        performance.now() - lastBeat > TIMEOUT
-    ) {
-
-        leader = null;
-
-        becomeLeader();
-
-    }
-
-}, HEARTBEAT);
-
-
-/*
- * Keep every silent popup synchronized.
- */
-setInterval(sync, SYNC);
-
-
-/* ---------------- AUDIO EVENTS ---------------- */
+/* ================= AUDIO EVENTS ================= */
 
 audio.addEventListener("play", () => {
 
@@ -402,8 +530,16 @@ audio.addEventListener("play", () => {
 
 audio.addEventListener("pause", () => {
 
-    if (!dead && !isLeader) {
-        setTimeout(silentPlay, 20);
+    if (
+        !dead &&
+        !isLeader
+    ) {
+        /*
+         * Only restart if actually needed.
+         *
+         * No timer spam.
+         */
+        ensureSilentPlaying();
     }
 
 });
@@ -411,7 +547,8 @@ audio.addEventListener("pause", () => {
 
 audio.addEventListener("playing", () => {
 
-    if (isLeader) beat();
+    if (isLeader)
+        sendHeartbeat();
 
 });
 
@@ -419,9 +556,10 @@ audio.addEventListener("playing", () => {
 audio.addEventListener("waiting", () => {
 
     /*
-     * Do NOT surrender leadership just because buffering occurs.
+     * Buffering does NOT kill leadership.
      */
-    if (isLeader) beat();
+    if (isLeader)
+        sendHeartbeat();
 
 });
 
@@ -429,7 +567,7 @@ audio.addEventListener("waiting", () => {
 audio.addEventListener("timeupdate", () => {
 
     if (isLeader) {
-        remoteTime = time();
+        remoteTime = getTime();
         remoteStamp = performance.now();
     }
 
@@ -438,69 +576,60 @@ audio.addEventListener("timeupdate", () => {
 
 audio.addEventListener("loadedmetadata", () => {
 
-    silentPlay();
+    if (!isLeader)
+        syncToRemote();
+
+    ensureSilentPlaying();
 
 });
 
 
-/* ---------------- CLEANUP ---------------- */
+/* ================= CLEANUP ================= */
 
 function cleanup() {
 
-    if (dead) return;
+    if (dead)
+        return;
 
     dead = true;
 
     if (isLeader) {
 
-        /*
-         * Give the surviving popups the latest position.
-         */
-        bc.postMessage({
+        channel.postMessage({
             type: "closing",
-            id,
-            time: time(),
+            id: id,
+            time: getTime(),
             stamp: performance.now()
         });
-
     }
+
+    if (heartbeatTimer)
+        clearInterval(heartbeatTimer);
+
+    if (timeoutTimer)
+        clearTimeout(timeoutTimer);
 
     try {
         audio.pause();
     } catch (_) {}
 
     try {
-        bc.close();
+        channel.close();
     } catch (_) {}
 }
 
-window.addEventListener("pagehide", cleanup);
-window.addEventListener("beforeunload", cleanup);
+window.addEventListener(
+    "pagehide",
+    cleanup,
+    { once: true }
+);
 
+window.addEventListener(
+    "beforeunload",
+    cleanup,
+    { once: true }
+);
 
-/* ---------------- IMMEDIATE HANDOFF ---------------- */
-
-bc.addEventListener("message", e => {
-
-    const m = e.data;
-
-    if (!m || m.type !== "closing") return;
-
-    if (String(m.id) !== String(leader)) return;
-
-    remoteTime = Number(m.time) || 0;
-    remoteStamp = Number(m.stamp) || performance.now();
-
-    leader = null;
-    lastBeat = 0;
-
-    /*
-     * The audio is already loaded and playing silently,
-     * so takeover can happen immediately.
-     */
-    becomeLeader();
-
-});
 </script>
 
 </body>
