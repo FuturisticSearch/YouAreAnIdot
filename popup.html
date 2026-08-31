@@ -12,7 +12,18 @@
 
     <title>Are You An Idiot?</title>
 
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/98.css"
+    >
+
     <style>
+
+        /* ====================================================
+           98.css does all the chrome (windows, title bars,
+           buttons, bevels, fonts). Only layout / scaling /
+           the original fixed 928x929 geometry lives here.
+           ==================================================== */
 
         * {
             box-sizing: border-box;
@@ -30,15 +41,6 @@
             background: transparent;
             overflow: hidden;
 
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
-
-            font-size: 11px;
-
             user-select: none;
             -webkit-user-select: none;
 
@@ -46,6 +48,9 @@
             align-items: center;
             justify-content: center;
         }
+
+
+        /* ---------- main window (98.css .window) ---------- */
 
         #question-window {
             position: absolute;
@@ -62,81 +67,47 @@
 
             transform-origin: center center;
 
-            background: #c0c0c0;
-
-            border: 2px solid;
-
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
-
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
+            padding: 3px;
 
             overflow: hidden;
         }
 
-        #titlebar {
-            position: absolute;
-            pointer-events: none;
-            left: 3px;
-            right: 3px;
-            top: 3px;
+        /* the window is rendered at ~0.5 scale, so the
+           98.css chrome is scaled up to stay readable */
 
+        #question-window > .title-bar {
             height: 25px;
-
-            display: flex;
-            align-items: center;
-
-            padding-left: 6px;
-            padding-right: 3px;
-
-            background: #000080;
-            color: #ffffff;
-
-            font-family:
-                Tahoma,
-                "MS Sans Serif",
-                Arial,
-                sans-serif;
-
-            font-size: 15px;
-            font-weight: bold;
-
-            line-height: 25px;
-            letter-spacing: 0;
 
             cursor: move;
             touch-action: none;
-
-            user-select: none;
-            -webkit-user-select: none;
-
-            box-sizing: border-box;
         }
 
-        #title {
-            flex: 1;
+        #question-window > .title-bar .title-bar-text {
+            font-size: 15px;
+            line-height: 25px;
+        }
 
-            min-width: 0;
+        #question-window > .title-bar .title-bar-controls button {
+            width: 32px;
+            height: 21px;
+        }
 
-            pointer-events: none;
+        #question-window > .window-body {
+            position: absolute;
 
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            left: 3px;
+            right: 3px;
+            top: 28px;
+            bottom: 3px;
 
-            text-rendering: optimizeLegibility;
+            margin: 0;
         }
 
         #pictureBox1 {
             position: absolute;
 
-            left: 3px;
-            top: 28px;
+            left: 0;
+            top: 0;
 
             width: 918px;
             height: 714px;
@@ -150,10 +121,10 @@
         #question-area {
             position: absolute;
 
-            left: 3px;
-            right: 3px;
+            left: 0;
+            right: 0;
 
-            top: 750px;
+            top: 722px;
             height: 90px;
 
             display: flex;
@@ -179,82 +150,40 @@
             text-align: center;
         }
 
+        /* answer buttons: 98.css button look, original geometry */
+
         .answer {
             position: absolute;
 
-            top: 860px;
+            top: 832px;
             height: 57px;
 
             padding: 0;
-
-            background: #c0c0c0;
-            color: #000000;
 
             font-family:
                 "Verdana",
                 sans-serif;
 
             font-size: 12pt;
-            font-weight: normal;
-
-            border: 2px solid;
-
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
-
-            border-radius: 0;
-
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
-
-            cursor: default;
-
-            appearance: none;
-            -webkit-appearance: none;
-        }
-
-        .answer:hover {
-            background: #c0c0c0;
-        }
-
-        .answer:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
-
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
-
-            padding-left: 2px;
-            padding-top: 2px;
-        }
-
-        .answer:focus {
-            outline: 1px dotted #000000;
-            outline-offset: -5px;
         }
 
         #no {
-            left: 28px;
+            left: 25px;
             width: 262px;
         }
 
         #none {
-            left: 298px;
+            left: 295px;
             width: 354px;
         }
 
         #yes {
-            left: 660px;
+            left: 657px;
             width: 244px;
         }
+
+
+        /* ---------- message box (98.css .window) ---------- */
 
         #popup-overlay {
             position: fixed;
@@ -290,85 +219,6 @@
                 calc(100vw - 30px),
                 calc(100vh - 30px)
             );
-
-            background: #c0c0c0;
-
-            border: 2px solid;
-
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
-
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
-        }
-
-        #popup-titlebar {
-            height: 22px;
-
-            display: flex;
-            align-items: center;
-
-            padding-left: 4px;
-            padding-right: 2px;
-
-            background: #000080;
-            color: #ffffff;
-
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        #popup-title {
-            flex: 1;
-
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        #popup-close {
-            width: 19px;
-            height: 18px;
-
-            padding: 0;
-
-            background: #c0c0c0;
-
-            border: 2px solid;
-
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
-
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
-
-            font-family:
-                Arial,
-                sans-serif;
-
-            font-size: 11px;
-            font-weight: bold;
-            line-height: 13px;
-        }
-
-        #popup-close:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
-
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
         }
 
         #popup-content {
@@ -377,7 +227,7 @@
             display: flex;
             align-items: center;
 
-            padding: 18px;
+            padding: 14px 6px;
         }
 
         #popup-icon {
@@ -392,12 +242,6 @@
             align-items: center;
             justify-content: center;
 
-            color: #000000;
-
-            font-family:
-                Arial,
-                sans-serif;
-
             font-size: 26px;
             font-weight: bold;
             line-height: 32px;
@@ -408,80 +252,19 @@
         #popup-message {
             flex: 1;
 
-            font-size: 13px;
-
-            color: #000000;
-
             line-height: 1.35;
         }
 
-        #popup-buttons {
-            display: flex;
+        /* .field-row from 98.css handles the button row spacing */
 
+        #popup-buttons {
             justify-content: center;
 
-            gap: 8px;
-
-            padding:
-                0
-                12px
-                14px;
+            padding: 0 6px 8px;
         }
 
         #popup-buttons button {
             min-width: 75px;
-
-            height: 27px;
-
-            padding:
-                2px
-                12px;
-
-            background: #c0c0c0;
-
-            border: 2px solid;
-
-            border-color:
-                #ffffff
-                #000000
-                #000000
-                #ffffff;
-
-            box-shadow:
-                inset 1px 1px 0 #dfdfdf,
-                inset -1px -1px 0 #808080;
-
-            font-family:
-                "MS Sans Serif",
-                "Microsoft Sans Serif",
-                Tahoma,
-                Arial,
-                sans-serif;
-
-            font-size: 12px;
-
-            color: #000000;
-        }
-
-        #popup-buttons button:hover {
-            background: #c0c0c0;
-        }
-
-        #popup-buttons button:active {
-            border-color:
-                #000000
-                #ffffff
-                #ffffff
-                #000000;
-
-            box-shadow:
-                inset 1px 1px 0 #808080,
-                inset -1px -1px 0 #dfdfdf;
-        }
-
-        #popup-buttons button:focus {
-            outline: 1px dotted #000000;
-            outline-offset: -5px;
         }
 
     </style>
@@ -490,95 +273,135 @@
 
 <body>
 
-    <main id="question-window">
+    <main
+        id="question-window"
+        class="window"
+    >
 
-        <div id="titlebar">
-
-            <span id="title">
-                Are You An Idiot?
-            </span>
-
-        </div>
-
-
-        <img
-            id="pictureBox1"
-            src="media/idiot.gif"
-            alt=""
-            draggable="false"
+        <div
+            id="titlebar"
+            class="title-bar"
         >
 
+            <div
+                id="title"
+                class="title-bar-text"
+            >
+                Are You An Idiot?
+            </div>
 
-        <div id="question-area">
+            <div class="title-bar-controls">
 
-            <div id="question">
-                Are You An Idiot ?
+                <button aria-label="Minimize"></button>
+                <button aria-label="Maximize"></button>
+                <button aria-label="Close"></button>
+
             </div>
 
         </div>
 
 
-        <button
-            class="answer"
-            id="no"
-            type="button"
-        >
-            No, I'm not.
-        </button>
+        <div class="window-body">
+
+            <img
+                id="pictureBox1"
+                src="media/idiot.gif"
+                alt=""
+                draggable="false"
+            >
 
 
-        <button
-            class="answer"
-            id="none"
-            type="button"
-        >
-            I don't know =[
-        </button>
+            <div id="question-area">
+
+                <div id="question">
+                    Are You An Idiot ?
+                </div>
+
+            </div>
 
 
-        <button
-            class="answer"
-            id="yes"
-            type="button"
-        >
-            Yes, I am.
-        </button>
+            <button
+                class="answer"
+                id="no"
+                type="button"
+            >
+                No, I'm not.
+            </button>
+
+
+            <button
+                class="answer"
+                id="none"
+                type="button"
+            >
+                I don't know =[
+            </button>
+
+
+            <button
+                class="answer"
+                id="yes"
+                type="button"
+            >
+                Yes, I am.
+            </button>
+
+        </div>
 
     </main>
 
 
     <div id="popup-overlay">
 
-        <div id="popup">
+        <div
+            id="popup"
+            class="window"
+        >
 
-            <div id="popup-titlebar">
+            <div
+                id="popup-titlebar"
+                class="title-bar"
+            >
 
-                <span id="popup-title">
-                    YouAreAnIdiot
-                </span>
-
-                <button
-                    id="popup-close"
-                    type="button"
+                <div
+                    id="popup-title"
+                    class="title-bar-text"
                 >
-                    ×
-                </button>
-
-            </div>
-
-
-            <div id="popup-content">
-
-                <div id="popup-icon">
-                    !
+                    YouAreAnIdiot
                 </div>
 
-                <div id="popup-message"></div>
+                <div class="title-bar-controls">
+
+                    <button
+                        id="popup-close"
+                        type="button"
+                        aria-label="Close"
+                    ></button>
+
+                </div>
 
             </div>
 
 
-            <div id="popup-buttons"></div>
+            <div class="window-body">
+
+                <div id="popup-content">
+
+                    <div id="popup-icon">
+                        !
+                    </div>
+
+                    <div id="popup-message"></div>
+
+                </div>
+
+
+                <div
+                    id="popup-buttons"
+                    class="field-row"
+                ></div>
+
+            </div>
 
         </div>
 
