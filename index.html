@@ -49,10 +49,6 @@
     }
 
 
-    /* ============================================================
-       WINDOWS 95 MESSAGE BOX
-       ============================================================ */
-
     #popup-overlay {
 
         position: fixed;
@@ -369,10 +365,6 @@
     }
 
 
-    /* ============================================================
-       SMALL SCREEN MESSAGE BOX
-       ============================================================ */
-
     @media (max-width: 520px) {
 
         #popup {
@@ -417,10 +409,6 @@
 
     }
 
-
-    /* ============================================================
-       VERY SMALL SCREEN
-       ============================================================ */
 
     @media (max-width: 360px) {
 
@@ -474,14 +462,6 @@
 </head>
 
 <body>
-
-<!--
-    Intentionally empty.
-
-    There is NO "Are You An Idiot?" text here.
-    The normal startup page is only the teal background.
--->
-
 
 <div id="popup-overlay">
 
@@ -561,19 +541,11 @@ const AUTOPLAY_CHECK_INTERVAL =
     250;
 
 
-/*
- * popup.html's actual design size.
- *
- * Keep these identical to popup.html.
- */
 const QUESTION_WIDTH = 928;
+
 const QUESTION_HEIGHT = 929;
 
 
-/*
- * Minimum amount of the desktop window that
- * should remain visible around the edges.
- */
 const SCREEN_MARGIN = 20;
 
 
@@ -701,10 +673,6 @@ let popupStartTop =
     0;
 
 
-/*
- * Return the permission popup to the exact
- * center of the viewport.
- */
 function resetPermissionPopupPosition() {
 
     popup.style.left =
@@ -723,10 +691,6 @@ popupTitlebar.addEventListener(
     "pointerdown",
     event => {
 
-        /*
-         * Do not start dragging when the
-         * close button is pressed.
-         */
         if (
             event.target.closest(
                 "#popup-close"
@@ -753,12 +717,6 @@ popupTitlebar.addEventListener(
             popup.getBoundingClientRect();
 
 
-        /*
-         * The popup starts centered using
-         * translate(-50%, -50%). Convert that
-         * to explicit viewport coordinates
-         * before dragging.
-         */
         popupStartLeft =
             rect.left;
 
@@ -1115,6 +1073,13 @@ async function testAutoplayPermission() {
         } catch (_) {}
 
 
+        /*
+         * This is intentionally attempted WITHOUT
+         * any user-interaction unlock handler.
+         *
+         * A click or keypress must NOT make this
+         * test pass.
+         */
         const playPromise =
             autoplayAudio.play();
 
@@ -1524,6 +1489,13 @@ async function showPermissionMessage() {
         false;
 
 
+    /*
+     * Do NOT try to unlock autoplay here.
+     *
+     * Clicking OK must not count as autoplay.
+     */
+
+
     if (
         !popupAllowed
     ) {
@@ -1534,6 +1506,22 @@ async function showPermissionMessage() {
         popupResults.clear();
 
         testPopupPermission();
+
+    }
+
+
+    /*
+     * Re-test autoplay normally, without using
+     * the user's click as a gesture.
+     */
+    if (
+        !autoplayAllowed
+    ) {
+
+        autoplayTestComplete =
+            false;
+
+        testAutoplayPermission();
 
     }
 
@@ -1726,7 +1714,9 @@ function getQuestionPopupDimensions() {
 
 
     const PREFERRED_WIDTH = 520;
+
     const PREFERRED_HEIGHT = 521;
+
 
     let scale =
         Math.min(
