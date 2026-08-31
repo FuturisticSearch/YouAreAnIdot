@@ -8,25 +8,22 @@ checkAndRedirect();
 
 window.addEventListener('focus', checkAndRedirect);
 
-document.addEventListener('click', function playMusicOnce() {
-    const audio = document.getElementById('youare-audio');
-    const micon = document.getElementById('youare-micon');
 
-    if (!audio || !micon) return;
+/*
+ * ============================================================
+ * SOUND
+ * ============================================================
+ *
+ * Removed autoplay handling.
+ * No audio is created, played, paused, or monitored here.
+ */
 
-    document.removeEventListener('click', playMusicOnce);
-}, { once: true });
 
-
-const faudio = new Audio('media/youare.mp3');
-
-faudio.addEventListener('timeupdate', function () {
-    if (this.currentTime > this.duration - 0.45) {
-        this.currentTime = 0;
-        this.play();
-    }
-});
-
+/*
+ * ============================================================
+ * BOOKMARK
+ * ============================================================
+ */
 
 function bookmark() {
     if (
@@ -37,6 +34,12 @@ function bookmark() {
     }
 }
 
+
+/*
+ * ============================================================
+ * WINDOWS
+ * ============================================================
+ */
 
 const openWindows = [];
 
