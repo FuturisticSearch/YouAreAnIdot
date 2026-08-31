@@ -52,115 +52,117 @@ const id =
     Math.random().toString(36).slice(2);
 
 const HEARTBEAT = 20;
-const TIMEOUT = 300;
-const SYNC_THRESHOLD = 0.03;
+const TIMEOUT = 150;
+const SYNC = 0.08;
 
 let leader = null;
 let lastBeat = 0;
 let remoteTime = 0;
 let remoteStamp = 0;
-let heartbeatTimer = null;
-let claiming = false;
+let isLeader = false;
 let dead = false;
+let beatTimer = null;
 
 
 /* ================= AUDIO ================= */
 
-audio.volume = 1;
-audio.muted = false;
+audio.muted = true;
+audio.volume = 0;
 
 try {
     audio.load();
 } catch (_) {}
 
-function playAudio() {
-    if (dead || !audio.paused)
-        return;
 
-    audio.play().catch(() => {});
-}
-
-
-/* ================= TIME ================= */
-
-function getDuration() {
+function duration() {
     return Number.isFinite(audio.duration) && audio.duration > 0
         ? audio.duration
         : 0;
 }
 
-function normalize(t) {
-    const d = getDuration();
 
-    if (!d)
-        return Math.max(0, t);
-
-    return ((t % d) + d) % d;
+function now() {
+    return Number.isFinite(audio.currentTime)
+        ? audio.currentTime
+        : 0;
 }
 
-function getTargetTime() {
-    let t = remoteTime;
 
-    if (remoteStamp) {
-        t += (
-            performance.now() -
-            remoteStamp
-        ) / 1000;
-    }
+function normalize(t) {
+    const d = duration();
 
-    return normalize(t);
+    return d
+        ? ((t % d) + d) % d
+        : Math.max(0, t);
+}
+
+
+function remotePosition() {
+    return normalize(
+        remoteTime +
+        Math.min(
+            1,
+            Math.max(
+                0,
+                (performance.now() - remoteStamp) / 1000
+            )
+        )
+    );
+}
+
+
+/* ================= PLAY SILENT ================= */
+
+async function playSilent() {
+
+    if (dead || !audio.paused)
+        return;
+
+    audio.muted = true;
+    audio.volume = 0;
+
+    try {
+        await audio.play();
+    } catch (_) {}
 }
 
 
 /* ================= SYNC ================= */
 
-function syncAudio() {
+function sync() {
 
-    if (leader === id)
+    if (
+        isLeader ||
+        leader === null ||
+        !duration()
+    )
         return;
 
-    const d = getDuration();
-
-    if (!d)
-        return;
-
-    const target = getTargetTime();
-    const current = audio.currentTime;
+    const target = remotePosition();
+    const current = now();
+    const d = duration();
 
     let diff = Math.abs(target - current);
 
-    diff = Math.min(
-        diff,
-        d - diff
-    );
+    diff = Math.min(diff, d - diff);
 
-    if (diff > SYNC_THRESHOLD) {
-
+    if (diff > SYNC) {
         try {
             audio.currentTime = target;
         } catch (_) {}
-
     }
-
-    audio.muted = false;
-    audio.volume = 1;
-
-    playAudio();
 }
 
 
 /* ================= HEARTBEAT ================= */
 
-function sendHeartbeat() {
+function heartbeat() {
 
-    if (
-        dead ||
-        leader !== id
-    )
+    if (dead || !isLeader)
         return;
 
     const stamp = performance.now();
-    const time = audio.currentTime;
+    const time = now();
 
     remoteTime = time;
     remoteStamp = stamp;
@@ -176,15 +178,14 @@ function sendHeartbeat() {
 
 function startHeartbeat() {
 
-    clearInterval(heartbeatTimer);
+    clearInterval(beatTimer);
 
-    sendHeartbeat();
+    heartbeat();
 
-    heartbeatTimer =
-        setInterval(
-            sendHeartbeat,
-            HEARTBEAT
-        );
+    beatTimer = setInterval(
+        heartbeat,
+        HEARTBEAT
+    );
 }
 
 
@@ -194,61 +195,55 @@ async function becomeLeader() {
 
     if (
         dead ||
-        leader === id ||
-        claiming
+        isLeader
     )
         return;
 
-    claiming = true;
-
-    await new Promise(resolve =>
-        setTimeout(
-            resolve,
-            Math.random() * 20
-        )
-    );
-
-    if (
-        dead ||
-        leader === id
-    ) {
-        claiming = false;
-        return;
-    }
-
-    if (
-        leader !== null &&
-        performance.now() - lastBeat < TIMEOUT
-    ) {
-        claiming = false;
-        return;
-    }
-
-    const time = getTargetTime();
-    const stamp = performance.now();
-
+    /*
+     * Tell everyone immediately.
+     */
     channel.postMessage({
         type: "claim",
-        id,
-        time,
-        stamp
+        id
     });
 
     leader = id;
-    claiming = false;
+    isLeader = true;
 
-    if (getDuration()) {
+    /*
+     * First window starts at 0.
+     * A takeover uses the last known position.
+     */
+    if (duration() && remoteStamp) {
         try {
-            audio.currentTime = time;
+            audio.currentTime = remotePosition();
         } catch (_) {}
     }
+
+    await playSilent();
+
+    if (dead || !isLeader)
+        return;
 
     audio.muted = false;
     audio.volume = 1;
 
-    playAudio();
-
     startHeartbeat();
+}
+
+
+function stopLeader() {
+
+    if (!isLeader)
+        return;
+
+    isLeader = false;
+
+    clearInterval(beatTimer);
+    beatTimer = null;
+
+    audio.muted = true;
+    audio.volume = 0;
 }
 
 
@@ -258,7 +253,11 @@ channel.onmessage = event => {
 
     const m = event.data;
 
-    if (!m || m.id === id)
+    if (
+        !m ||
+        !m.type ||
+        m.id === id
+    )
         return;
 
 
@@ -268,20 +267,15 @@ channel.onmessage = event => {
 
         const other = String(m.id);
 
-        if (leader === id) {
+        /*
+         * If two leaders exist, smaller ID wins.
+         */
+        if (isLeader) {
 
             if (other < id) {
-
-                leader = other;
-
-                clearInterval(
-                    heartbeatTimer
-                );
-
+                stopLeader();
             } else {
-
-                sendHeartbeat();
-
+                heartbeat();
                 return;
             }
         }
@@ -289,16 +283,11 @@ channel.onmessage = event => {
         leader = other;
         lastBeat = performance.now();
 
-        remoteTime =
-            Number(m.time) || 0;
+        remoteTime = Number(m.time) || 0;
+        remoteStamp = Number(m.stamp) || performance.now();
 
-        remoteStamp =
-            Number(m.stamp) ||
-            performance.now();
-
-        claiming = false;
-
-        syncAudio();
+        sync();
+        playSilent();
 
         return;
     }
@@ -310,38 +299,38 @@ channel.onmessage = event => {
 
         const other = String(m.id);
 
-        if (
-            leader === id &&
-            other >= id
-        ) {
-            sendHeartbeat();
-            return;
+        /*
+         * Deterministic winner if multiple windows claim.
+         */
+        if (isLeader) {
+
+            if (other < id) {
+                stopLeader();
+            } else {
+                heartbeat();
+                return;
+            }
         }
 
         leader = other;
         lastBeat = performance.now();
 
-        remoteTime =
-            Number(m.time) || 0;
+        audio.muted = true;
+        audio.volume = 0;
 
-        remoteStamp =
-            Number(m.stamp) ||
-            performance.now();
-
-        claiming = false;
-
-        syncAudio();
+        sync();
+        playSilent();
 
         return;
     }
 
 
-    /* ---------- DISCOVERY ---------- */
+    /* ---------- DISCOVER ---------- */
 
     if (m.type === "discover") {
 
-        if (leader === id)
-            sendHeartbeat();
+        if (isLeader)
+            heartbeat();
 
         return;
     }
@@ -351,21 +340,23 @@ channel.onmessage = event => {
 
     if (m.type === "closing") {
 
-        if (
-            String(m.id) !==
-            String(leader)
-        )
+        if (String(m.id) !== String(leader))
             return;
 
-        remoteTime =
-            Number(m.time) || 0;
-
-        remoteStamp =
-            Number(m.stamp) ||
-            performance.now();
+        remoteTime = Number(m.time) || 0;
+        remoteStamp = Number(m.stamp) || performance.now();
 
         leader = null;
         lastBeat = 0;
+
+        /*
+         * Reuse the already loaded audio.
+         */
+        if (duration()) {
+            try {
+                audio.currentTime = remotePosition();
+            } catch (_) {}
+        }
 
         becomeLeader();
     }
@@ -374,109 +365,75 @@ channel.onmessage = event => {
 
 /* ================= STARTUP ================= */
 
-audio.addEventListener(
-    "loadedmetadata",
-    () => {
-
-        syncAudio();
-        playAudio();
-
-    }
-);
-
-
-audio.addEventListener(
-    "play",
-    () => {
-
-        audio.muted = false;
-        audio.volume = 1;
-
-    }
-);
-
-
-audio.addEventListener(
-    "pause",
-    () => {
-
-        if (!dead)
-            playAudio();
-
-    }
-);
-
-
-audio.addEventListener(
-    "playing",
-    () => {
-
-        if (leader === id)
-            sendHeartbeat();
-
-    }
-);
-
-
-audio.addEventListener(
-    "waiting",
-    () => {
-
-        if (leader === id)
-            sendHeartbeat();
-
-    }
-);
-
-
-/* Ask existing windows who the leader is. */
-
+/*
+ * Ask existing windows first.
+ */
 channel.postMessage({
     type: "discover",
     id
 });
 
 
-/* Start audio immediately. */
-
-playAudio();
-
-
-/* Elect a leader if nobody answers. */
-
+/*
+ * If this is the first window, nobody answers.
+ */
 setTimeout(() => {
 
     if (
         !dead &&
-        leader === null
+        !isLeader &&
+        (
+            leader === null ||
+            performance.now() - lastBeat > TIMEOUT
+        )
     ) {
+        leader = null;
         becomeLeader();
     }
 
-}, TIMEOUT);
+}, 200);
 
 
-/* ================= WATCHDOG ================= */
+/* ================= AUDIO ================= */
 
-setInterval(() => {
+audio.addEventListener("play", () => {
+
+    if (!isLeader) {
+        audio.muted = true;
+        audio.volume = 0;
+    }
+
+});
+
+
+audio.addEventListener("playing", () => {
+
+    if (isLeader)
+        heartbeat();
+
+});
+
+
+audio.addEventListener("loadedmetadata", () => {
+
+    if (!isLeader)
+        sync();
+
+});
+
+
+audio.addEventListener("pause", () => {
 
     if (
         !dead &&
-        leader !== id &&
-        (
-            leader === null ||
-            performance.now() -
-            lastBeat >
-            TIMEOUT
-        )
+        !isLeader &&
+        leader !== null
     ) {
-
-        leader = null;
-        becomeLeader();
-
+        sync();
+        playSilent();
     }
 
-}, 100);
+});
 
 
 /* ================= CLEANUP ================= */
@@ -488,36 +445,38 @@ function cleanup() {
 
     dead = true;
 
-    if (leader === id) {
+    if (isLeader) {
 
         channel.postMessage({
             type: "closing",
             id,
-            time: audio.currentTime,
+            time: now(),
             stamp: performance.now()
         });
-
     }
 
-    clearInterval(heartbeatTimer);
+    clearInterval(beatTimer);
 
     try {
         audio.pause();
-        channel.close();
     } catch (_) {}
 
+    try {
+        channel.close();
+    } catch (_) {}
 }
+
 
 window.addEventListener(
     "pagehide",
     cleanup,
-    {once:true}
+    { once: true }
 );
 
 window.addEventListener(
     "beforeunload",
     cleanup,
-    {once:true}
+    { once: true }
 );
 
 </script>
