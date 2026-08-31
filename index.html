@@ -1208,9 +1208,14 @@ window.addEventListener(
 
 function getPermissionMessage() {
 
-    const REFRESH_HINT =
-        " If you already enabled it and nothing " +
-        "changes, refresh the page.";
+    const POPUP_REFRESH_HINT =
+        " If you already allowed pop-ups but nothing has changed, " +
+        "try refreshing the page.";
+
+
+    const BOTH_REFRESH_HINT =
+        " If you already changed the settings but nothing has changed, " +
+        "try refreshing the page.";
 
 
     const AUTOPLAY_HINT =
@@ -1237,7 +1242,7 @@ function getPermissionMessage() {
             "This recreation requires pop-up windows " +
             "to be enabled in your browser. Please allow " +
             "pop-ups for this site." +
-            REFRESH_HINT
+            POPUP_REFRESH_HINT
         );
 
     }
@@ -1252,8 +1257,7 @@ function getPermissionMessage() {
             "This recreation requires audio autoplay " +
             "to be enabled in your browser. Please allow " +
             "autoplay for this site." +
-            AUTOPLAY_HINT +
-            REFRESH_HINT
+            AUTOPLAY_HINT
         );
 
     }
@@ -1264,7 +1268,7 @@ function getPermissionMessage() {
         "audio autoplay to be enabled in your browser. " +
         "Please allow both for this site." +
         AUTOPLAY_HINT +
-        REFRESH_HINT
+        BOTH_REFRESH_HINT
     );
 
 }
