@@ -46,86 +46,190 @@
         <source src="/media/youare-long.mp3" type="audio/mpeg">
     </audio>
 
+
     <script>
         "use strict";
 
+
         /*
          * ============================================================
-         * AUDIO BROADCASTING
+         * SHARED AUDIO PLAYER
          * ============================================================
          *
-         * Every lol.html window joins the same BroadcastChannel.
+         * Only ONE lol.html window is allowed to play the audio.
          *
-         * When one window starts the audio, it broadcasts that event
-         * to the other windows so they can start the same audio too.
+         * The player sends a heartbeat every 10 ms.
          *
-         * BroadcastChannel only works between pages from the same
-         * origin, which is exactly what we want here.
+         * Every other window listens for that heartbeat.
+         *
+         * If the heartbeat disappears, one of the other windows
+         * takes over as the new player.
          */
+
 
         const audio =
             document.getElementById("youare-audio");
 
+
         const audioChannel =
-            new BroadcastChannel("youare-idiot-audio");
+            new BroadcastChannel(
+                "youare-idiot-audio"
+            );
 
 
-        let audioStarted =
-            false;
+        /*
+         * Unique ID for this particular popup.
+         *
+         * Every lol.html window gets a different ID.
+         */
+        const playerId =
+            `${Date.now()}-${Math.random()
+                .toString(36)
+                .slice(2)}`;
 
 
         /*
          * ============================================================
-         * START AUDIO
+         * TIMING
          * ============================================================
          */
 
-        function startAudio() {
-
-            if (!audio) {
-                return;
-            }
+        const HEARTBEAT_INTERVAL =
+            10;
 
 
-            const playPromise =
-                audio.play();
+        /*
+         * This is deliberately larger than 10 ms.
+         *
+         * We don't immediately assume the player died because
+         * one individual heartbeat was delayed.
+         */
+        const PLAYER_TIMEOUT =
+            100;
 
+
+        /*
+         * Prevent multiple takeover attempts from happening
+         * simultaneously inside this window.
+         */
+        let takeoverInProgress =
+            false;
+
+
+        /*
+         * Whether THIS popup currently owns the audio.
+         */
+        let isPlayer =
+            false;
+
+
+        /*
+         * ID of the player we currently believe is alive.
+         */
+        let currentPlayerId =
+            null;
+
+
+        /*
+         * Last time we heard a heartbeat from the player.
+         */
+        let lastHeartbeat =
+            0;
+
+
+        /*
+         * Heartbeat timer belonging to THIS popup.
+         */
+        let heartbeatTimer =
+            null;
+
+
+        /*
+         * Timer used to check whether the current player died.
+         */
+        let healthCheckTimer =
+            null;
+
+
+        /*
+         * ============================================================
+         * SEND HEARTBEAT
+         * ============================================================
+         */
+
+        function sendHeartbeat() {
 
             if (
-                playPromise &&
-                typeof playPromise.then === "function"
+                !isPlayer
             ) {
 
-                playPromise
-                    .then(() => {
-
-                        audioStarted = true;
-
-                        audioChannel.postMessage({
-                            type: "AUDIO_STARTED"
-                        });
-
-                    })
-                    .catch(() => {
-
-                        /*
-                         * Browser autoplay policy may block this.
-                         * Do not treat the failure as a successful
-                         * start.
-                         */
-
-                        audioStarted = false;
-
-                    });
+                return;
 
             }
-            else {
 
-                audioStarted = true;
 
-                audioChannel.postMessage({
-                    type: "AUDIO_STARTED"
-                });
+            audioChannel.postMessage({
+
+                type:
+                    "PLAYER_HEARTBEAT",
+
+                playerId:
+                    playerId,
+
+                time:
+                    audio
+                        ? audio.currentTime
+                        : 0
+
+            });
+
+        }
+
+
+        /*
+         * ============================================================
+         * START HEARTBEAT
+         * ============================================================
+         */
+
+        function startHeartbeat() {
+
+            stopHeartbeat();
+
+
+            /*
+             * Send one immediately instead of waiting 10 ms.
+             */
+            sendHeartbeat();
+
+
+            heartbeatTimer =
+                setInterval(
+                    sendHeartbeat,
+                    HEARTBEAT_INTERVAL
+                );
+
+        }
+
+
+        /*
+         * ============================================================
+         * STOP HEARTBEAT
+         * ============================================================
+         */
+
+        function stopHeartbeat() {
+
+            if (
+                heartbeatTimer !== null
+            ) {
+
+                clearInterval(
+                    heartbeatTimer
+                );
+
+                heartbeatTimer =
+                    null;
 
             }
 
@@ -134,7 +238,272 @@
 
         /*
          * ============================================================
-         * BROADCAST RECEIVER
+         * BECOME PLAYER
+         * ============================================================
+         */
+
+        async function becomePlayer() {
+
+            if (
+                isPlayer
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                !audio
+            ) {
+
+                return;
+
+            }
+
+
+            /*
+             * Tell the other windows that we are taking over.
+             */
+            audioChannel.postMessage({
+
+                type:
+                    "PLAYER_CLAIM",
+
+                playerId:
+                    playerId
+
+            });
+
+
+            currentPlayerId =
+                playerId;
+
+
+            isPlayer =
+                true;
+
+
+            takeoverInProgress =
+                false;
+
+
+            /*
+             * Start the audio.
+             *
+             * This may still be blocked by browser autoplay policy.
+             */
+            try {
+
+                await audio.play();
+
+            }
+            catch (_) {
+
+                /*
+                 * If autoplay is blocked, don't pretend that this
+                 * window is successfully playing.
+                 */
+                isPlayer =
+                    false;
+
+                currentPlayerId =
+                    null;
+
+                takeoverInProgress =
+                    false;
+
+                return;
+
+            }
+
+
+            /*
+             * Begin the 10 ms health heartbeat.
+             */
+            startHeartbeat();
+
+        }
+
+
+        /*
+         * ============================================================
+         * STOP BEING PLAYER
+         * ============================================================
+         */
+
+        function stopBeingPlayer() {
+
+            if (
+                !isPlayer
+            ) {
+
+                return;
+
+            }
+
+
+            isPlayer =
+                false;
+
+
+            stopHeartbeat();
+
+
+            /*
+             * Non-player windows MUST NOT produce sound.
+             */
+            if (
+                audio
+            ) {
+
+                audio.pause();
+
+            }
+
+        }
+
+
+        /*
+         * ============================================================
+         * PLAYER HEALTH CHECK
+         * ============================================================
+         *
+         * Runs every 10 ms.
+         *
+         * If we haven't received a heartbeat for PLAYER_TIMEOUT,
+         * the current player is considered dead.
+         */
+
+        function checkPlayerHealth() {
+
+            if (
+                isPlayer
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                currentPlayerId === null
+            ) {
+
+                attemptTakeover();
+
+                return;
+
+            }
+
+
+            const elapsed =
+                performance.now() -
+                lastHeartbeat;
+
+
+            if (
+                elapsed >
+                PLAYER_TIMEOUT
+            ) {
+
+                currentPlayerId =
+                    null;
+
+
+                attemptTakeover();
+
+            }
+
+        }
+
+
+        /*
+         * ============================================================
+         * START HEALTH CHECK
+         * ============================================================
+         */
+
+        healthCheckTimer =
+            setInterval(
+                checkPlayerHealth,
+                HEARTBEAT_INTERVAL
+            );
+
+
+        /*
+         * ============================================================
+         * TAKEOVER
+         * ============================================================
+         *
+         * There can be several windows that notice the old player
+         * died at almost exactly the same time.
+         *
+         * We therefore don't immediately claim the player.
+         *
+         * Each popup waits a tiny ID-derived amount of time.
+         *
+         * The first one to claim wins.
+         */
+
+        function attemptTakeover() {
+
+            if (
+                takeoverInProgress ||
+                isPlayer
+            ) {
+
+                return;
+
+            }
+
+
+            takeoverInProgress =
+                true;
+
+
+            /*
+             * Generate a deterministic tiny delay from the
+             * random part of this window's unique ID.
+             */
+            const delay =
+                Math.floor(
+                    Math.random() * 25
+                );
+
+
+            setTimeout(
+                () => {
+
+                    /*
+                     * Another popup may have become player while
+                     * we were waiting.
+                     */
+                    if (
+                        currentPlayerId !== null ||
+                        isPlayer
+                    ) {
+
+                        takeoverInProgress =
+                            false;
+
+                        return;
+
+                    }
+
+
+                    becomePlayer();
+
+                },
+                delay
+            );
+
+        }
+
+
+        /*
+         * ============================================================
+         * RECEIVE BROADCASTS
          * ============================================================
          */
 
@@ -148,7 +517,223 @@
 
                 if (
                     !data ||
-                    typeof data.type !== "string"
+                    typeof data.type !==
+                    "string"
+                ) {
+
+                    return;
+
+                }
+
+
+                /*
+                 * ====================================================
+                 * PLAYER HEARTBEAT
+                 * ====================================================
+                 */
+
+                if (
+                    data.type ===
+                    "PLAYER_HEARTBEAT"
+                ) {
+
+                    if (
+                        data.playerId ===
+                        playerId
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * Somebody else is the player.
+                     */
+                    currentPlayerId =
+                        data.playerId;
+
+
+                    lastHeartbeat =
+                        performance.now();
+
+
+                    takeoverInProgress =
+                        false;
+
+
+                    /*
+                     * If we accidentally became player at the
+                     * same time, the existing heartbeat wins.
+                     */
+                    if (
+                        isPlayer
+                    ) {
+
+                        /*
+                         * Deterministic tie-breaker.
+                         *
+                         * The lexicographically smaller ID wins.
+                         */
+                        if (
+                            String(data.playerId) <
+                            String(playerId)
+                        ) {
+
+                            stopBeingPlayer();
+
+                        }
+                        else {
+
+                            /*
+                             * We are the winner.
+                             *
+                             * Continue sending our heartbeat.
+                             */
+                            currentPlayerId =
+                                playerId;
+
+                        }
+
+                    }
+
+
+                    /*
+                     * NON-PLAYER WINDOWS MUST NEVER PLAY.
+                     */
+                    if (
+                        !isPlayer &&
+                        audio &&
+                        !audio.paused
+                    ) {
+
+                        audio.pause();
+
+                    }
+
+
+                    return;
+
+                }
+
+
+                /*
+                 * ====================================================
+                 * PLAYER CLAIM
+                 * ====================================================
+                 */
+
+                if (
+                    data.type ===
+                    "PLAYER_CLAIM"
+                ) {
+
+                    if (
+                        data.playerId ===
+                        playerId
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * Somebody is claiming the player.
+                     */
+                    if (
+                        isPlayer
+                    ) {
+
+                        /*
+                         * Deterministic conflict resolution.
+                         *
+                         * Only one popup survives.
+                         */
+                        if (
+                            String(data.playerId) <
+                            String(playerId)
+                        ) {
+
+                            stopBeingPlayer();
+
+                            currentPlayerId =
+                                data.playerId;
+
+                            lastHeartbeat =
+                                performance.now();
+
+                        }
+
+                        return;
+
+                    }
+
+
+                    currentPlayerId =
+                        data.playerId;
+
+
+                    lastHeartbeat =
+                        performance.now();
+
+
+                    takeoverInProgress =
+                        false;
+
+
+                    /*
+                     * Make absolutely sure this popup is silent.
+                     */
+                    if (
+                        audio
+                    ) {
+
+                        audio.pause();
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /*
+         * ============================================================
+         * INITIAL PLAYER DISCOVERY
+         * ============================================================
+         *
+         * Ask whether another popup is already playing.
+         */
+
+        audioChannel.postMessage({
+
+            type:
+                "PLAYER_DISCOVERY",
+
+            playerId:
+                playerId
+
+        });
+
+
+        /*
+         * Existing player responds to discovery.
+         */
+
+        audioChannel.addEventListener(
+            "message",
+            event => {
+
+                const data =
+                    event.data;
+
+
+                if (
+                    !data ||
+                    data.type !==
+                    "PLAYER_DISCOVERY"
                 ) {
 
                     return;
@@ -157,81 +742,28 @@
 
 
                 if (
-                    data.type === "AUDIO_STARTED"
+                    !isPlayer
                 ) {
 
-                    if (
-                        audio &&
-                        audio.paused
-                    ) {
-
-                        audio.play()
-                            .then(() => {
-
-                                audioStarted = true;
-
-                            })
-                            .catch(() => {
-
-                                /*
-                                 * Autoplay was blocked in this
-                                 * particular window.
-                                 */
-
-                                audioStarted = false;
-
-                            });
-
-                    }
+                    return;
 
                 }
 
 
                 if (
-                    data.type === "AUDIO_STOPPED"
+                    data.playerId ===
+                    playerId
                 ) {
 
-                    if (audio) {
-
-                        audio.pause();
-
-                    }
-
-                    audioStarted =
-                        false;
+                    return;
 
                 }
 
 
-                if (
-                    data.type === "AUDIO_RESTART"
-                ) {
-
-                    if (audio) {
-
-                        try {
-
-                            audio.currentTime =
-                                0;
-
-                        } catch (_) {}
-
-
-                        audio.play()
-                            .then(() => {
-
-                                audioStarted = true;
-
-                            })
-                            .catch(() => {
-
-                                audioStarted = false;
-
-                            });
-
-                    }
-
-                }
+                /*
+                 * Immediately announce ourselves.
+                 */
+                sendHeartbeat();
 
             }
         );
@@ -239,46 +771,47 @@
 
         /*
          * ============================================================
-         * INITIAL AUDIO START
+         * INITIAL TAKEOVER
          * ============================================================
          *
-         * Try immediately when the page loads.
-         *
-         * If the browser allows autoplay, it starts immediately.
-         * If not, the browser simply rejects the play() promise.
+         * Give an existing player a short opportunity to answer.
+         * If nobody answers, this popup can become the player.
          */
 
-        window.addEventListener(
-            "load",
+        setTimeout(
             () => {
 
-                startAudio();
+                if (
+                    currentPlayerId === null &&
+                    !isPlayer
+                ) {
+
+                    attemptTakeover();
+
+                }
 
             },
-            {
-                once: true
-            }
+            PLAYER_TIMEOUT + 25
         );
 
 
         /*
          * ============================================================
-         * BROADCAST WHEN THIS WINDOW BECOMES ACTIVE
+         * AUDIO ENFORCEMENT
          * ============================================================
+         *
+         * If this popup is NOT the player, it must remain silent.
          */
 
-        window.addEventListener(
-            "focus",
+        audio.addEventListener(
+            "play",
             () => {
 
                 if (
-                    audio &&
-                    !audio.paused
+                    !isPlayer
                 ) {
 
-                    audioChannel.postMessage({
-                        type: "AUDIO_STARTED"
-                    });
+                    audio.pause();
 
                 }
 
@@ -296,9 +829,39 @@
             "beforeunload",
             () => {
 
-                audioChannel.postMessage({
-                    type: "AUDIO_WINDOW_CLOSED"
-                });
+                if (
+                    isPlayer
+                ) {
+
+                    audioChannel.postMessage({
+
+                        type:
+                            "PLAYER_CLOSED",
+
+                        playerId:
+                            playerId
+
+                    });
+
+                }
+
+
+                stopHeartbeat();
+
+
+                if (
+                    healthCheckTimer !== null
+                ) {
+
+                    clearInterval(
+                        healthCheckTimer
+                    );
+
+                    healthCheckTimer =
+                        null;
+
+                }
+
 
                 audioChannel.close();
 
