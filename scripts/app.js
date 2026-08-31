@@ -84,85 +84,169 @@ function randomSpeed(multiplier) {
 function playBall() {
     const multiplier = screen.height >= 1440 ? 2 : 1;
 
-    // Approximate the C#:
-    // Screen.PrimaryScreen.Bounds.Width - this.Width
-    const maxX = Math.max(0, screen.width - window.outerWidth);
+    /*
+     * Match the C#:
+     *
+     * Screen.PrimaryScreen.Bounds.Width - this.Width
+     * Screen.PrimaryScreen.Bounds.Height - this.Height
+     *
+     * For a browser popup, outerWidth/outerHeight are
+     * the closest equivalent to the WinForms window size.
+     */
+    const maxX = Math.max(
+        0,
+        screen.width - window.outerWidth
+    );
 
-    // Approximate the C#:
-    // Screen.PrimaryScreen.Bounds.Height - this.Height
-    const maxY = Math.max(0, screen.height - window.outerHeight);
+    const maxY = Math.max(
+        0,
+        screen.height - window.outerHeight
+    );
 
-    // Hit right edge
+    /*
+     * C#:
+     *
+     * if (X >= maxX)
+     */
     if (xPos >= maxX) {
-        xPos = maxX;
-        xOff = -randomSpeed(multiplier);
 
+        xOff =
+            -randomSpeed(multiplier);
+
+        /*
+         * Preserve the Y direction.
+         */
         if (yOff < 0) {
-            yOff = -randomSpeed(multiplier);
+
+            yOff =
+                -randomSpeed(multiplier);
+
         } else if (yOff > 0) {
-            yOff = randomSpeed(multiplier);
-        } else {
-            yOff = randomSpeed(multiplier);
+
+            yOff =
+                randomSpeed(multiplier);
+
         }
+
     }
 
-    // Hit bottom edge
+
+    /*
+     * C#:
+     *
+     * if (Y >= height - this.Height)
+     */
     if (yPos >= maxY) {
-        yPos = maxY;
-        yOff = -randomSpeed(multiplier);
 
+        yOff =
+            -randomSpeed(multiplier);
+
+        /*
+         * Preserve the X direction.
+         */
         if (xOff < 0) {
-            xOff = -randomSpeed(multiplier);
+
+            xOff =
+                -randomSpeed(multiplier);
+
         } else if (xOff > 0) {
-            xOff = randomSpeed(multiplier);
-        } else {
-            xOff = randomSpeed(multiplier);
+
+            xOff =
+                randomSpeed(multiplier);
+
         }
+
     }
 
-    // Hit left edge
+
+    /*
+     * C#:
+     *
+     * if (X <= 0)
+     */
     if (xPos <= 0) {
-        xPos = 0;
-        xOff = randomSpeed(multiplier);
 
+        xOff =
+            randomSpeed(multiplier);
+
+        /*
+         * Preserve the Y direction.
+         */
         if (yOff < 0) {
-            yOff = -randomSpeed(multiplier);
+
+            yOff =
+                -randomSpeed(multiplier);
+
         } else if (yOff > 0) {
-            yOff = randomSpeed(multiplier);
-        } else {
-            yOff = randomSpeed(multiplier);
+
+            yOff =
+                randomSpeed(multiplier);
+
         }
+
     }
 
-    // Hit top edge
+
+    /*
+     * C#:
+     *
+     * if (Y <= 0)
+     */
     if (yPos <= 0) {
-        yPos = 0;
-        yOff = randomSpeed(multiplier);
 
+        yOff =
+            randomSpeed(multiplier);
+
+        /*
+         * Preserve the X direction.
+         */
         if (xOff < 0) {
-            xOff = -randomSpeed(multiplier);
+
+            xOff =
+                -randomSpeed(multiplier);
+
         } else if (xOff > 0) {
-            xOff = randomSpeed(multiplier);
-        } else {
-            xOff = randomSpeed(multiplier);
+
+            xOff =
+                randomSpeed(multiplier);
+
         }
+
     }
 
+
+    /*
+     * Exact equivalent of:
+     *
+     * X = X + MoveX
+     * Y = Y + MoveY
+     */
     xPos += xOff;
     yPos += yOff;
 
+
     if (flagRun === 1) {
+
         try {
+
             window.moveTo(
                 Math.round(xPos),
                 Math.round(yPos)
             );
-        } catch {
+
+        } catch (_) {
+
             flagRun = 0;
+
             return;
+
         }
 
-        setTimeout(playBall, 1);
+        setTimeout(
+            playBall,
+            1
+        );
+
     }
 }
   
