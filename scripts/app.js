@@ -35,41 +35,19 @@ document.addEventListener("mousemove", e => {
     mouseX = e.clientX;  
     mouseY = e.clientY;  
 });  
-
 function openWindow(url) {
-    // Dynamic popup size based on the same sizing
-    // approach used by index.html.
-    const DESIGN_WIDTH = 928;
-    const DESIGN_HEIGHT = 929;
-
-    const PREFERRED_WIDTH = 520;
-    const PREFERRED_HEIGHT = 521;
-
-    const availableWidth = Math.max(1, screen.availWidth);
-    const availableHeight = Math.max(1, screen.availHeight);
-
-    // Preserve the 928x929 aspect ratio.
-    // Do not make it larger than the original ~520x521 size.
-    const scale = Math.min(
-        availableWidth / DESIGN_WIDTH,
-        availableHeight / DESIGN_HEIGHT,
-        PREFERRED_WIDTH / DESIGN_WIDTH,
-        PREFERRED_HEIGHT / DESIGN_HEIGHT
-    );
-
-    const width = Math.round(DESIGN_WIDTH * scale);
-    const height = Math.round(DESIGN_HEIGHT * scale);
-
-    // Keep the original position exactly as before.
-    const left = 0;
-    const top = 0;
+    const width = Math.round(window.screen.width * 0.1875);
+    const height = Math.round(window.screen.height * 0.2222);
+    
+    const left = 0
+    const top = 0
 
     const features =
-        `menubar=no,status=no,toolbar=no,resizable=no,location=no,` +
-        `scrollbars=no,personalbar=no,` +
-        `width=${width},height=${height},left=${left},top=${top},` +
-        `titlebar=no,alwaysRaised=yes`;
-
+    `menubar=no,status=no,toolbar=no,resizable=no,location=no,` +
+    `scrollbars=no,personalbar=no,` +
+    `width=${width},height=${height},left=${left},top=${top},` +
+    `titlebar=no,alwaysRaised=yes`;
+    
     const aWindow = window.open(url, "_blank", features);
 
     if (aWindow) {
