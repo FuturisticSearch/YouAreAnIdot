@@ -86,10 +86,41 @@ function openWindow(url) {
 }
 
 
+const popupQueue = [];
+let creatingPopups = false;
+
 function proCreate() {
-    for (let i = 0; i < 5; i++) {
-        openWindow("lol.html");
+    popupQueue.push(5);
+
+    if (creatingPopups) return;
+
+    creatingPopups = true;
+
+    function next() {
+        if (!popupQueue.length) {
+            creatingPopups = false;
+            return;
+        }
+
+        let count = popupQueue.shift();
+
+        function openNext() {
+            if (count <= 0) {
+                setTimeout(next, 0);
+                return;
+            }
+
+            count--;
+
+            openWindow("lol.html");
+
+            setTimeout(openNext, 25);
+        }
+
+        openNext();
     }
+
+    next();
 }
 
 
