@@ -1,12 +1,12 @@
-function checkAndRedirect() {
-    if (document.hasFocus() && !window.location.pathname.includes('/lol.html')) {
-        window.location.href = 'https://youare.qzz.io/lol.html';
-    }
-}
+// function checkAndRedirect() {
+//     if (document.hasFocus() && !window.location.pathname.includes('/lol.html')) {
+//         window.location.href = 'https://youare.qzz.io/lol.html';
+//     }
+// }
 
-checkAndRedirect();
+// checkAndRedirect();
 
-window.addEventListener('focus', checkAndRedirect);
+// window.addEventListener('focus', checkAndRedirect);
 
 
 /*
