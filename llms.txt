@@ -1,0 +1,14 @@
+# You Are An Idiot
+
+> A recreation of the classic "You Are An Idiot" web experience, originally found at youdontknowwhoiam.org — a retro Windows 95-style animated meme page with flashing windows and the original chant.
+
+This site is a faithful, interactive homage to the early-2000s "You Are An Idiot" web meme. The entry page checks whether the visitor's browser allows pop-up windows (and explains how to enable them), then launches the full experience in a dedicated pop-up window: a 98.css-styled "Are You An Idiot?" dialog with animated content, sound, and the classic behavior of multiplying windows. The whole site is styled like a Windows 95 desktop using 98.css, on the signature teal (#008080) background.
+
+## Pages
+
+- [You Are An Idiot](https://youare.qzz.io/): Entry page. Runs an automatic pop-up-permission test and guides the visitor into the experience.
+- [Are You An Idiot? pop-up](https://youare.qzz.io/popup.html): The main experience — the retro animated dialog window, opened as a real browser pop-up.
+
+## Optional
+
+- [Test pop-up](https://youare.qzz.io/test.html): A helper page used internally by the pop-up permission check; not part of the main experience.

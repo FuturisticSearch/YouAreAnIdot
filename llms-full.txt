@@ -1,0 +1,61 @@
+# You Are An Idiot
+
+> A recreation of the classic "You Are An Idiot" web experience, originally found at youdontknowwhoiam.org — a retro Windows 95-style animated meme page with flashing windows and the original chant.
+
+Author: Vojtik Vokoun
+Language: English
+URL: https://youare.qzz.io/
+
+## What the site is
+
+"You Are An Idiot" is a faithful recreation of the early-2000s internet meme
+site originally hosted at youdontknowwhoiam.org. The original page played a
+looping animation of smiling faces while chanting "you are an idiot", and
+attempted to trap the visitor by spawning endless pop-up windows whenever
+they tried to leave. This recreation rebuilds that experience with modern,
+safe techniques: it is styled like a genuine Windows 95 desktop using the
+98.css library, sits on the signature teal (#008080) background, and uses a
+real browser pop-up window for the main experience instead of trapping the
+visitor.
+
+## How a visit works
+
+1. The visitor lands on the entry page (/). It automatically opens a small
+   test pop-up (test.html) several times to detect whether the browser
+   allows pop-up windows for the site.
+2. A Windows 95-style dialog (built with 98.css) reports the result:
+   - If pop-ups are blocked, the dialog explains that pop-ups must be
+     allowed, and offers to retry the test. Enter triggers the default
+     button, Escape closes the dialog.
+   - If pop-ups are allowed, the dialog asks "Are You Sure?" before
+     starting the experience.
+3. On confirmation, the site opens the main experience in a real pop-up
+   window (popup.html).
+
+## Pages
+
+- [You Are An Idiot](https://youare.qzz.io/): Entry page. Runs the pop-up
+  permission test, shows retro dialog boxes, and launches the experience.
+- [Are You An Idiot? pop-up](https://youare.qzz.io/popup.html): The main
+  experience — a 98.css "Are You An Idiot?" dialog with the classic
+  animation, sound, and window behavior.
+- [Test pop-up](https://youare.qzz.io/test.html): Helper page used only by
+  the pop-up permission check; not part of the main experience.
+
+## Technical notes
+
+- Pure static HTML/CSS/JS; no frameworks, no build step.
+- Window chrome (title bars, buttons, bevels, fonts) comes from the 98.css
+  library, loaded from unpkg.com.
+- Dialogs support keyboard interaction: Enter activates the default button
+  ("OK" / "Yes") and Escape closes them.
+- Audio (/media/test.mp3) starts muted to satisfy browser autoplay rules and
+  unmutes after a user interaction.
+- Because the experience depends on real pop-up windows, visitors must allow
+  pop-ups for the site; the entry page detects this and guides them through
+  it.
+
+## Credits
+
+Recreated by Vojtik Vokoun as a nostalgia project. The original meme dates
+from the early 2000s (youdontknowwhoiam.org).
