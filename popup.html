@@ -1120,6 +1120,8 @@
 
         let popupResolver = null;
 
+        let popupDefaultButton = null;
+
 
         function showPopup(
             message,
@@ -1193,9 +1195,20 @@
 
                     if (firstButton) {
 
+                        /* first button ("OK" / "Yes")
+                           is the default: Enter clicks it */
+
+                        firstButton.classList.add(
+                            "default"
+                        );
+
+                        popupDefaultButton =
+                            firstButton;
+
                         firstButton.focus();
 
                     }
+
 
                 }
             );
@@ -1206,6 +1219,8 @@
         function closePopup(
             result = "Close"
         ) {
+
+            popupDefaultButton = null;
 
             popupOverlay.classList.remove(
                 "visible"
@@ -1685,12 +1700,26 @@
 
 
         /* ====================================================
-           ESCAPE
+           ENTER (default button) / ESCAPE
            ==================================================== */
 
         document.addEventListener(
             "keydown",
             event => {
+
+                if (
+                    event.key === "Enter" &&
+                    popupDefaultButton
+                ) {
+
+                    event.preventDefault();
+
+                    popupDefaultButton.click();
+
+                    return;
+
+                }
+
 
                 if (
                     event.key === "Escape"
